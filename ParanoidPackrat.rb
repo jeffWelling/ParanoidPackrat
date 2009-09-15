@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 =begin
 		Copyright 2009 Jeff Welling (jeff.welling (a) gmail.com)
 		This file is part of ParanoidPackrat.
@@ -16,4 +17,23 @@
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'pp'
 
+#Load the options from the command line
+config=''
+silent_mode=''
+ARGV.each {|cli_arg|
+	if cli_arg[/^--config=/]
+		raise "--config file must exist, and be readable!" unless File.exist?(cli_arg.gsub(/^--config=/, '')) and File.readable?(cli_arg.gsub(/^--config=/, ''))
+		raise "only one --config file!" if !config.empty?
+		config=cli_arg.gsub(/^--config=/, '') unless !config.empty?
+		next
+	elsif cli_arg[/^--silent/]
+		silent_mode=TRUE
+		next
+	else
+		raise "Unrecognized option on command line, '#{cli_arg}'\nPlease see the documentation on the wiki at http://wiki.github.com/jeffWelling/ParanoidPackrat"
+	end		
+}
+
+load "#{config}"
