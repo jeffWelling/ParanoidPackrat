@@ -9,6 +9,7 @@ class PPackratConfig
 		@@Configs||={}
 		@@BadConfig||=FALSE
 		@@BackupDestinations||=[]
+		@@SilentMode||=FALSE
 	end
 
 	#setBackupDestination is a way of specifying a global backup Destination.
@@ -18,7 +19,16 @@ class PPackratConfig
 		PPackrat.checkYourconfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
 		@@BackupDestinations << backup_destination unless @@BackupDestinations.include?(backup_destination)
 		return TRUE
-	end	
+	end
+	#Running PPackratConfig.setSilent will set silent mode on.
+	#Default is off.
+	def setSilent
+		@@SilentMode=TRUE
+	end
+	#Is silent mode set to TRUE or FALSE?
+	def silentMode?
+		@@SilentMode
+	end
 
 	#addName creates a new blank configuration with the name you provided
 	#The config is then populated by referencing the name, and using the set* functions below.
