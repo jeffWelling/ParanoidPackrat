@@ -5,15 +5,23 @@
 
 <html>
 <head>
-  <title>setDuplication (PPackratConfig)</title>
+  <title>setBackupTarget (PPackratConfig)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 65</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">setDuplication</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">guaranteed_num_of_backups</span>
-                <span class="ruby-constant">PPackrat</span>.<span class="ruby-identifier">checkYourConfig</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@Configs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">name</span>)
-                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'GuaranteedNumBackups'</span>]<span class="ruby-operator">==</span><span class="ruby-identifier">guaranteed_num_of_backups</span>.<span class="ruby-identifier">to_i</span>
+  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 56</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">setBackupTarget</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">thingToBackup</span>
+                <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@Configs</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">name</span>
+                        <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Must addName('#{name}') first&quot;</span>
+                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
+                <span class="ruby-keyword kw">end</span>
+                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>]<span class="ruby-operator">||=</span>{}
+                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'BackupTarget'</span>]=<span class="ruby-identifier">thingToBackup</span>
+                <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">thingToBackup</span>
+                        <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;PPackratConfig:  File or directory does not exist? '#{thingToBackup}'&quot;</span>
+                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
+                <span class="ruby-keyword kw">end</span>
                 <span class="ruby-keyword kw">return</span> <span class="ruby-constant">TRUE</span>
         <span class="ruby-keyword kw">end</span></pre>
 </body>

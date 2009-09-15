@@ -1,4 +1,5 @@
 class PPackratConfig
+	#checkYourConfig is called when an error is encountered reading the configuration. 
 	def self.checkYourConfig
 		puts "PPackratConfig:  Please check your configuration."
 		@@BadConfig=TRUE
@@ -13,7 +14,8 @@ class PPackratConfig
 	end
 
 	#setBackupDestination is a way of specifying a global backup Destination.
-	#global backup destinations will be used in leu of specifying a backup destination in the individual configs by name
+	#Global backup destinations will be used in leu of specifying a backup destination in the individual configs by name.
+	#
 	#backup_destination must exist and it must be a directory.
 	def setBackupDestination backup_destination
 		PPackrat.checkYourconfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
@@ -30,7 +32,7 @@ class PPackratConfig
 		@@SilentMode
 	end
 
-	#addName creates a new blank configuration with the name you provided
+	#addName creates a new blank configuration with the name you provided.
 	#The config is then populated by referencing the name, and using the set* functions below.
 	def addName configName
 		if @@Configs.include? configName
@@ -48,7 +50,8 @@ class PPackratConfig
 	def [] configName
 		@@Configs[configName]
 	end
-	#name is the name of the config who's file your setting
+	#name is the name of the config who's file your setting.
+	#
 	#thingToBackup is an absolute path to the file or directory that you want backed up
 	def setBackupTarget name, thingToBackup
 		unless @@Configs.include? name
@@ -63,7 +66,8 @@ class PPackratConfig
 		end
 		return TRUE
 	end
-	#name is the name of the config your setting
+	#name is the name of the config your setting.
+	#
 	#exclusion is a file or directory that you want to exclude from the backup target.
 	#exclusion must be a subdirectory of the backup target.
 	def setBackupExclusions name, exclusion
@@ -79,10 +83,12 @@ class PPackratConfig
 		@@Configs[name]['Exclusions'] << exclusion unless @@Configs[name]['Exclusions'].include? exclusion
 		return TRUE
 	end
-	#name is the name of the config your setting
+	#name is the name of the config your setting.
+	#
 	#guaranteed_num_of_backups is the guarunteed number of duplicates you want to keep across your drives.
 	#guaranteed_num_of_backups must be an integer, or a string containing an integer
-	#Note that setting guaranteed_num_of_backups larger than the total number of backup drives your using
+	#
+	#<b>Note</b> that setting guaranteed_num_of_backups larger than the total number of backup drives your using
 	#will issue a warning, and the maximum number of duplicates possible will be stored (one per device).
 	def setDuplication name, guaranteed_num_of_backups
 		unless @@Configs.include?(name)

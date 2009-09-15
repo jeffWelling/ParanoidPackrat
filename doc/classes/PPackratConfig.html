@@ -86,17 +86,19 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000006">[]</a>&nbsp;&nbsp;
-      <a href="#M000004">addName</a>&nbsp;&nbsp;
+      <a href="#M000008">[]</a>&nbsp;&nbsp;
+      <a href="#M000006">addName</a>&nbsp;&nbsp;
       <a href="#M000001">checkYourConfig</a>&nbsp;&nbsp;
-      <a href="#M000005">length</a>&nbsp;&nbsp;
+      <a href="#M000007">length</a>&nbsp;&nbsp;
       <a href="#M000002">new</a>&nbsp;&nbsp;
       <a href="#M000003">setBackupDestination</a>&nbsp;&nbsp;
-      <a href="#M000011">setBackupDestinationOn</a>&nbsp;&nbsp;
-      <a href="#M000008">setBackupExclusions</a>&nbsp;&nbsp;
-      <a href="#M000007">setBackupTarget</a>&nbsp;&nbsp;
-      <a href="#M000009">setDuplication</a>&nbsp;&nbsp;
-      <a href="#M000010">setIsCritical?</a>&nbsp;&nbsp;
+      <a href="#M000013">setBackupDestinationOn</a>&nbsp;&nbsp;
+      <a href="#M000010">setBackupExclusions</a>&nbsp;&nbsp;
+      <a href="#M000009">setBackupTarget</a>&nbsp;&nbsp;
+      <a href="#M000011">setDuplication</a>&nbsp;&nbsp;
+      <a href="#M000012">setIsCritical?</a>&nbsp;&nbsp;
+      <a href="#M000004">setSilent</a>&nbsp;&nbsp;
+      <a href="#M000005">silentMode?</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -129,6 +131,10 @@
         </div>
       
         <div class="method-description">
+          <p>
+<a href="PPackratConfig.html#M000001">checkYourConfig</a> is called when an
+error is encountered reading the configuration.
+</p>
         </div>
       </div>
 
@@ -151,12 +157,12 @@ To be called once at the beginning of the config file
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000006" class="method-detail">
-        <a name="M000006"></a>
+      <div id="method-M000008" class="method-detail">
+        <a name="M000008"></a>
 
         <div class="method-heading">
-          <a href="PPackratConfig.src/M000006.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000006.html');return false;">
+          <a href="PPackratConfig.src/M000008.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000008.html');return false;">
           <span class="method-name">[]</span><span class="method-args">(configName)</span>
           </a>
         </div>
@@ -168,32 +174,32 @@ To look at the configuration
         </div>
       </div>
 
-      <div id="method-M000004" class="method-detail">
-        <a name="M000004"></a>
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
 
         <div class="method-heading">
-          <a href="PPackratConfig.src/M000004.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000004.html');return false;">
+          <a href="PPackratConfig.src/M000006.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000006.html');return false;">
           <span class="method-name">addName</span><span class="method-args">(configName)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPackratConfig.html#M000004">addName</a> creates a <a
+<a href="PPackratConfig.html#M000006">addName</a> creates a <a
 href="PPackratConfig.html#M000002">new</a> blank configuration with the
-name you provided The config is then populated by referencing the name, and
-using the set* functions below.
+name you provided. The config is then populated by referencing the name,
+and using the set* functions below.
 </p>
         </div>
       </div>
 
-      <div id="method-M000005" class="method-detail">
-        <a name="M000005"></a>
+      <div id="method-M000007" class="method-detail">
+        <a name="M000007"></a>
 
         <div class="method-heading">
-          <a href="PPackratConfig.src/M000005.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000005.html');return false;">
+          <a href="PPackratConfig.src/M000007.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000007.html');return false;">
           <span class="method-name">length</span><span class="method-args">()</span>
           </a>
         </div>
@@ -218,88 +224,32 @@ Number of configurations currently entered
         <div class="method-description">
           <p>
 <a href="PPackratConfig.html#M000003">setBackupDestination</a> is a way of
-specifying a global backup Destination. global backup destinations will be
+specifying a global backup Destination. Global backup destinations will be
 used in leu of specifying a backup destination in the individual configs by
-name backup_destination must exist and it must be a directory.
+name.
+</p>
+<p>
+backup_destination must exist and it must be a directory.
 </p>
         </div>
       </div>
 
-      <div id="method-M000011" class="method-detail">
-        <a name="M000011"></a>
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
 
         <div class="method-heading">
-          <a href="PPackratConfig.src/M000011.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000011.html');return false;">
+          <a href="PPackratConfig.src/M000013.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000013.html');return false;">
           <span class="method-name">setBackupDestinationOn</span><span class="method-args">(name, backup_destination)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPackratConfig.html#M000011">setBackupDestinationOn</a> sets the
+<a href="PPackratConfig.html#M000013">setBackupDestinationOn</a> sets the
 backup destination for a specific configuration as referenced by name.
 There can only be one backup destination per config when specified in this
 method. subsequent calls simply overwrite the previous entry.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000008" class="method-detail">
-        <a name="M000008"></a>
-
-        <div class="method-heading">
-          <a href="PPackratConfig.src/M000008.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000008.html');return false;">
-          <span class="method-name">setBackupExclusions</span><span class="method-args">(name, exclusion)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-name is the name of the config your setting exclusion is a file or
-directory that you want to exclude from the backup target. exclusion must
-be a subdirectory of the backup target.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000007" class="method-detail">
-        <a name="M000007"></a>
-
-        <div class="method-heading">
-          <a href="PPackratConfig.src/M000007.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000007.html');return false;">
-          <span class="method-name">setBackupTarget</span><span class="method-args">(name, thingToBackup)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-name is the name of the config who&#8216;s file your setting thingToBackup
-is an absolute path to the file or directory that you want backed up
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000009" class="method-detail">
-        <a name="M000009"></a>
-
-        <div class="method-heading">
-          <a href="PPackratConfig.src/M000009.html" target="Code" class="method-signature"
-            onclick="popupCode('PPackratConfig.src/M000009.html');return false;">
-          <span class="method-name">setDuplication</span><span class="method-args">(name, guaranteed_num_of_backups)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-name is the name of the config your setting guaranteed_num_of_backups is
-the guarunteed number of duplicates you want to keep across your drives.
-guaranteed_num_of_backups must be an integer, or a string containing an
-integer Note that setting guaranteed_num_of_backups larger than the total
-number of backup drives your using will issue a warning, and the maximum
-number of duplicates possible will be stored (one per device).
 </p>
         </div>
       </div>
@@ -310,7 +260,76 @@ number of duplicates possible will be stored (one per device).
         <div class="method-heading">
           <a href="PPackratConfig.src/M000010.html" target="Code" class="method-signature"
             onclick="popupCode('PPackratConfig.src/M000010.html');return false;">
-          <span class="method-name">setIsCritical?</span><span class="method-args">(name, anything_but_nil)</span>
+          <span class="method-name">setBackupExclusions</span><span class="method-args">(name, exclusion)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+name is the name of the config your setting.
+</p>
+<p>
+exclusion is a file or directory that you want to exclude from the backup
+target. exclusion must be a subdirectory of the backup target.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000009" class="method-detail">
+        <a name="M000009"></a>
+
+        <div class="method-heading">
+          <a href="PPackratConfig.src/M000009.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000009.html');return false;">
+          <span class="method-name">setBackupTarget</span><span class="method-args">(name, thingToBackup)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+name is the name of the config who&#8216;s file your setting.
+</p>
+<p>
+thingToBackup is an absolute path to the file or directory that you want
+backed up
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
+
+        <div class="method-heading">
+          <a href="PPackratConfig.src/M000011.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000011.html');return false;">
+          <span class="method-name">setDuplication</span><span class="method-args">(name, guaranteed_num_of_backups)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+name is the name of the config your setting.
+</p>
+<p>
+guaranteed_num_of_backups is the guarunteed number of duplicates you want
+to keep across your drives. guaranteed_num_of_backups must be an integer,
+or a string containing an integer
+</p>
+<p>
+<b>Note</b> that setting guaranteed_num_of_backups larger than the total
+number of backup drives your using will issue a warning, and the maximum
+number of duplicates possible will be stored (one per device).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="PPackratConfig.src/M000012.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000012.html');return false;">
+          <span class="method-name">setIsCritical?</span><span class="method-args">(name, anything_but_nil=nil)</span>
           </a>
         </div>
       
@@ -319,6 +338,41 @@ number of duplicates possible will be stored (one per device).
 If setIsCritical is called with a name, and anything_but_nil as anything
 except nil, then the backup specified by this name will be considered
 critical, and one copy will be kept on every drive.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
+
+        <div class="method-heading">
+          <a href="PPackratConfig.src/M000004.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000004.html');return false;">
+          <span class="method-name">setSilent</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Running <a href="PPackratConfig.html#M000004">PPackratConfig.setSilent</a>
+will set silent mode on. Default is off.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
+
+        <div class="method-heading">
+          <a href="PPackratConfig.src/M000005.html" target="Code" class="method-signature"
+            onclick="popupCode('PPackratConfig.src/M000005.html');return false;">
+          <span class="method-name">silentMode?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is silent mode set to TRUE or FALSE?
 </p>
         </div>
       </div>
