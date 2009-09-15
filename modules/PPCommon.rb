@@ -15,7 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
+#This is the collection of methods that are common to the ParanoidPackrat
+#project.
 module PPCommon
+	#pprint is a function to help control output based on silent mode or not.
+	#This is called from other internal method to print output, which is then
+	#only displayed if we are not in silent mode.
 	def pprint str
 		return TRUE if PPackratConfig.silentMode?
 		puts str
