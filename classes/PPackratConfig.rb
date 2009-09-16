@@ -117,6 +117,7 @@ class PPackratConfig
 			puts "Must first addName('#{name}'), and '#{backup_destination}' must first exist and be a directory."
 			PPackratConfig.checkYourConfig 
 		end
+		pp @@Configs
 		@@Configs[name]['BackupDestination']||=''
 		@@Configs[name]['BackupDestination']= backup_destination
 		return TRUE
