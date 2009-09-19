@@ -2,17 +2,17 @@ require 'PPackratConfig.rb'
 require 'pp'
 
 describe PPackratConfig do
-	it "should contain no configs at startup" do
+	it "contains no configs at startup" do
 		PPackratConfig.length.should==0
 	end
-	it "should add a name" do
+	it "add a backup source by name" do
 		PPackratConfig.addName 'jesusboots'
 		PPackratConfig['jesusboots'].should==nil
 	end
-	it "should contain 1 config" do
+	it "now contains one config" do
 		PPackratConfig.length.should==1
 	end
-	it "adds a destination" do
+	it "takes a destination for a backup source" do
 		PPackratConfig.addName 'Jesus has no boots'
 		PPackratConfig.setBackupDestinationOn 'Jesus has no boots', '/mnt'
 		PPackratConfig['Jesus has no boots'].should=={'BackupDestination'=>'/mnt'}
