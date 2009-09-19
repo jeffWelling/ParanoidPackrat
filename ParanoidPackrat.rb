@@ -21,7 +21,7 @@ require 'pp'
 load 'classes/PPackratConfig.rb'
 load 'modules/PPCommon.rb'
 #Load the options and config file from the command line
-config=''
+config='ParanoidPackrat.config.rb'
 silent_mode=''
 ARGV.each {|cli_arg|
 	if cli_arg[/^--config=/]
@@ -37,3 +37,5 @@ ARGV.each {|cli_arg|
 	end		
 }
 load "#{config}"
+
+
