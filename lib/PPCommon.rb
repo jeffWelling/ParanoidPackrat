@@ -34,6 +34,20 @@ module PPCommon
 	#PPackratConfig.dumpConfig and PPackratConfig.sanityCheck is expected
 	#to have been run already.
 	def self.scanBackupDir backup
-		
+		#simple sanity check
+		raise "You idiot" unless backup.class==Hash
+		collection=[]
+		Find.find(backup['BackupTarget']) {|path|
+			collect=true
+			if backup['Exclusions'].class==Array
+				backup['Exclusions'].each {|exclusion|
+					collect=false if path[Regexp.new(exclusion)]
+				}
+				collection << path unless collect==false
+			else
+				collection << path
+			end
+		}
+		return collection
 	end
 end
