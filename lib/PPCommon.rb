@@ -26,9 +26,9 @@ module PPCommon
 		return TRUE if PPackratConfig.silentMode?
 		puts str
 	end
-	#scanBackupDir(backup) will scan the dir/file specified in backup['BackupTarget'],
+	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
-	#backup['BackupTarget'], excluding anything specified in backup['Exclusions'].
+	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
 	#
 	#<b>Note</b> backup is expected to be one of the configs from 
 	#PPackratConfig.dumpConfig and PPackratConfig.sanityCheck is expected
@@ -37,10 +37,10 @@ module PPCommon
 		#simple sanity check
 		raise "You idiot" unless backup.class==Hash
 		collection=[]
-		Find.find(backup['BackupTarget']) {|path|
+		Find.find(backup[:BackupTarget]) {|path|
 			collect=true
-			if backup['Exclusions'].class==Array
-				backup['Exclusions'].each {|exclusion|
+			if backup[:Exclusions].class==Array
+				backup[:Exclusions].each {|exclusion|
 					collect=false if path[Regexp.new(exclusion)]
 				}
 				collection << path unless collect==false
