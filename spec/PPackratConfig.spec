@@ -2,8 +2,6 @@
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
 
 require 'PPackratConfig'
-require 'PPCommon'
-require 'prettyprint'
 
 describe PPackratConfig do
 	it "contains no configs at startup" do
@@ -23,7 +21,3 @@ describe PPackratConfig do
 	end
 end
 
-describe PPCommon do
-  it "scans a path, returning it or all files under it that were not specifically excluded"
-
-end
