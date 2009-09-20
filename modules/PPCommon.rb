@@ -29,6 +29,10 @@ module PPCommon
 	#scanBackupDir(backup) will scan the dir/file specified in backup['BackupTarget'],
 	#and will return an array with the full path of every file covered by
 	#backup['BackupTarget'], excluding anything specified in backup['Exclusions'].
+	#
+	#<b>Note</b> backup is expected to be one of the configs from 
+	#PPackratConfig.dumpConfig and PPackratConfig.sanityCheck is expected
+	#to have been run already.
 	def self.scanBackupDir backup
 		
 	end

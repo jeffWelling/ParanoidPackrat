@@ -5,24 +5,19 @@
 
 <html>
 <head>
-  <title>setBackupTarget (PPackratConfig)</title>
+  <title>addName (PPackratConfig)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 56</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">setBackupTarget</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">thingToBackup</span>
-                <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@Configs</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">name</span>
-                        <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Must addName('#{name}') first&quot;</span>
-                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
-                <span class="ruby-keyword kw">end</span>
-                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>]<span class="ruby-operator">||=</span>{}
-                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'BackupTarget'</span>]=<span class="ruby-identifier">thingToBackup</span>
-                <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">thingToBackup</span>
-                        <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;PPackratConfig:  File or directory does not exist? '#{thingToBackup}'&quot;</span>
-                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
-                <span class="ruby-keyword kw">end</span>
-                <span class="ruby-keyword kw">return</span> <span class="ruby-constant">TRUE</span>
-        <span class="ruby-keyword kw">end</span></pre>
+  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 55</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">addName</span> <span class="ruby-identifier">configName</span>
+                        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@Configs</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">configName</span>
+                                <span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;Config names must be unique&quot;</span>
+                                <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
+                        <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-ivar">@Configs</span>.<span class="ruby-identifier">merge!</span>({ <span class="ruby-identifier">configName</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">nil</span> }) <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">return</span> <span class="ruby-constant">TRUE</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@Configs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">configName</span>)
+                        <span class="ruby-keyword kw">return</span> <span class="ruby-constant">FALSE</span>
+                <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

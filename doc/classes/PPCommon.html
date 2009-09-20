@@ -87,7 +87,8 @@ project.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000014">pprint</a>&nbsp;&nbsp;
+      <a href="#M000001">pprint</a>&nbsp;&nbsp;
+      <a href="#M000002">scanBackupDir</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -107,24 +108,51 @@ project.
 
     <!-- if method_list -->
     <div id="methods">
-      <h3 class="section-bar">Public Instance methods</h3>
+      <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000014" class="method-detail">
-        <a name="M000014"></a>
+      <div id="method-M000001" class="method-detail">
+        <a name="M000001"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000014.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000014.html');return false;">
+          <a href="PPCommon.src/M000001.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000001.html');return false;">
           <span class="method-name">pprint</span><span class="method-args">(str)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000014">pprint</a> is a function to help control
+<a href="PPCommon.html#M000001">pprint</a> is a function to help control
 output based on silent mode or not. This is called from other internal
 methods to print output, which is then only displayed if we are not in
 silent mode.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000002.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000002.html');return false;">
+          <span class="method-name">scanBackupDir</span><span class="method-args">(backup)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000002">scanBackupDir</a>(backup) will scan the
+dir/file specified in backup[&#8216;BackupTarget&#8217;], and will return
+an array with the full path of every file covered by
+backup[&#8216;BackupTarget&#8217;], excluding anything specified in
+backup[&#8216;Exclusions&#8217;].
+</p>
+<p>
+<b>Note</b> backup is expected to be one of the configs from <a
+href="PPackratConfig.html#M000012">PPackratConfig.dumpConfig</a> and <a
+href="PPackratConfig.html#M000004">PPackratConfig.sanityCheck</a> is
+expected to have been run already.
 </p>
         </div>
       </div>

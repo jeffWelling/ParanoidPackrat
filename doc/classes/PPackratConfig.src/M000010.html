@@ -5,24 +5,14 @@
 
 <html>
 <head>
-  <title>setBackupExclusions (PPackratConfig)</title>
+  <title>length (PPackratConfig)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 73</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">setBackupExclusions</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">exclusion</span>
-                <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@Configs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">exclusion</span>)
-                        <span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;name not yet addName'd, or exclusion file/dir does not exist&quot;</span>
-                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span> 
-                <span class="ruby-keyword kw">end</span>
-                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">exclusion</span>.<span class="ruby-identifier">slice</span>(<span class="ruby-value">0</span>,<span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'BackupTarget'</span>].<span class="ruby-identifier">length</span>)<span class="ruby-operator">!=</span><span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'BackupTarget'</span>]
-                        <span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;When using exclusions in this way, you must specify an exclusion which is a subset of the BackupTarget.\nSee Exclusions in the documentation&quot;</span>
-                        <span class="ruby-constant">PPackratConfig</span>.<span class="ruby-identifier">checkYourConfig</span>
-                <span class="ruby-keyword kw">end</span>
-                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'Exclusions'</span>]<span class="ruby-operator">||=</span>[]
-                <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'Exclusions'</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">exclusion</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@Configs</span>[<span class="ruby-identifier">name</span>][<span class="ruby-value str">'Exclusions'</span>].<span class="ruby-identifier">include?</span> <span class="ruby-identifier">exclusion</span>
-                <span class="ruby-keyword kw">return</span> <span class="ruby-constant">TRUE</span>
-        <span class="ruby-keyword kw">end</span></pre>
+  <pre><span class="ruby-comment cmt"># File classes/PPackratConfig.rb, line 64</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">length</span>
+                        <span class="ruby-ivar">@Configs</span>.<span class="ruby-identifier">length</span>
+                <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>
