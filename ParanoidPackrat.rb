@@ -38,5 +38,7 @@ ARGV.each {|cli_arg|
 	end		
 }
 load "#{config}"
+PPackratConfig.sanityCheck silent_mode
+
 
 

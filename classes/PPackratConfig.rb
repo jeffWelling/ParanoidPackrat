@@ -5,6 +5,21 @@ module PPackratConfig
 	def self.checkYourConfig
 		puts "PPackratConfig:  Please check your configuration."
 		@BadConfig=TRUE
+	end
+	#This function is intended to be run AFTER the the configurations have been set
+	#to make sure the configurations entered are sane.
+	#if silent is not nil, then silent mode is activated for this function.
+	def self.sanityCheck silent=nil
+		@Configs.each {|config_name, config|
+			puts "sanityCheck(): Warning, you have entered a blank configuration for '#{config_name}'!" if silent!=nil and config==nil
+			unless config.nil?
+	
+				#Unless a global backup directory is set, make sure every config has it's own backup dir specified
+				if @BackupDestinations.empty? 
+					raise "No Global backup directory is set, and config '#{config_name}' does not have one set either!" if config['BackupDestination'].nil?
+				end #of unless @BackupDestinations.empty?
+			end #of unless config.nil?
+		}
 	end 
 	class <<self
 		#To be called once at the beginning of the config file
@@ -12,7 +27,7 @@ module PPackratConfig
 			@numOfConfigs||=0
 			@Configs||={}
 			@BadConfig||=FALSE
-			@BackupDestinations||=[]
+			@BackupDestinations||=''
 			@SilentMode||=FALSE
 		end
 
@@ -22,7 +37,7 @@ module PPackratConfig
 		#backup_destination must exist and it must be a directory.
 		def setBackupDestination backup_destination
 			PPackrat.checkYourconfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
-			@BackupDestinations << backup_destination unless @BackupDestinations.include?(backup_destination)
+			@BackupDestinations = backup_destination
 			return TRUE
 		end
 		#Running PPackratConfig.setSilent will set silent mode on.
