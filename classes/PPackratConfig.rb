@@ -68,6 +68,10 @@ module PPackratConfig
 		def [] configName
 			@Configs[configName]
 		end
+		#Dump configuration
+		def dumpConfig
+			@Configs
+		end
 		#name is the name of the config who's file your setting.
 		#
 		#thingToBackup is an absolute path to the file or directory that you want backed up

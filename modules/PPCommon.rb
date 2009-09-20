@@ -22,8 +22,14 @@ module PPCommon
 	#pprint is a function to help control output based on silent mode or not.
 	#This is called from other internal methods to print output, which is then
 	#only displayed if we are not in silent mode.
-	def pprint str
+	def self.pprint str
 		return TRUE if PPackratConfig.silentMode?
 		puts str
+	end
+	#scanBackupDir(backup) will scan the dir/file specified in backup['BackupTarget'],
+	#and will return an array with the full path of every file covered by
+	#backup['BackupTarget'], excluding anything specified in backup['Exclusions'].
+	def self.scanBackupDir backup
+		
 	end
 end

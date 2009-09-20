@@ -33,12 +33,13 @@ ARGV.each {|cli_arg|
 	elsif cli_arg[/^--silent/]
 		silent_mode=TRUE
 		next
-	else
-		raise "Unrecognized option on command line, '#{cli_arg}'\nPlease see the documentation on the wiki at http://wiki.github.com/jeffWelling/ParanoidPackrat"
 	end		
 }
 load "#{config}"
-PPackratConfig.sanityCheck silent_mode
 
+#Don't actually run unless we are being executed from the CLI, just load.
+if $0 == __FILE__ 
+	PPackratConfig.sanityCheck silent_mode
+end
 
 
