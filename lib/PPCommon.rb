@@ -26,6 +26,7 @@ module PPCommon
 		return TRUE if PPackratConfig.silentMode?
 		puts str
 	end
+
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
 	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
@@ -49,5 +50,23 @@ module PPCommon
 			end
 		}
 		return collection
+	end
+	
+	#createBackupDirectory(dir) creates the backup directory structure to store the backups in.
+	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
+	#Using that example, it would create the dir "/mnt/backup/", it will return FALSE unless
+	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
+	#return the path of the directory that was just created.
+	def self.makeBackupDirectory(dir)
+		raise "You idiot" unless dir.class==String
+		#Add a trailing slash if there isn't already one.
+		dir << "/" unless dir.reverse[0]==47   #FIXME Probly a better way of doing this than using the hardcoded value 47
+		#Make sure the directory is empty
+		counter=0
+		Find.find(dir) {|file|
+			counter+=1
+		}
+		return FALSE unless counter==1
+		FileUtils.mkdir( dir + "backup/", 700 )[0]
 	end
 end
