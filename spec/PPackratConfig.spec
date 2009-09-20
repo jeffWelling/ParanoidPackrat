@@ -1,5 +1,8 @@
-require 'PPackratConfig.rb'
-require 'pp'
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+
+require 'PPackratConfig'
+require 'prettyprint'
 
 describe PPackratConfig do
 	it "contains no configs at startup" do

@@ -17,12 +17,16 @@
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pp'
-load 'classes/PPackratConfig.rb'
-load 'modules/PPCommon.rb'
+current_dir = File.expand_path(File.dirname(__FILE__))
+$LOAD_PATH.unshift(current_dir + "/lib")
+
+require 'prettyprint'
+
+require 'PPackratConfig.rb'
+require 'PPCommon.rb'
 #Load the options and config file from the command line
 #FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
-config='/home/jeff/Documents/Projects/ParanoidPackrat/ParanoidPackrat.config.rb'
+config="#{current_dir}/ParanoidPackrat.config.rb"
 silent_mode=''
 
 ARGV.each {|cli_arg|
