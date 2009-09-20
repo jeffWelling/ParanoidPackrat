@@ -21,13 +21,14 @@ require 'pp'
 load 'classes/PPackratConfig.rb'
 load 'modules/PPCommon.rb'
 #Load the options and config file from the command line
-config='ParanoidPackrat.config.rb'
+#FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
+config='/home/jeff/Documents/Projects/ParanoidPackrat/ParanoidPackrat.config.rb'
 silent_mode=''
+
 ARGV.each {|cli_arg|
 	if cli_arg[/^--config=/]
 		raise "--config file must exist, and be readable!" unless File.exist?(cli_arg.gsub(/^--config=/, '')) and File.readable?(cli_arg.gsub(/^--config=/, ''))
-		raise "only one --config file!" if !config.empty?
-		config=cli_arg.gsub(/^--config=/, '') unless !config.empty?
+		config=cli_arg.gsub(/^--config=/, '')
 		next
 	elsif cli_arg[/^--silent/]
 		silent_mode=TRUE
