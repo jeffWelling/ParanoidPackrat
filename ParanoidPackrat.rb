@@ -22,8 +22,8 @@ $LOAD_PATH.unshift(current_dir + "/lib")
 
 require 'prettyprint'
 
-require 'PPackratConfig.rb'
-require 'PPCommon.rb'
+require 'PPackratConfig'
+require 'PPCommon'
 #Load the options and config file from the command line
 #FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
 config="#{current_dir}/ParanoidPackrat.config.rb"
