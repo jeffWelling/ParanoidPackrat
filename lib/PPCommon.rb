@@ -84,5 +84,34 @@ module PPCommon
 		FileUtils.mkdir( dir + "backup/", 700 )[0]
 	end
 	
-	
+	#This method is used to determine if a backup dir contains backups or not.
+	#Basically, its used to tell if this if the first run backup, or if there are others
+	#that it can use to help shrink the size of the backup.
+	#
+	#It will look for any directories underneath backup_dir, if they also contain a directory
+	#which has the correct date time format, and there is a last_backup symlink (broken or 
+	#not), then it will return TRUE that yes there is at least one existing backup meaning
+	#this is not the first run.
+	#Otherwise, if there are no directories underneath backup_dir which also contain a dir
+	#with the name in the right date time format which also contains a last_backup symlink,
+	#it will return FALSE signaling that this is the first run.
+	#If backup_dir does not exist, or there are other files in backup_dir, it will simply
+	#return FALSE.
+	#NOTE - backup_dir is expected to be a full path
+	def self.containsBackups?(backup_dir)
+		return FALSE unless File.exist?(backup_dir) and File.directory?(backup_dir) and File.readable?(backup_dir)
+		is_a_backup=false
+		files_in_backupdir=[]
+		Dir.entries(backup_dir) {|f| files_in_backupdir << f }
+		files_in_backupdir.each {|backup_name|
+			next if backup_name=='.' or backup_name=='..'
+			Dir.entries(backup_dir + backup_name) {|backup_date|
+				next unless PPCommon.datetimeFormat?(backup_date)
+				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date) {|last_backup|
+					is_a_backup==true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + last_backup)
+				}
+			}
+		}
+		return TRUE if is_a_backup.class==TrueClass
+	end
 end
