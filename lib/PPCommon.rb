@@ -28,6 +28,12 @@ module PPCommon
 		return TRUE if PPackratConfig.silentMode?
 		puts str
 	end
+	
+	#Add a slash to the end of name if there isn't already one there.
+	def self.addSlash(name)
+		name << "/" unless dir.reverse[0]==47  #FIXME Probly a better way of doing this than using the hardcoded value 47
+		return name
+	end
 
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
@@ -61,8 +67,7 @@ module PPCommon
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
 		raise "You idiot" unless dir.class==String
-		#Add a trailing slash if there isn't already one.
-		dir << "/" unless dir.reverse[0]==47   #FIXME Probly a better way of doing this than using the hardcoded value 47
+		dir=PPCommon.addSlash(dir)
 		#Make sure the directory is empty
 		counter=0
 		Find.find(dir) {|file|
