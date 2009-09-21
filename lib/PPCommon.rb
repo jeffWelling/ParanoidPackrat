@@ -89,8 +89,8 @@ module PPCommon
 	#that it can use to help shrink the size of the backup.
 	#
 	#It will look for any directories underneath backup_dir, if they also contain a directory
-	#which has the correct date time format, and there is a last_backup symlink (broken or 
-	#not), then it will return TRUE that yes there is at least one existing backup meaning
+	#which has the correct date time format, and there is a last_backup symlink pointing to a dir,
+	#then it will return TRUE that yes there is at least one existing backup meaning
 	#this is not the first run.
 	#Otherwise, if there are no directories underneath backup_dir which also contain a dir
 	#with the name in the right date time format which also contains a last_backup symlink,
@@ -101,18 +101,28 @@ module PPCommon
 	def self.containsBackups?(backup_dir)
 		return FALSE unless File.exist?(backup_dir) and File.directory?(backup_dir) and File.readable?(backup_dir)
 		backup_dir=PPCommon.addSlash(backup_dir)
-		is_a_backup=false
+		has_a_backup=true
+		last_backup=true
 		files_in_backupdir=[]
 		Dir.entries(backup_dir).each{|f| files_in_backupdir << f }
 		files_in_backupdir.each {|backup_name|
 			next if backup_name=='.' or backup_name=='..'
 			Dir.entries(backup_dir + backup_name).each{|backup_date|
-				next unless PPCommon.datetimeFormat?(backup_date)
+				next unless PPCommon.datetimeFormat?(backup_date) or backup_date=='last_backup'
+				has_a_backup=true if PPCommon.datetimeFormat?(backup_date)
+				if backup_date=='last_backup'
+					last_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + 'last_backup' ) and File.directory?(backup_dir + PPCommon.addSlash(backup_name) + 'last_backup')
+
+=begin
 				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date).each {|last_backup|
-					is_a_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup)
+					next unless last_backup=="last_backup"  #name of the link
+					is_a_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup) and File.directory?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup)
 				}
+=end
+				end
 			}
 		}
-		return TRUE if is_a_backup.class==TrueClass
+		return TRUE if has_a_backup.class==TrueClass and last_backup.class==TrueClass
+		return FALSE
 	end
 end
