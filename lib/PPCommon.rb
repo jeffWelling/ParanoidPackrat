@@ -35,6 +35,13 @@ module PPCommon
 		return name
 	end
 
+	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
+	#otherwise, returns FALSE
+	def self.datetimeFormat?(str)
+		return TRUE if !str[/^[012][\d]{3}$/].nil?
+		return FALSE
+	end
+
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
 	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
