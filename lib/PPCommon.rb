@@ -54,7 +54,7 @@ module PPCommon
 		return collection
 	end
 	
-	#createBackupDirectory(dir) creates the backup directory structure to store the backups in.
+	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
 	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
 	#Using that example, it would create the dir "/mnt/backup/", it will return FALSE unless
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
@@ -71,4 +71,6 @@ module PPCommon
 		return FALSE unless counter==1
 		FileUtils.mkdir( dir + "backup/", 700 )[0]
 	end
+	
+	
 end
