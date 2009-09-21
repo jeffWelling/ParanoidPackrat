@@ -28,6 +28,19 @@ module PPCommon
 		return TRUE if PPackratConfig.silentMode?
 		puts str
 	end
+	
+	#Add a slash to the end of name if there isn't already one there.
+	def self.addSlash(name)
+		name << "/" unless name.reverse[0]==47  #FIXME Probly a better way of doing this than using the hardcoded value 47
+		return name
+	end
+
+	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
+	#otherwise, returns FALSE
+	def self.datetimeFormat?(str)
+		return TRUE if !str[/^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-4])_([01]\d|[2][0-3]):([0-4]\d|[5][0-9])$/].nil?
+		return FALSE
+	end
 
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
@@ -61,8 +74,7 @@ module PPCommon
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
 		raise "You idiot" unless dir.class==String
-		#Add a trailing slash if there isn't already one.
-		dir << "/" unless dir.reverse[0]==47   #FIXME Probly a better way of doing this than using the hardcoded value 47
+		dir=PPCommon.addSlash(dir)
 		#Make sure the directory is empty
 		counter=0
 		Find.find(dir) {|file|
@@ -72,5 +84,35 @@ module PPCommon
 		FileUtils.mkdir( dir + "backup/", 700 )[0]
 	end
 	
-	
+	#This method is used to determine if a backup dir contains backups or not.
+	#Basically, its used to tell if this if the first run backup, or if there are others
+	#that it can use to help shrink the size of the backup.
+	#
+	#It will look for any directories underneath backup_dir, if they also contain a directory
+	#which has the correct date time format, and there is a last_backup symlink (broken or 
+	#not), then it will return TRUE that yes there is at least one existing backup meaning
+	#this is not the first run.
+	#Otherwise, if there are no directories underneath backup_dir which also contain a dir
+	#with the name in the right date time format which also contains a last_backup symlink,
+	#it will return FALSE signaling that this is the first run.
+	#If backup_dir does not exist, or there are other files in backup_dir, it will simply
+	#return FALSE.
+	#NOTE - backup_dir is expected to be a full path
+	def self.containsBackups?(backup_dir)
+		return FALSE unless File.exist?(backup_dir) and File.directory?(backup_dir) and File.readable?(backup_dir)
+		backup_dir=PPCommon.addSlash(backup_dir)
+		is_a_backup=false
+		files_in_backupdir=[]
+		Dir.entries(backup_dir).each{|f| files_in_backupdir << f }
+		files_in_backupdir.each {|backup_name|
+			next if backup_name=='.' or backup_name=='..'
+			Dir.entries(backup_dir + backup_name).each{|backup_date|
+				next unless PPCommon.datetimeFormat?(backup_date)
+				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date).each {|last_backup|
+					is_a_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup)
+				}
+			}
+		}
+		return TRUE if is_a_backup.class==TrueClass
+	end
 end
