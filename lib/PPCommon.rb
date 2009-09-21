@@ -17,6 +17,7 @@
 =end
 require 'find'
 require 'fileutils'
+require 'date'
 
 #This is the collection of methods that are common to the ParanoidPackrat
 #project.
@@ -40,6 +41,15 @@ module PPCommon
 	def self.datetimeFormat?(str)
 		return TRUE if !str[/^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-4])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/].nil?
 		return FALSE
+	end
+
+	#return a string to be used as the datetime part of the backup path name
+	#the string is to be used   backup/backupname/HERE/...
+	#Expected to be used once at the beginning of running a backup to use
+	#in the backup path.
+	def self.newDatetime
+		str=DateTime.now.to_s
+		return "#{str[/^\d{4}\-\d{2}\-\d{2}/]}_#{str[/(\d{2}:){2}\d{2}/]}"
 	end
 
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
