@@ -31,7 +31,7 @@ module PPCommon
 	
 	#Add a slash to the end of name if there isn't already one there.
 	def self.addSlash(name)
-		name << "/" unless dir.reverse[0]==47  #FIXME Probly a better way of doing this than using the hardcoded value 47
+		name << "/" unless name.reverse[0]==47  #FIXME Probly a better way of doing this than using the hardcoded value 47
 		return name
 	end
 
@@ -100,15 +100,16 @@ module PPCommon
 	#NOTE - backup_dir is expected to be a full path
 	def self.containsBackups?(backup_dir)
 		return FALSE unless File.exist?(backup_dir) and File.directory?(backup_dir) and File.readable?(backup_dir)
+		backup_dir=PPCommon.addSlash(backup_dir)
 		is_a_backup=false
 		files_in_backupdir=[]
-		Dir.entries(backup_dir) {|f| files_in_backupdir << f }
+		Dir.entries(backup_dir).each{|f| files_in_backupdir << f }
 		files_in_backupdir.each {|backup_name|
 			next if backup_name=='.' or backup_name=='..'
-			Dir.entries(backup_dir + backup_name) {|backup_date|
+			Dir.entries(backup_dir + backup_name).each{|backup_date|
 				next unless PPCommon.datetimeFormat?(backup_date)
-				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date) {|last_backup|
-					is_a_backup==true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + last_backup)
+				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date).each {|last_backup|
+					is_a_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup)
 				}
 			}
 		}
