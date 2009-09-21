@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>makeBackupDirectory (PPCommon)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 75</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">makeBackupDirectory</span>(<span class="ruby-identifier">dir</span>)
+                <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;You idiot&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">dir</span>.<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">String</span>
+                <span class="ruby-identifier">dir</span>=<span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">dir</span>)
+                <span class="ruby-comment cmt">#Make sure the directory is empty</span>
+                <span class="ruby-identifier">counter</span>=<span class="ruby-value">0</span>
+                <span class="ruby-constant">Find</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">dir</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+                        <span class="ruby-identifier">counter</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>
+                }
+                <span class="ruby-keyword kw">return</span> <span class="ruby-constant">FALSE</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">counter</span><span class="ruby-operator">==</span><span class="ruby-value">1</span>
+                <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir</span>( <span class="ruby-identifier">dir</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;backup/&quot;</span>, <span class="ruby-value">700</span> )[<span class="ruby-value">0</span>]
+        <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
