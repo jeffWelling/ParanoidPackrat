@@ -16,7 +16,7 @@
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'classes/PPackratConfig.rb'
+require 'lib/PPackratConfig.rb'
 
 #This line sets a Global backup destination, which will be defaulted to in the event
 #of no backup destination being specified on the per backup name basis.
