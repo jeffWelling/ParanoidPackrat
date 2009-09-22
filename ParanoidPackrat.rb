@@ -27,17 +27,16 @@ load 'PPCommon.rb'
 #Load the options and config file from the command line
 #FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
 config="#{current_dir}/ParanoidPackrat.config.rb"
-silent_mode=''
+silent_mode=false
 
 ARGV.each {|cli_arg|
-	if cli_arg[/^--config=/]
-		raise "--config file must exist, and be readable!" unless File.exist?(cli_arg.gsub(/^--config=/, '')) and File.readable?(cli_arg.gsub(/^--config=/, ''))
-		config=cli_arg.gsub(/^--config=/, '')
-		next
-	elsif cli_arg[/^--silent/]
-		silent_mode=TRUE
-		next
-	end		
+  case cli_arg
+    when /^--config/
+      config = cli_arg.gsub(/^--config=/,'')
+      raise "Specified --config file #{config} must exist, and be readable!" unless File.exist?(config) and File.readable?(config)
+    when /^--silent/
+      silent_mode=TRUE
+  end		
 }
 raise "Config file required - should be at #{config}" unless File.exists? config
 load "#{config}"
