@@ -28,6 +28,8 @@ module PPIrb
 	#	2. perform an rsync -a --link-dest=../last_backup backupTarget backup/name/datetime/ .
 	#	3. check entire backup/name dir recursively for duplicate files, and hardlink for single instance storage.
 	#
+	#In that order.
 	def self.simpleBackup(backup)
+		PPCommon.makeBackupDirectory(backup['BackupDestination'])
 	end
 end
