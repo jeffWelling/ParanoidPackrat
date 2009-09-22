@@ -27,7 +27,7 @@ load 'PPCommon.rb'
 #Load the options and config file from the command line
 #FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
 config="#{current_dir}/ParanoidPackrat.config.rb"
-silent_mode=''
+silent_mode=false
 
 ARGV.each {|cli_arg|
   case cli_arg
