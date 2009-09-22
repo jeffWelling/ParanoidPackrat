@@ -2,7 +2,6 @@
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
 
 require 'PPackratConfig'
-require 'prettyprint'
 
 describe PPackratConfig do
 	it "contains no configs at startup" do
@@ -20,6 +19,5 @@ describe PPackratConfig do
 		PPackratConfig.setBackupDestinationOn 'Jesus has no boots', '/mnt'
 		PPackratConfig['Jesus has no boots'].should=={'BackupDestination'=>'/mnt'}
 	end
-
 end
 
