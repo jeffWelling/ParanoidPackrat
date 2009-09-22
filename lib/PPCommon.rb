@@ -25,7 +25,10 @@ module PPCommon
 	#pprint is a function to help control output based on silent mode or not.
 	#This is called from other internal methods to print output, which is then
 	#only displayed if we are not in silent mode.
-	def self.pprint str
+	#if fatal is anything except nil, than an exception is raise with str instead
+	#of printing the output.
+	def self.pprint str, fatal=nil
+		raise str unless fatal.nil?
 		return TRUE if self.silentMode?
 		puts str
 	end
