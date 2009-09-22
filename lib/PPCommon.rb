@@ -159,4 +159,10 @@ module PPCommon
 		#FIXME Fill me in. 
 		false
 	end
+	
+	#strip any trailing slashes from str if they exist
+	def self.stripSlash(str)
+		str=str.chop if str.reverse[0]==47
+		return str
+	end
 end
