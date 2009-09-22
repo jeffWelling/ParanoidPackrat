@@ -26,9 +26,16 @@ module PPCommon
 	#This is called from other internal methods to print output, which is then
 	#only displayed if we are not in silent mode.
 	def self.pprint str
-		return TRUE if PPackratConfig.silentMode?
+		return TRUE if self.silentMode?
 		puts str
 	end
+
+  #mktempdir(prefix = 'PP') will return a temp directory.
+  #This directory is not yet, but should be auto-deleted on exit
+  def self.mktempdir str = 'PP'
+    str += '.XXXXXX' unless str =~ /X+$/
+    `mktemp -td #{str}`.strip # Is there a better way?
+  end
 	
 	#Add a slash to the end of name if there isn't already one there.
 	def self.addSlash(name)
