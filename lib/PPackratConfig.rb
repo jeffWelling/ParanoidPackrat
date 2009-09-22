@@ -23,6 +23,17 @@ module PPackratConfig
 		puts "PPackratConfig:  Please check your configuration."
 		@BadConfig=TRUE
 	end
+
+	#returns true if silentmode has been enabled from the command line arg (the only way)
+	def self.silentMode?
+		@SilentMode
+	end
+	#sets PPackratConfig.silentMode?
+	#It expects a true or false value, that is what it is expected to contain, but you could put anything in it.
+	def self.silentMode= arg
+		@SilentMode=arg
+	end
+
 	#This function is intended to be run AFTER the the configurations have been set
 	#to make sure the configurations entered are sane.
 	#if silent is not nil, then silent mode is activated for this function.
@@ -43,9 +54,9 @@ module PPackratConfig
 		def initialize
 			@numOfConfigs||=0
 			@Configs||={}
-			@BadConfig||=FALSE
+			@BadConfig||=false
 			@BackupDestinations||=''
-			@SilentMode||=FALSE
+			@SilentMode||=false
 		end
 
 		#setBackupDestination is a way of specifying a global backup Destination.
