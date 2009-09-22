@@ -39,6 +39,7 @@ ARGV.each {|cli_arg|
 		next
 	end		
 }
+raise "Config file required - should be at #{config}" unless File.exists? config
 load "#{config}"
 
 #Don't actually run unless we are being executed from the CLI, just load.
