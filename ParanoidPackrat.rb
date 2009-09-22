@@ -24,6 +24,7 @@ require 'prettyprint'
 
 load 'PPackratConfig.rb'
 load 'PPCommon.rb'
+load 'PPIrb.rb'
 #Load the options and config file from the command line
 #FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
 config="#{current_dir}/ParanoidPackrat.config.rb"
