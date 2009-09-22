@@ -16,7 +16,7 @@ module PPackratConfig
 	
 				#Unless a global backup directory is set, make sure every config has it's own backup dir specified
 				if @BackupDestinations.empty? 
-					raise "No Global backup directory is set, and config '#{config_name}' does not have one set either!" if config['BackupDestination'].nil?
+					raise "No Global backup directory is set, and config '#{config_name}' does not have one set either!" if config[:BackupDestination].nil?
 				end #of unless @BackupDestinations.empty?
 			end #of unless config.nil?
 		}
@@ -81,7 +81,7 @@ module PPackratConfig
 				PPackratConfig.checkYourConfig
 			end
 			@Configs[name]||={}
-			@Configs[name]['BackupTarget']=thingToBackup
+			@Configs[name][:BackupTarget]=thingToBackup
 			unless File.exist? thingToBackup
 				puts "PPackratConfig:  File or directory does not exist? '#{thingToBackup}'"
 				PPackratConfig.checkYourConfig
@@ -97,12 +97,12 @@ module PPackratConfig
 				puts "name not yet addName'd, or exclusion file/dir does not exist"
 				PPackratConfig.checkYourConfig 
 			end
-			if exclusion.slice(0,@Configs[name]['BackupTarget'].length)!=@Configs[name]['BackupTarget']
+			if exclusion.slice(0,@Configs[name][:BackupTarget].length)!=@Configs[name][:BackupTarget]
 				puts "When using exclusions in this way, you must specify an exclusion which is a subset of the BackupTarget.\nSee Exclusions in the documentation"
 				PPackratConfig.checkYourConfig
 			end
-			@Configs[name]['Exclusions']||=[]
-			@Configs[name]['Exclusions'] << exclusion unless @Configs[name]['Exclusions'].include? exclusion
+			@Configs[name][:Exclusions]||=[]
+			@Configs[name][:Exclusions] << exclusion unless @Configs[name][:Exclusions].include? exclusion
 			return TRUE
 		end
 		#name is the name of the config your setting.
@@ -117,7 +117,7 @@ module PPackratConfig
 				puts "Must first addname('#{name}')"
 				PPackrat.checkYourConfig
 			end
-			@Configs[name]['GuaranteedNumBackups']==guaranteed_num_of_backups.to_i
+			@Configs[name][:GuaranteedNumBackups]==guaranteed_num_of_backups.to_i
 			return TRUE
 		end
 		#If setIsCritical is called with a name, and anything_but_nil as anything except nil, then
@@ -128,7 +128,7 @@ module PPackratConfig
 				puts "Must first addName('#{name}')"
 				PPackrat.checkYourConfig
 			end
-			@Configs[name]['CriticalBackup']=TRUE
+			@Configs[name][:CriticalBackup]=TRUE
 			return TRUE
 		end
 		#setBackupDestinationOn sets the backup destination for a specific configuration as referenced
@@ -140,8 +140,8 @@ module PPackratConfig
 				PPackratConfig.checkYourConfig 
 			end
 			@Configs[name]||={}
-			@Configs[name]['BackupDestination']||=''
-			@Configs[name]['BackupDestination']= backup_destination
+			@Configs[name][:BackupDestination]||=''
+			@Configs[name][:BackupDestination]= backup_destination
 			return TRUE
 		end
 	end
