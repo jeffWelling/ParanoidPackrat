@@ -10,6 +10,12 @@ describe PPCommon do
     File.directory?(td).should == true
   end
 
+  it "adds a slash to strings if they do not already end with one" do
+    PPCommon.addSlash('foo' ).should == 'foo/'
+    PPCommon.addSlash('foo/').should == 'foo/'
+  end
+
+
   it "scans a path, returning it or all files under it that were not specifically excluded"
 
 end

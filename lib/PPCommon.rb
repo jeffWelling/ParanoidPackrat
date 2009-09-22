@@ -38,7 +38,7 @@ module PPCommon
 	
 	#Add a slash to the end of name if there isn't already one there.
 	def self.addSlash(name)
-		name << "/" unless name.reverse[0]==47  #FIXME Probly a better way of doing this than using the hardcoded value 47
+		name << "/" unless name[-1].chr == '/'
 		return name
 	end
 
