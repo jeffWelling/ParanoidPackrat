@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
+require 'fileutils'
 
 #This module is intended to assist users while they are working with 
 #ParanoidPackrat from IRB.  Basically, the executed ./ParanoidPackrat.rb
@@ -30,6 +31,28 @@ module PPIrb
 	#
 	#In that order.
 	def self.simpleBackup(backup)
-		PPCommon.makeBackupDirectory(backup['BackupDestination'])
+		date=PPCommon.newDatetime
+		PPCommon.makeBackupDirectory(backup[:BackupDestination]) unless (
+			File.exist?(backup[:BackupDestination]) and
+			File.directory?(backup[:BackupDestination])
+		)
+		dest_name=PPCommon.addSlash(backup[:BackupDestination]) + backup[:BackupName]
+		FileUtils.mkdir(dest_name) unless File.exist?(dest_name)
+		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
+		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
+		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName])
+			#This isn't the first backup, you can hardlink to the other backups.
+			`rsync -a --link-dest=../last_backup --log-file=#{dest_name_date}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget])} #{dest_name_date}`
+			File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
+			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+			#run the method to scan all of the backups for duplicates and hardlink them
+			PPCommon.shrinkBackupDestination(backup)
+		else
+			#This is the first backup.
+			`rsync -a --link-dest=../last_backup --log-file=#{dest_name_date}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget])} #{dest_name_date}`
+			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+		end
+		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
+		return true
 	end
 end
