@@ -29,7 +29,7 @@ module PPCommon
 	#of printing the output.
 	def self.pprint str, fatal=nil
 		raise str unless fatal.nil?
-		return TRUE if self.silentMode?
+#		return TRUE if self.silentMode?
 		puts str
 	end
 
