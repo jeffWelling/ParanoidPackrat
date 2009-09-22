@@ -74,7 +74,7 @@ module PPackratConfig
 				puts "Config names must be unique"
 				PPackratConfig.checkYourConfig
 			end
-			@Configs.merge!({ configName=>nil }) and return TRUE unless @Configs.include?(configName)
+			@Configs.merge!({ configName=>{:BackupName=>configName} }) and return TRUE unless @Configs.include?(configName)
 			return FALSE
 		end
 		#Number of configurations currently entered
