@@ -145,4 +145,25 @@ module PPCommon
 		return TRUE if has_a_backup.class==TrueClass and last_backup.class==TrueClass
 		return FALSE
 	end
+	
+	#shrinkBackupDestination(backup,wide) traverse through backups under backupDestination/backupName/ , hardlinking to save space
+	#
+	#By default, it will only traverse backup directories (backupDest/backupName/datetimes).  To get it to
+	#scan every folder, set wide=true.  
+	#
+	#Be warned! This is a very dangerous operation if you forget that you've hardlinked
+	#to files that are in backupDest/backupName that aren't your backups, and you use this option to hardlink to them, and then
+	#you change them, YOU WILL BE CORRUPTING YOUR BACKUPS.  This is why wide=nil by default, but if you know you won't be
+	#changing those files it could be useful to hardlink them to save a little bit of space.  
+	#
+	#Also note there is no undo for
+	#this operation, if you run it once, that file is hardlinked and you will have to create a copy, unlink the file, and mv
+	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
+	#
+	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
+	def self.shrinkBackupDestination(backup,wide=nil)
+		raise "you idiot" unless backup.class==Hash
+		#FIXME Fill me in. 
+		false
+	end
 end
