@@ -98,35 +98,38 @@ module PPCommon
 	#Basically, its used to tell if this if the first run backup, or if there are others
 	#that it can use to help shrink the size of the backup.
 	#
-	#It will look for any directories underneath backup_dir, if they also contain a directory
+	#It will look for any directories underneath backup_dest, if they also contain a directory
 	#which has the correct date time format, and there is a last_backup symlink pointing to a dir,
 	#then it will return TRUE that yes there is at least one existing backup meaning
 	#this is not the first run.
-	#Otherwise, if there are no directories underneath backup_dir which also contain a dir
+	#Otherwise, if there are no directories underneath backup_dest which also contain a dir
 	#with the name in the right date time format which also contains a last_backup symlink,
 	#it will return FALSE signaling that this is the first run.
-	#If backup_dir does not exist, or there are other files in backup_dir, it will simply
+	#If backup_dest does not exist, or there are other files in backup_dest, it will simply
 	#return FALSE.
-	#NOTE - backup_dir is expected to be a full path
-	def self.containsBackups?(backup_dir)
-		return FALSE unless File.exist?(backup_dir) and File.directory?(backup_dir) and File.readable?(backup_dir)
-		backup_dir=PPCommon.addSlash(backup_dir)
+	#
+	#If backup_name is provided, that one backupDest/backupName dir will be checked for backups.
+	#NOTE - all paths are expected to be full paths
+	def self.containsBackups?(backup_dest, backup_name=nil)
+		return FALSE unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
+		backup_dest=PPCommon.addSlash(backup_dest)
 		has_a_backup=true
 		last_backup=true
 		files_in_backupdir=[]
-		Dir.entries(backup_dir).each{|f| files_in_backupdir << f }
-		files_in_backupdir.each {|backup_name|
-			next if backup_name=='.' or backup_name=='..'
-			Dir.entries(backup_dir + backup_name).each{|backup_date|
+		Dir.entries(backup_dest).each{|f| files_in_backupdir << f }
+		files_in_backupdir.each {|backupDest_backupName|
+			next if backupDest_backupName=='.' or backupDest_backupName=='..'
+			next if !backup_name.nil? and backupDest_backupName!=backup_name
+			Dir.entries(backup_dest + backupDest_backupName).each{|backup_date|
 				next unless PPCommon.datetimeFormat?(backup_date) or backup_date=='last_backup'
 				has_a_backup=true if PPCommon.datetimeFormat?(backup_date)
 				if backup_date=='last_backup'
-					last_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + 'last_backup' ) and File.directory?(backup_dir + PPCommon.addSlash(backup_name) + 'last_backup')
+					last_backup=true if File.symlink?(backup_dest + PPCommon.addSlash(backupDest_backupName) + 'last_backup' ) and File.directory?(backup_dest + PPCommon.addSlash(backupDest_backupName) + 'last_backup')
 
 =begin
-				Dir.entries(backup_dir + (PPCommon.addSlash(backup_name)) + backup_date).each {|last_backup|
+				Dir.entries(backup_dest + (PPCommon.addSlash(backupDest_backupName)) + backup_date).each {|last_backup|
 					next unless last_backup=="last_backup"  #name of the link
-					is_a_backup=true if File.symlink?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup) and File.directory?(backup_dir + PPCommon.addSlash(backup_name) + PPCommon.addSlash(backup_date) + last_backup)
+					is_a_backup=true if File.symlink?(backup_dest + PPCommon.addSlash(backupDest_backupName) + PPCommon.addSlash(backup_date) + last_backup) and File.directory?(backup_dest + PPCommon.addSlash(backupDest_backupName) + PPCommon.addSlash(backup_date) + last_backup)
 				}
 =end
 				end
