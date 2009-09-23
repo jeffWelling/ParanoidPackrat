@@ -43,8 +43,9 @@ module PPIrb
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
 		pp backup
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
+			puts "not first run"
 			#This isn't the first backup, you can hardlink to the other backups.
-			`rsync -a  --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
+			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
 			if $?.exitstatus==0
 				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
 				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
@@ -52,9 +53,10 @@ module PPIrb
 				PPCommon.shrinkBackupDestination(backup)
 			end
 		else
+			puts "first run"
 			#This is the first backup.
-			`rsync -a --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
-			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) unless $?.exitstatus==0
+			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
+			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
 		end
 		PPCommon.pprint( 'simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!' ) if $?.exitstatus!=0
 		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
