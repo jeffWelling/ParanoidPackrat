@@ -123,8 +123,8 @@ module PPCommon
 	def self.containsBackups?(backup_dest, backup_name=nil)
 		return FALSE unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
 		backup_dest=PPCommon.addSlash(backup_dest)
-		has_a_backup=true
-		last_backup=true
+		has_a_backup=false
+		last_backup=false
 		files_in_backupdir=[]
 		Dir.entries(backup_dest).each{|f| files_in_backupdir << f }
 		files_in_backupdir.each {|backupDest_backupName|
