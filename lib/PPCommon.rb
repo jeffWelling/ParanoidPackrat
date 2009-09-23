@@ -179,4 +179,14 @@ module PPCommon
 		str=str.chop if str.reverse[0]==47
 		return str
 	end
+
+	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
+	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
+	#returns false if there was no error, otherwise will return a hash in the form of {:Permissions=>[foo.txt,bar.txt]}
+	#for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
+	def self.whatWasError?( p, error_log )
+		return false if p.exitstatus==0
+		return false
+	end
 end
+
