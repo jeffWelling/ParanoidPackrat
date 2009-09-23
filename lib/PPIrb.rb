@@ -33,6 +33,7 @@ module PPIrb
 	def self.simpleBackup(backup)
 		PPCommon.pprint("simpleBackup():  Performing simple backup, '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination]}'")
 		date=PPCommon.newDatetime
+		error=false
 		PPCommon.makeBackupDirectory(backup[:BackupDestination]) unless (
 			File.exist?(backup[:BackupDestination]) and
 			File.directory?(backup[:BackupDestination])
@@ -42,22 +43,39 @@ module PPIrb
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
 		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
+		err_log=dest_name_date + 'err_log.txt'
+		first_or_second=nil
+
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
+			first_or_second=:first
 			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
 			#This isn't the first backup, you can hardlink to the other backups.
-			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{dest_name_date.gsub(' ','\ ')}/error_log.txt`
-			if $?.exitstatus==0
-				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
-				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
-				#run the method to scan all of the backups for duplicates and hardlink them
-				PPCommon.shrinkBackupDestination(backup)
-			end
+			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		else
+			first_or_second=:second
 			PPCommon.pprint('simpleBackup():  First time backing up.')
 			#This is the first backup.
-			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{dest_name_date.gsub(' ','\ ')}/error_log.txt`
-			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
+			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		end
+
+		er= PPCommon.whatWasError?( $?, err_log )
+		#maybe a case on the return value of whatWasError?()
+
+		if er==false
+			if first_or_second==:first
+				if $?.exitstatus==0
+					File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
+					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+					#run the method to scan all of the backups for duplicates and hardlink them
+					PPCommon.shrinkBackupDestination(backup)
+				end
+			else
+				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
+			end
+		else #There was an error
+			#
+		end
+
 		PPCommon.pprint( 'simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!' ) if $?.exitstatus!=0
 		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
 		
