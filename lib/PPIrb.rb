@@ -29,7 +29,7 @@ module PPIrb
 	#	2. perform an rsync -a --link-dest=../last_backup backupTarget backup/name/datetime/ .
 	#	3. check entire backup/name dir recursively for duplicate files, and hardlink for single instance storage.
 	#
-	#In that order.
+	#In that order.  It returns the path that the backup was stored in, for example "/backupDest/backupName/datetime/"
 	def self.simpleBackup(backup)
 		date=PPCommon.newDatetime
 		PPCommon.makeBackupDirectory(backup[:BackupDestination]) unless (
@@ -41,21 +41,23 @@ module PPIrb
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
 		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
-		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==true
+		pp backup
+		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
 			#This isn't the first backup, you can hardlink to the other backups.
-			puts "not first run        rsync -a --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ', '\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ', '\ ')} #{dest_name_date.gsub(' ', '\ ')}"
 			`rsync -a  --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
-			File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
-			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
-			#run the method to scan all of the backups for duplicates and hardlink them
-			PPCommon.shrinkBackupDestination(backup)
+			if $?.exitstatus==0
+				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
+				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+				#run the method to scan all of the backups for duplicates and hardlink them
+				PPCommon.shrinkBackupDestination(backup)
+			end
 		else
 			#This is the first backup.
-			puts "first run        rsync -a --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}"
 			`rsync -a --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
-			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) unless $?.exitstatus==0
 		end
+		PPCommon.pprint( 'simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!' ) if $?.exitstatus!=0
 		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
-		return true
+		return dest_name_date
 	end
 end

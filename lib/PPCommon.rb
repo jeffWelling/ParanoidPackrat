@@ -123,26 +123,30 @@ module PPCommon
 	def self.containsBackups?(backup_dest, backup_name=nil)
 		return FALSE unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
 		backup_dest=PPCommon.addSlash(backup_dest)
-		has_a_backup=true
-		last_backup=true
+		has_a_backup=false
+		last_backup=false
 		files_in_backupdir=[]
-		Dir.entries(backup_dest).each{|f| files_in_backupdir << f }
-		files_in_backupdir.each {|backupDest_backupName|
-			next if backupDest_backupName=='.' or backupDest_backupName=='..'
-			next if !backup_name.nil? and backupDest_backupName!=backup_name
-			Dir.entries(backup_dest + backupDest_backupName).each{|backup_date|
-				next unless PPCommon.datetimeFormat?(backup_date) or backup_date=='last_backup'
-				has_a_backup=true if PPCommon.datetimeFormat?(backup_date)
-				if backup_date=='last_backup'
-					last_backup=true if File.symlink?(backup_dest + PPCommon.addSlash(backupDest_backupName) + 'last_backup' ) and File.directory?(backup_dest + PPCommon.addSlash(backupDest_backupName) + 'last_backup')
-
 =begin
-				Dir.entries(backup_dest + (PPCommon.addSlash(backupDest_backupName)) + backup_date).each {|last_backup|
-					next unless last_backup=="last_backup"  #name of the link
-					is_a_backup=true if File.symlink?(backup_dest + PPCommon.addSlash(backupDest_backupName) + PPCommon.addSlash(backup_date) + last_backup) and File.directory?(backup_dest + PPCommon.addSlash(backupDest_backupName) + PPCommon.addSlash(backup_date) + last_backup)
-				}
+		backupDest/* = l0
+		backupDest/backup/* =l1
+		backupDest/backup/backupName/* =l2
+		backupDest/backup/backupName/datetime/* =l3
 =end
-				end
+		Dir.entries(backup_dest).each {|l0|
+			next if l0[/^(\.|\.\.)$/]   #Skip '.' and '..'
+			next unless l0[/^backup$/]
+			dest_backup=backup_dest + 'backup/'
+			Dir.entries(dest_backup).each {|l1|
+				next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
+				next if !backup_name.nil? and backup_name!=l1    #If backup_name is specified, only check that directory	
+				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
+				Dir.entries(dest_backup_name).each {|l2|
+					next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
+					next unless PPCommon.datetimeFormat?(l2) or l2[/^last_backup$/]
+					has_a_backup=true
+					dest_backup_name_datetime=(dest_backup_name + l2) if l2[/^last_backup$/]
+					last_backup=true if l2[/^last_backup$/] and File.symlink?(dest_backup_name_datetime)
+				}
 			}
 		}
 		return TRUE if has_a_backup.class==TrueClass and last_backup.class==TrueClass
