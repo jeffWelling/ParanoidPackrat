@@ -31,6 +31,7 @@ module PPIrb
 	#
 	#In that order.  It returns the path that the backup was stored in, for example "/backupDest/backupName/datetime/"
 	def self.simpleBackup(backup)
+		PPCommon.pprint("simpleBackup():  Performing simple backup, '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination]}'")
 		date=PPCommon.newDatetime
 		PPCommon.makeBackupDirectory(backup[:BackupDestination]) unless (
 			File.exist?(backup[:BackupDestination]) and
@@ -41,7 +42,6 @@ module PPIrb
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
 		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
-		pp backup
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
 			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
 			#This isn't the first backup, you can hardlink to the other backups.
