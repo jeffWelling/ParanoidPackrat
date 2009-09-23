@@ -43,7 +43,7 @@ module PPIrb
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
 		pp backup
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
-			puts "not first run"
+			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
 			#This isn't the first backup, you can hardlink to the other backups.
 			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
 			if $?.exitstatus==0
@@ -53,7 +53,7 @@ module PPIrb
 				PPCommon.shrinkBackupDestination(backup)
 			end
 		else
-			puts "first run"
+			PPCommon.pprint('simpleBackup():  First time backing up.')
 			#This is the first backup.
 			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')}`
 			File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
