@@ -17,34 +17,20 @@
     along with ParanoidPackrat.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'prettyprint'
+
 current_dir = File.expand_path(File.dirname(__FILE__))
 $LOAD_PATH.unshift(current_dir + "/lib")
 
-require 'prettyprint'
-
+load 'ParanoidPackrat.rb'
 load 'PPackratConfig.rb'
 load 'PPCommon.rb'
 load 'PPIrb.rb'
-#Load the options and config file from the command line
-#FIXME How can this be done without hardcoding?  Expect it to be in /etc/?
-config="#{current_dir}/ParanoidPackrat.config.rb"
-silent_mode=false
 
-ARGV.each {|cli_arg|
-  case cli_arg
-    when /^--config/
-      config = cli_arg.gsub(/^--config=/,'')
-      raise "Specified --config file #{config} must exist, and be readable!" unless File.exist?(config) and File.readable?(config)
-    when /^--silent/
-      silent_mode=TRUE
-  end		
-}
-raise "Config file required - should be at #{config}" unless File.exists? config
-load "#{config}"
-
-#Don't actually run unless we are being executed from the CLI, just load.
+#Just load unless we are being executed from the CLI
 if $0 == __FILE__ 
-	PPackratConfig.sanityCheck silent_mode
+  #Load the options and config file from the command line
+  PPackratConfig.parse_cli_args ARGV
+  ParanoidPackrat.run
 end
-
 
