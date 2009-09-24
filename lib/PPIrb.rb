@@ -76,12 +76,10 @@ module PPIrb
 
 		if er==false
 			if first_or_second==:first
-				if $?.exitstatus==0
-					File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
-					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
-					#run the method to scan all of the backups for duplicates and hardlink them
-					PPCommon.shrinkBackupDestination(backup)
-				end
+				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
+				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+				#run the method to scan all of the backups for duplicates and hardlink them
+				PPCommon.shrinkBackupDestination(backup)
 			else
 				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
 			end
