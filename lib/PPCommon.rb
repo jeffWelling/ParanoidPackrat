@@ -236,7 +236,7 @@ module PPCommon
 	#from running rsync ... &>error_log, from simpleBackup().
 	def self.rsyncErr?( p, error_log )
 		return false if p.exitstatus==0
-		results={}
+		results={:FailedToOpen=>[]}
 		log=PPCommon.readFile(error_log)
 		log.each {|log_line|
 			case
@@ -244,13 +244,10 @@ module PPCommon
 				#which is required for case/when (methinks)
 				when (!log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?)
 					#oh noes! This file, we can has no read access on it!
-					results.merge({ :FailedToOpen=>[] }) unless results.has_key? :FailedToOpen
 					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
-				default
-					#do nothing
 			end
 		}
-		return false
+		return results
 	end
 	
 	#readFile takes a filename, and optionally the maximum number of lines to read.
