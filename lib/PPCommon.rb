@@ -170,10 +170,56 @@ module PPCommon
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
 		raise "you idiot" unless backup.class==Hash
-		#FIXME Fill me in. 
-		false
+    sigs = getExistingFileSignatures
+    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
+      sig = getFileSignature(new_file)
+      unless sigs[sig]
+        sigs[sig] = new_file
+      else
+        original_file = sigs[sig]
+        next if original_file == new_file
+        raise "File #{file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        hardlinkFile(new_file, original_file)
+      end
+    }
+    saveFileSignatures(sigs)
 	end
 	
+  require 'yaml'
+  #getExistingFileSignatures() reads the stored hashes in from a file
+  #takes an optional filename, otherwise uses the default
+  def self.getExistingFileSignatures(filename = nil)
+    filename ||= '~/file_hashes.yaml'
+    return {} unless File.exists?(File.expand_path(filename))
+    YAML.load(File.read(File.expand_path(filename))) || {}
+  end
+
+  #saveFileSignatures(signatures) saves a list of signatures to a file
+  #takes an optional filename, otherwise uses the default
+  #returns number of bytes written
+  def self.saveFileSignatures(signatures, filename = nil)
+    filename ||= '~/file_hashes.yaml'
+    File.open(File.expand_path(filename),'w') {|file| file.write signatures.to_yaml }
+  end
+
+  #getFileSignature(filename) hashes a file with sha1 and returns its signature
+  def self.getFileSignature(filename)
+    `sha1sum #{filename}`.split.first   #  Output looks like: 66b4e9c23697c5aa947b00f92c56ded95b0122e3  lib/PPCommon.rb
+  end
+
+  #hardLinkFile(new, old) makes 'new' a hardlink to 'old'
+  #WARNING - deletes new without checking if hardlinking is possible
+  def self.hardlinkFile(new,old)
+    # check both share a filesystem (for hardlinking)
+    # check both are identical
+    # check not the same file
+    #File.unlink new
+    #File.link old, new
+    puts "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
+    # check hardlink was made
+    # restore original file otherwise
+  end
+     
 	#strip any trailing slashes from str if they exist
 	def self.stripSlash(str)
 		str=str.chop if str.reverse[0]==47
