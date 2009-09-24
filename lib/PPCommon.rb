@@ -182,7 +182,7 @@ module PPCommon
 
 	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
 	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
-	#returns false if there was no error, otherwise will return a hash in the form of {:Permissions=>[foo.txt,bar.txt]}
+	#returns false if there was no error, otherwise will return a hash in the form of {:FailedToOpen=>[foo.txt,bar.txt]}
 	#for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
 	#error_log is expected to be the full path to the error log in question.  The error log is expected to be the stderr output
 	#from running rsync ... &>error_log, from simpleBackup().
@@ -196,8 +196,8 @@ module PPCommon
 				#which is required for case/when (methinks)
 				when !log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?
 					#oh noes! This file, we can has no read access on it!
-					results.merge({ :Permissions=>[] }) unless results.has_key? :Permissions
-					results[:Permissions] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
+					results.merge({ :FailedToOpen=>[] }) unless results.has_key? :FailedToOpen
+					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
 				default
 					#do nothing
 			end
