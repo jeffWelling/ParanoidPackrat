@@ -62,6 +62,43 @@ module PPCommon
 		return "#{str[/^\d{4}\-\d{2}\-\d{2}/]}_#{str[/(\d{2}:){2}\d{2}/]}"
 	end
 
+	#ask the user question, and return the response (with optional default)
+	def self.ask question, default=nil
+		print "\n#{question} "
+		answer = STDIN.gets.strip.downcase
+		throw :quit if 'q' == answer
+		return default if symbolize(answer)==:empty
+		answer
+	end
+
+	#ask the user a question, return the symbolized response with optional default
+	def self.ask_symbol question, default
+		answer = symbolize PPCommon.ask(question)
+		throw :quit if :quit == answer
+		return default if :empty == answer
+		answer
+	end
+	
+	#ask the user question, loop until he selects a valid option.
+	def self.prompt question, default = :yes, add_options = nil, delete_options = nil
+		options = ([default] + [:yes,:no] + [add_options] + [:quit]).flatten.uniq
+		if delete_options.class == Array
+			delete_options.each {|del_option|
+			options -= [del_option]
+			}
+		else
+			options -= [delete_options]
+		end
+		option_string = options.collect {|x| x.to_s.capitalize}.join('/')
+		answer = nil
+		loop {
+			answer = PPCommon.ask_symbol "#{question} (#{option_string.gsub('//', '/')}):", default
+			(answer=default if answer==:nil) unless default.nil?
+			break if options.member? answer
+		}
+		answer
+	end
+
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
 	#and will return an array with the full path of every file covered by
 	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
@@ -194,7 +231,7 @@ module PPCommon
 			case
 				#In the folloring when tests, the .nil? and ! basically cancel each other out, but the reason they're used is to provide a boolean response
 				#which is required for case/when (methinks)
-				when !log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?
+				when (!log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?)
 					#oh noes! This file, we can has no read access on it!
 					results.merge({ :FailedToOpen=>[] }) unless results.has_key? :FailedToOpen
 					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
