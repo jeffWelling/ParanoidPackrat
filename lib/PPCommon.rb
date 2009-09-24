@@ -188,6 +188,20 @@ module PPCommon
 	#from running rsync ... &>error_log, from simpleBackup().
 	def self.rsyncErr?( p, error_log )
 		return false if p.exitstatus==0
+		results={}
+		log=PPCommon.readFile(error_log)
+		log.each {|log_line|
+			case
+				#In the folloring when tests, the .nil? and ! basically cancel each other out, but the reason they're used is to provide a boolean response
+				#which is required for case/when (methinks)
+				when !log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?
+					#oh noes! This file, we can has no read access on it!
+					results.merge({ :Permissions=>[] }) unless results.has_key? :Permissions
+					results[:Permissions] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
+				default
+					#do nothing
+			end
+		}
 		return false
 	end
 	
