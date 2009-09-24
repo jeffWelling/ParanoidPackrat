@@ -61,19 +61,30 @@ module PPCommon
 		str=DateTime.now.to_s
 		return "#{str[/^\d{4}\-\d{2}\-\d{2}/]}_#{str[/(\d{2}:){2}\d{2}/]}"
 	end
+	
+	#symbolize text
+	def PPCommon.symbolize text
+	 return :nil if text.nil?
+		return :empty if text.empty?
+		return :quit if text =~ /^(q|quit)$/i
+		return :edit if text =~ /^(e|edit)$/i
+		return :yes  if text =~ /^(y|yes)$/i
+		return :no   if text =~ /^(n|no)$/i
+		text.to_sym
+	end 
 
 	#ask the user question, and return the response (with optional default)
 	def self.ask question, default=nil
 		print "\n#{question} "
 		answer = STDIN.gets.strip.downcase
 		throw :quit if 'q' == answer
-		return default if symbolize(answer)==:empty
+		return default if PPCommon.symbolize(answer)==:empty
 		answer
 	end
 
 	#ask the user a question, return the symbolized response with optional default
 	def self.ask_symbol question, default
-		answer = symbolize PPCommon.ask(question)
+		answer = PPCommon.symbolize PPCommon.ask(question)
 		throw :quit if :quit == answer
 		return default if :empty == answer
 		answer
