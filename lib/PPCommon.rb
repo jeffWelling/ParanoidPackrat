@@ -186,7 +186,7 @@ module PPCommon
 	#for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
 	#error_log is expected to be the full path to the error log in question.  The error log is expected to be the stderr output
 	#from running rsync ... &>error_log, from simpleBackup().
-	def self.whatWasError?( p, error_log )
+	def self.rsyncErr?( p, error_log )
 		return false if p.exitstatus==0
 		return false
 	end
