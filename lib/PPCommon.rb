@@ -190,5 +190,20 @@ module PPCommon
 		return false if p.exitstatus==0
 		return false
 	end
+	
+	#readFile takes a filename, and optionally the maximum number of lines to read.
+	#
+	#returns the lines read as an array.
+	def self.readFile file, max_lines=0
+		counter=0
+		read_lines=[]
+		File.open(file, 'r') {|f|
+			while (line= f.gets and counter<=max_lines)
+				read_lines << line
+				counter+=1 unless max_lines==0
+			end
+		}
+		return read_lines
+	end
 end
 
