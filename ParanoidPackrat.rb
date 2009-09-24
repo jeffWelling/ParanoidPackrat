@@ -23,7 +23,7 @@ current_dir = File.expand_path(File.dirname(__FILE__))
 $LOAD_PATH.unshift(current_dir + "/lib")
 
 load 'ParanoidPackrat.rb'
-load 'PPackratConfig.rb'
+load 'PPConfig.rb'
 load 'PPCommon.rb'
 load 'PPIrb.rb'
 load 'ParanoidPackrat.config.rb'
@@ -31,7 +31,7 @@ load 'ParanoidPackrat.config.rb'
 #Just load unless we are being executed from the CLI
 if $0 == __FILE__ 
   #Load the options and config file from the command line
-  PPackratConfig.parse_cli_args ARGV
+  PPConfig.parse_cli_args ARGV
   ParanoidPackrat.run
 end
 

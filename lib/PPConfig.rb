@@ -19,11 +19,11 @@ require 'pp'
 require 'optparse'
 require 'ostruct'
 
-module PPackratConfig
+module PPConfig
 	class <<self
 		#checkYourConfig is called when an error is encountered reading the configuration. 
 		def self.checkYourConfig
-			puts "PPackratConfig:  Please check your configuration."
+			puts "PPConfig:  Please check your configuration."
 			@BadConfig=TRUE
 		end
 		#This function is intended to be run AFTER the the configurations have been set
@@ -70,7 +70,7 @@ module PPackratConfig
         options.configFile = config
       end
       load "#{options.configFile}"
-      PPackratConfig.sanityCheck
+      PPConfig.sanityCheck
     end
 
 		#To be called once at the beginning of the config file
@@ -98,7 +98,7 @@ module PPackratConfig
 		def addName configName
 			if @Configs.include? configName
 				puts "Config names must be unique"
-				PPackratConfig.checkYourConfig
+				PPConfig.checkYourConfig
 			end
 			@Configs.merge!({ configName=>{:BackupName=>configName} }) and return TRUE unless @Configs.include?(configName)
 			return FALSE
@@ -121,13 +121,13 @@ module PPackratConfig
 		def setBackupTarget name, thingToBackup
 			unless @Configs.include? name
 				puts "Must addName('#{name}') first"
-				PPackratConfig.checkYourConfig
+				PPConfig.checkYourConfig
 			end
 			@Configs[name]||={}
 			@Configs[name][:BackupTarget]=thingToBackup
 			unless File.exist? thingToBackup
-				puts "PPackratConfig:  File or directory does not exist? '#{thingToBackup}'"
-				PPackratConfig.checkYourConfig
+				puts "PPConfig:  File or directory does not exist? '#{thingToBackup}'"
+				PPConfig.checkYourConfig
 			end
 			return TRUE
 		end
@@ -138,11 +138,11 @@ module PPackratConfig
 		def setBackupExclusions name, exclusion
 			unless @Configs.include?(name) and File.exist?(exclusion)
 				puts "name not yet addName'd, or exclusion file/dir does not exist"
-				PPackratConfig.checkYourConfig 
+				PPConfig.checkYourConfig 
 			end
 			if exclusion.slice(0,@Configs[name][:BackupTarget].length)!=@Configs[name][:BackupTarget]
 				puts "When using exclusions in this way, you must specify an exclusion which is a subset of the BackupTarget.\nSee Exclusions in the documentation"
-				PPackratConfig.checkYourConfig
+				PPConfig.checkYourConfig
 			end
 			@Configs[name][:Exclusions]||=[]
 			@Configs[name][:Exclusions] << exclusion unless @Configs[name][:Exclusions].include? exclusion
@@ -180,7 +180,7 @@ module PPackratConfig
 		def setBackupDestinationOn name, backup_destination
 			unless @Configs.include?(name) and File.exist?(backup_destination) and File.directory?(backup_destination)
 				puts "Must first addName('#{name}'), and '#{backup_destination}' must first exist and be a directory."
-				PPackratConfig.checkYourConfig 
+				PPConfig.checkYourConfig 
 			end
 			@Configs[name]||={}
 			@Configs[name][:BackupDestination]||=''

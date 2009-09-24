@@ -67,7 +67,7 @@ module PPCommon
 	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
 	#
 	#<b>Note</b> backup is expected to be one of the configs from 
-	#PPackratConfig.dumpConfig and PPackratConfig.sanityCheck is expected
+	#PPConfig.dumpConfig and PPConfig.sanityCheck is expected
 	#to have been run already.
 	def self.scanBackupDir backup
 		#simple sanity check
