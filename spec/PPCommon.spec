@@ -15,6 +15,12 @@ describe PPCommon do
     PPCommon.addSlash('foo/').should == 'foo/'
   end
 
+  it "strips slashes from the end of a string" do
+    PPCommon.stripSlash('foo'  ).should == 'foo'
+    PPCommon.stripSlash('foo/' ).should == 'foo'
+    PPCommon.stripSlash('foo//').should == 'foo'
+  end
+
   it "checks for valid dates in archive directories" do
     patterns = [['2009-12-23_12:31',  true,  'valid'],
                 ['2011-03-13_22:02',  true,  'valid'],
