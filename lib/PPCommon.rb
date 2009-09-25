@@ -63,8 +63,9 @@ module PPCommon
 	#Expected to be used once at the beginning of running a backup to use
 	#in the backup path.
 	def self.newDatetime
-		str=DateTime.now.to_s
-		return "#{str[/^\d{4}\-\d{2}\-\d{2}/]}_#{str[/(\d{2}:){2}\d{2}/]}"
+		timestamp = DateTime.now.to_s
+    timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
+    timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
 	end
 
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
