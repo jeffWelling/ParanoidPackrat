@@ -68,10 +68,18 @@ describe PPCommon do
     PPCommon.datetimeFormat?(PPCommon.newDatetime).should be_true
   end
 
-  it "scans a path, returning it or all files under it that were not specifically excluded" do
+  it "scans a path, returning it or all files under it" do
     dir = TestLibrary.build_temp_dir
     count = TestLibrary.entries_under(dir).length
-    PPCommon.scanBackupDir(dir).length.should equal count
+    PPCommon.scanBackupDir(dir).length.should == count
+  end
+
+  it "excludes specified files during this scan" do
+    dir = TestLibrary.build_temp_dir
+    files = TestLibrary.entries_under dir
+    excludes = 3.of { files.random }.collect {|str| Regexp.new str }
+    filtered_files = files.select {|file| excludes.all? {|exclude| file !~ exclude } }
+    PPCommon.scanBackupDir(:BackupTarget => dir, :Exclusions => excludes).length.should == filtered_files.length
   end
 
 end
