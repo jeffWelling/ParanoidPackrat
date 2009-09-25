@@ -40,17 +40,22 @@ module PPCommon
     `mktemp -td #{str}`.strip # Is there a better way?
   end
 	
-	#Add a slash to the end of name if there isn't already one there.
-	def self.addSlash(name)
-		name << "/" unless name[-1].chr == '/'
-		return name
+	#Add a slash to the end of str if there isn't already one there.
+	def self.addSlash(str)
+		str << "/" unless str[-1].chr == '/'
+    str
+	end
+
+	#strip any trailing slashes from str if they exist
+	def self.stripSlash(str)
+    str.sub(/\/+$/,'')
 	end
 
 	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns FALSE
 	def self.datetimeFormat?(str)
-		return TRUE if !str[/^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/].nil?
-		return FALSE
+    return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
+    false
 	end
 
 	#return a string to be used as the datetime part of the backup path name
@@ -58,8 +63,9 @@ module PPCommon
 	#Expected to be used once at the beginning of running a backup to use
 	#in the backup path.
 	def self.newDatetime
-		str=DateTime.now.to_s
-		return "#{str[/^\d{4}\-\d{2}\-\d{2}/]}_#{str[/(\d{2}:){2}\d{2}/]}"
+		timestamp = DateTime.now.to_s
+    timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
+    timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
 	end
 	
 	#symbolize text
@@ -115,24 +121,20 @@ module PPCommon
 	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
 	#
 	#<b>Note</b> backup is expected to be one of the configs from 
-	#PPackratConfig.dumpConfig and PPackratConfig.sanityCheck is expected
+	#PPConfig.dumpConfig and PPConfig.sanityCheck is expected
 	#to have been run already.
 	def self.scanBackupDir backup
-		#simple sanity check
-		raise "You idiot" unless backup.class==Hash
-		collection=[]
-		Find.find(backup[:BackupTarget]) {|path|
-			collect=true
-			if backup[:Exclusions].class==Array
-				backup[:Exclusions].each {|exclusion|
-					collect=false if path[Regexp.new(exclusion)]
-				}
-				collection << path unless collect==false
-			else
-				collection << path
-			end
-		}
-		return collection
+    path = if backup.respond_to? :keys
+      backup[:BackupTarget]
+    else
+      backup.to_s
+    end
+		raise "You idiot - specify a path!" unless path
+		raise "You idiot - #{path} doesn't exists!" unless File.exists?(path)
+    collection = []
+    Find.find(path) {|file| collection << file }
+    return collection unless backup.respond_to?(:keys) && (exclusions = backup[:Exclusions])
+    collection.reject {|file| [*exclusions].any? {|exclusion| file =~ exclusion } }
 	end
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
@@ -218,16 +220,56 @@ module PPCommon
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
 		raise "you idiot" unless backup.class==Hash
-		#FIXME Fill me in. 
-		false
+    sigs = getExistingFileSignatures
+    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
+      sig = getFileSignature(new_file)
+      unless sigs[sig]
+        sigs[sig] = new_file
+      else
+        original_file = sigs[sig]
+        next if original_file == new_file
+        raise "File #{file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        hardlinkFile(new_file, original_file)
+      end
+    }
+    saveFileSignatures(sigs)
 	end
 	
-	#strip any trailing slashes from str if they exist
-	def self.stripSlash(str)
-		str=str.chop if str.reverse[0]==47
-		return str
-	end
+  require 'yaml'
+  #getExistingFileSignatures() reads the stored hashes in from a file
+  #takes an optional filename, otherwise uses the default
+  def self.getExistingFileSignatures(filename = nil)
+    filename ||= '~/file_hashes.yaml'
+    return {} unless File.exists?(File.expand_path(filename))
+    YAML.load(File.read(File.expand_path(filename))) || {}
+  end
 
+  #saveFileSignatures(signatures) saves a list of signatures to a file
+  #takes an optional filename, otherwise uses the default
+  #returns number of bytes written
+  def self.saveFileSignatures(signatures, filename = nil)
+    filename ||= '~/file_hashes.yaml'
+    File.open(File.expand_path(filename),'w') {|file| file.write signatures.to_yaml }
+  end
+
+  #getFileSignature(filename) hashes a file with sha1 and returns its signature
+  def self.getFileSignature(filename)
+    `sha1sum #{filename}`.split.first   #  Output looks like: 66b4e9c23697c5aa947b00f92c56ded95b0122e3  lib/PPCommon.rb
+  end
+
+  #hardLinkFile(new, old) makes 'new' a hardlink to 'old'
+  #WARNING - deletes new without checking if hardlinking is possible
+  def self.hardlinkFile(new,old)
+    # check both share a filesystem (for hardlinking)
+    # check both are identical
+    # check not the same file
+    #File.unlink new
+    #File.link old, new
+    puts "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
+    # check hardlink was made
+    # restore original file otherwise
+  end
+     
 	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
 	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
 	#returns false if there was no error, otherwise will return a hash in the form of {:FailedToOpen=>[foo.txt,bar.txt]}
