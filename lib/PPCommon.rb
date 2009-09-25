@@ -43,13 +43,12 @@ module PPCommon
 	#Add a slash to the end of name if there isn't already one there.
 	def self.addSlash(name)
 		name << "/" unless name[-1].chr == '/'
-		return name
+    name
 	end
 
 	#strip any trailing slashes from str if they exist
 	def self.stripSlash(str)
-    str.sub!(/\/+$/,'')
-		return str
+    str.sub(/\/+$/,'')
 	end
 
 	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
