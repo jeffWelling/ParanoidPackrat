@@ -80,6 +80,8 @@ describe PPCommon do
     excludes = 3.of { files.random }.collect {|str| Regexp.new str }
     filtered_files = files.select {|file| excludes.all? {|exclude| file !~ exclude } }
     PPCommon.scanBackupDir(:BackupTarget => dir, :Exclusions => excludes).length.should == filtered_files.length
+    filtered_files = files.select {|file| file !~ excludes.first }
+    PPCommon.scanBackupDir(:BackupTarget => dir, :Exclusions => excludes.first).length.should == filtered_files.length
   end
 
 end
