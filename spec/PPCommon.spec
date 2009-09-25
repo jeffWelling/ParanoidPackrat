@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../spec"))
 
 require 'PPCommon'
+load 'TestLibrary.rb'
+include TestLibrary
 
 describe PPCommon do
   it "creates an empty temp directory on request" do
@@ -65,6 +68,10 @@ describe PPCommon do
     PPCommon.datetimeFormat?(PPCommon.newDatetime).should be_true
   end
 
-  it "scans a path, returning it or all files under it that were not specifically excluded"
+  it "scans a path, returning it or all files under it that were not specifically excluded" do
+    dir = TestLibrary.build_temp_dir
+    count = TestLibrary.entries_under(dir).length
+    PPCommon.scanBackupDir(dir).length.should equal count
+  end
 
 end
