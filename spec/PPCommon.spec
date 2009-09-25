@@ -47,6 +47,24 @@ describe PPCommon do
     }
   end
 
+  it "creates accurate and properly formatted timestamps" do
+    nil while (Time.now.sec == 59) # avoid roll-over related bugs
+    timestamp = PPCommon.newDatetime
+    timestamp.length.should == 19
+    time = Time.now
+    year, month, day, hour, min, sec = timestamp.split(/\D/).collect(&:to_i)
+    time.year.should  == year
+    time.month.should == month
+    time.day.should   == day
+    time.hour.should  == hour
+    time.min.should   == min
+    time.sec.should   == sec
+  end
+
+  it "recognizes its own timestamps as valid" do
+    PPCommon.datetimeFormat?(PPCommon.newDatetime).should be_true
+  end
+
   it "scans a path, returning it or all files under it that were not specifically excluded"
 
 end
