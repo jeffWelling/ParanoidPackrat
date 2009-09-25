@@ -51,6 +51,45 @@ module PPCommon
     str.sub(/\/+$/,'')
 	end
 
+	#do a `df`, parse, return as array.  example return array below.
+	#	[ ['/dev/sda1', filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+	#		['/dev/sdb1', ...] ]
+	#the optional debug argument is for creating/using specs, if debug is provided it will be
+	#used instead of calling out to `df`.
+	def self.df debug=nil
+		debug.nil? ? output=`df -P` : output=debug
+		output=output.split("\n").reject {|l| !l[/^Filesystem/].nil? }  #Reject the first line of output, which is the columns.
+		output.each_index {|i|
+			filesystem= output[i][/^[^\s]+/]
+			total_1k_blocks=''
+			used=''
+			available=''
+			capacity=''
+			mountpoint=''
+			temp=''
+			i2=0  #I cant believe I have to use an index, I MUST be tired
+			output[i]=output[i].gsub(/^[^\s]+/, '')
+			output[i][/(\s+\d+){3}\s+\d+%\s+\//].strip.chop.chop.chop.split(' ').each {|number|
+				if i2==0
+					total_1k_blocks=number
+					i2+=1
+				elsif i2==1
+					used=number
+					i2+=1
+				elsif i2==2
+					available=number
+					i2+=1
+				elsif i2==3
+					capacity=number
+				end             			   #  << DAMN thats ugly
+				temp=[total_1k_blocks, used, available, capacity]
+			}
+			temp << (output[i].gsub(/(\s+\d+){3}\s+\d+%\s+\//, '/'))
+			output[i]= (temp.reverse << filesystem).reverse
+		}
+		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
+	end
+
 	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns FALSE
 	def self.datetimeFormat?(str)
