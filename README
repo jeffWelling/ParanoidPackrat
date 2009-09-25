@@ -11,6 +11,7 @@ drives.  It will have configurable redundancy, so
 you can specify how many copies you want to keep,
 across how many devices.  For more detail, see
 http://wiki.github.com/jeffWelling/ParanoidPackrat
+and http://jeffwelling.github.com/ParanoidPackrat
 
 Written by Jeff Welling [and hopefully, friends].
 Published as GPLv3 Free Software.
