@@ -76,10 +76,15 @@ module PPCommon
 	#PPConfig.dumpConfig and PPConfig.sanityCheck is expected
 	#to have been run already.
 	def self.scanBackupDir backup
-		#simple sanity check
-		raise "You idiot" unless backup.class==Hash
+    path = if backup.respond_to? :keys
+      backup[:BackupTarget]
+    else
+      backup.to_s
+    end
+		raise "You idiot - specify a path!" unless path
+		raise "You idiot - #{path} doesn't exists!" unless File.exists?(path)
 		collection=[]
-		Find.find(backup[:BackupTarget]) {|path|
+		Find.find(path) {|path|
 			collect=true
 			if backup[:Exclusions].class==Array
 				backup[:Exclusions].each {|exclusion|
