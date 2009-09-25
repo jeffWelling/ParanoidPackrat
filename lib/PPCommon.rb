@@ -46,6 +46,12 @@ module PPCommon
 		return name
 	end
 
+	#strip any trailing slashes from str if they exist
+	def self.stripSlash(str)
+		str=str.chop if str.reverse[0]==47
+		return str
+	end
+
 	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns FALSE
 	def self.datetimeFormat?(str)
@@ -220,12 +226,6 @@ module PPCommon
     # restore original file otherwise
   end
      
-	#strip any trailing slashes from str if they exist
-	def self.stripSlash(str)
-		str=str.chop if str.reverse[0]==47
-		return str
-	end
-
 	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
 	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
 	#returns false if there was no error, otherwise will return a hash in the form of {:Permissions=>[foo.txt,bar.txt]}
