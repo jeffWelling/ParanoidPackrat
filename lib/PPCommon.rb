@@ -40,10 +40,10 @@ module PPCommon
     `mktemp -td #{str}`.strip # Is there a better way?
   end
 	
-	#Add a slash to the end of name if there isn't already one there.
-	def self.addSlash(name)
-		name << "/" unless name[-1].chr == '/'
-    name
+	#Add a slash to the end of str if there isn't already one there.
+	def self.addSlash(str)
+		str << "/" unless str[-1].chr == '/'
+    str
 	end
 
 	#strip any trailing slashes from str if they exist
