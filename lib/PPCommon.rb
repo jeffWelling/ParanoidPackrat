@@ -48,7 +48,7 @@ module PPCommon
 
 	#strip any trailing slashes from str if they exist
 	def self.stripSlash(str)
-		str=str.chop if str.reverse[0]==47
+    str.sub!(/\/+$/,'')
 		return str
 	end
 
