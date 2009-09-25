@@ -83,19 +83,10 @@ module PPCommon
     end
 		raise "You idiot - specify a path!" unless path
 		raise "You idiot - #{path} doesn't exists!" unless File.exists?(path)
-		collection=[]
-		Find.find(path) {|path|
-			collect=true
-			if backup[:Exclusions].class==Array
-				backup[:Exclusions].each {|exclusion|
-					collect=false if path[Regexp.new(exclusion)]
-				}
-				collection << path unless collect==false
-			else
-				collection << path
-			end
-		}
-		return collection
+    collection = []
+    Find.find(path) {|file| collection << file }
+    return collection unless backup.respond_to?(:keys) && (exclusions = backup[:Exclusions])
+    collection.reject {|file| [*exclusions].any? {|exclusion| file =~ exclusion } }
 	end
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
