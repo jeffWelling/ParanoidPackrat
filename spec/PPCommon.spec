@@ -22,21 +22,23 @@ describe PPCommon do
   end
 
   it "checks for valid dates in archive directories" do
-    patterns = [['2009-12-23_12:31',  true,  'valid'],
-                ['2011-03-13_22:02',  true,  'valid'],
-                ['1992-11-07_02:40',  true,  'valid'],
-                ['3009-13-23_12:31',  false, 'invalid year'],
-                ['2009-13-23_12:31',  false, 'invalid month'],
-                ['2009-12-32_12:31',  false, 'invalid day'],
-                ['2009-12-23_25:31',  false, 'invalid hour'],
-                ['2009--13-23_12:63', false, 'invalid minute'],
-                ['09-11-25_12:31',    false, 'invalid 2-digit day'],
-                ['2009-1-23_12:31',   false, 'invalid 1-digit month'],
-                ['2009-12-2_12:31',   false, 'invalid 1-digit day'],
-                ['2009--12-23_12:31', false, 'invalid punctuation'],
-                ['2009-12--23_12:31', false, 'invalid punctuation'],
-                ['2009-12-23__12:31', false, 'invalid punctuation'],
-                ['2009-12-23_12::31', false, 'invalid punctuation'],
+    patterns = [['2009-12-23_12:31:10',  true,  'valid'],
+                ['2011-03-13_22:02:30',  true,  'valid'],
+                ['1992-11-07_02:40:59',  true,  'valid'],
+                ['3009-13-23_12:31:10',  false, 'invalid year'],
+                ['2009-13-23_12:31:20',  false, 'invalid month'],
+                ['2009-12-32_12:31:30',  false, 'invalid day'],
+                ['2009-12-23_25:31:40',  false, 'invalid hour'],
+                ['2009-13-23_12:63:50',  false, 'invalid minute'],
+                ['2009-13-23_12:63:70',  false, 'invalid second'],
+                ['09-11-25_12:31:10',    false, 'invalid 2-digit day'],
+                ['2009-1-23_12:31:10',   false, 'invalid 1-digit month'],
+                ['2009-12-2_12:31:10',   false, 'invalid 1-digit day'],
+                ['2009--12-23_12:31:10', false, 'invalid punctuation'],
+                ['2009-12--23_12:31:10', false, 'invalid punctuation'],
+                ['2009-12-23__12:31:10', false, 'invalid punctuation'],
+                ['2009-12-23_12::31:10', false, 'invalid punctuation'],
+                ['2009-12-23_12:31::10', false, 'invalid punctuation'],
               ]
     patterns.each {|pattern,expected,reason|
       result = PPCommon.datetimeFormat?(pattern)

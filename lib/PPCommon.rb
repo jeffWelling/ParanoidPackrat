@@ -54,8 +54,8 @@ module PPCommon
 	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns FALSE
 	def self.datetimeFormat?(str)
-		return TRUE if !str[/^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/].nil?
-		return FALSE
+    return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
+    false
 	end
 
 	#return a string to be used as the datetime part of the backup path name
