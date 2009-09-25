@@ -29,7 +29,7 @@ module PPCommon
 	#of printing the output.
 	def self.pprint str, fatal=nil
 		raise str unless fatal.nil?
-#		return TRUE if self.silentMode?
+#		return true if self.silentMode?
 		puts str
 	end
 
@@ -71,11 +71,11 @@ module PPCommon
 			output[i]=output[i].gsub(/^[^\s]+/, '')
 			output[i][/(\s+\d+){3}\s+\d+%\s+\//].strip.chop.chop.chop.split(' ').each {|number|
 				if i2==0
-					total_1k_blocks=number
-					i2+=1
-				elsif i2==1
-					used=number
-					i2+=1
+					total_1k_blocks=number			#Chef: "Hello children!"
+					i2+=1												#Kids: "Hi Chef!"
+				elsif i2==1										#Kids: "Chef, what would a priest want to put up our butts?"
+					used=number									#Chef: "Goodbye!"
+					i2+=1												#ROFL
 				elsif i2==2
 					available=number
 					i2+=1
@@ -90,8 +90,8 @@ module PPCommon
 		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
 	end
 
-	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
-	#otherwise, returns FALSE
+	#returns true if str matches the date time format expected to be found in the backup destination folders
+	#otherwise, returns false
 	def self.datetimeFormat?(str)
     return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
     false
@@ -178,7 +178,7 @@ module PPCommon
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
 	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
-	#Using that example, it would create the dir "/mnt/backup/", it will return FALSE unless
+	#Using that example, it would create the dir "/mnt/backup/", it will return false unless
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
@@ -189,7 +189,7 @@ module PPCommon
 		Find.find(dir) {|file|
 			counter+=1
 		}
-		return FALSE unless counter==1
+		return false unless counter==1
 		FileUtils.mkdir( dir + "backup/", 700 )[0]
 	end
 	
@@ -199,18 +199,18 @@ module PPCommon
 	#
 	#It will look for any directories underneath backup_dest, if they also contain a directory
 	#which has the correct date time format, and there is a last_backup symlink pointing to a dir,
-	#then it will return TRUE that yes there is at least one existing backup meaning
+	#then it will return true that yes there is at least one existing backup meaning
 	#this is not the first run.
 	#Otherwise, if there are no directories underneath backup_dest which also contain a dir
 	#with the name in the right date time format which also contains a last_backup symlink,
-	#it will return FALSE signaling that this is the first run.
+	#it will return false signaling that this is the first run.
 	#If backup_dest does not exist, or there are other files in backup_dest, it will simply
-	#return FALSE.
+	#return false.
 	#
 	#If backup_name is provided, that one backupDest/backupName dir will be checked for backups.
 	#NOTE - all paths are expected to be full paths
 	def self.containsBackups?(backup_dest, backup_name=nil)
-		return FALSE unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
+		return false unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
 		backup_dest=PPCommon.addSlash(backup_dest)
 		has_a_backup=false
 		last_backup=false
@@ -238,8 +238,8 @@ module PPCommon
 				}
 			}
 		}
-		return TRUE if has_a_backup.class==TrueClass and last_backup.class==TrueClass
-		return FALSE
+		return true if has_a_backup.class==TrueClass and last_backup.class==TrueClass
+		return false
 	end
 	
 	#shrinkBackupDestination(backup,wide) traverse through backups under backupDestination/backupName/ , hardlinking to save space
@@ -328,7 +328,7 @@ module PPCommon
 					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
 			end
 		}
-		return results
+		results
 	end
 	
 	#readFile takes a filename, and optionally the maximum number of lines to read.
@@ -343,7 +343,7 @@ module PPCommon
 				counter+=1 unless max_lines==0
 			end
 		}
-		return read_lines
+		read_lines
 	end
 end
 

@@ -90,6 +90,6 @@ module PPIrb
 		PPCommon.pprint( "simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!\n\t\tBackup was performed, but some files may not have been copies so last_backup still points to your most recent completed backup.\n" ) unless er==false
 		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
 		
-		return dest_name_date
+		dest_name_date
 	end
 end

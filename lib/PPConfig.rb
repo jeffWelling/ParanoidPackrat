@@ -24,7 +24,7 @@ module PPConfig
 		#checkYourConfig is called when an error is encountered reading the configuration. 
 		def self.checkYourConfig
 			puts "PPConfig:  Please check your configuration."
-			@BadConfig=TRUE
+			@BadConfig=true
 		end
 		#This function is intended to be run AFTER the the configurations have been set
 		#to make sure the configurations entered are sane.
@@ -77,7 +77,7 @@ module PPConfig
 		def initialize
 			@numOfConfigs||=0
 			@Configs||={}
-			@BadConfig||=FALSE
+			@BadConfig||=false
 			@BackupDestinations||=''
       @options = OpenStruct.new
       set_default_options
@@ -90,7 +90,7 @@ module PPConfig
 		def setBackupDestination backup_destination
 			PPackrat.checkYourconfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
 			@BackupDestinations = backup_destination
-			return TRUE
+			true
 		end
 
 		#addName creates a new blank configuration with the name you provided.
@@ -100,8 +100,8 @@ module PPConfig
 				puts "Config names must be unique"
 				PPConfig.checkYourConfig
 			end
-			@Configs.merge!({ configName=>{:BackupName=>configName} }) and return TRUE unless @Configs.include?(configName)
-			return FALSE
+			@Configs.merge!({ configName=>{:BackupName=>configName} }) and return false unless @Configs.include?(configName)
+			false
 		end
 		#Number of configurations currently entered
 		def length
@@ -129,7 +129,7 @@ module PPConfig
 				puts "PPConfig:  File or directory does not exist? '#{thingToBackup}'"
 				PPConfig.checkYourConfig
 			end
-			return TRUE
+			true
 		end
 		#name is the name of the config your setting.
 		#
@@ -146,7 +146,7 @@ module PPConfig
 			end
 			@Configs[name][:Exclusions]||=[]
 			@Configs[name][:Exclusions] << exclusion unless @Configs[name][:Exclusions].include? exclusion
-			return TRUE
+			true
 		end
 		#name is the name of the config your setting.
 		#
@@ -161,7 +161,7 @@ module PPConfig
 				PPackrat.checkYourConfig
 			end
 			@Configs[name][:GuaranteedNumBackups]==guaranteed_num_of_backups.to_i
-			return TRUE
+			true
 		end
 		#If setIsCritical is called with a name, and anything_but_nil as anything except nil, then
 		#the backup specified by this name will be considered critical, and one copy will be kept
@@ -171,8 +171,8 @@ module PPConfig
 				puts "Must first addName('#{name}')"
 				PPackrat.checkYourConfig
 			end
-			@Configs[name][:CriticalBackup]=TRUE
-			return TRUE
+			@Configs[name][:CriticalBackup]=true
+			true
 		end
 		#setBackupDestinationOn sets the backup destination for a specific configuration as referenced
 		#by name.  There can only be one backup destination per config when specified in this method.
@@ -185,7 +185,7 @@ module PPConfig
 			@Configs[name]||={}
 			@Configs[name][:BackupDestination]||=''
 			@Configs[name][:BackupDestination]= backup_destination
-			return TRUE
+			true
 		end
 	end
 	initialize
