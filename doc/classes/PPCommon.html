@@ -74,8 +74,8 @@
 
     <div id="description">
       <p>
-This is the collection of methods that are common to the ParanoidPackrat
-project.
+This is the collection of methods that are common to the <a
+href="ParanoidPackrat.html">ParanoidPackrat</a> project.
 </p>
 
     </div>
@@ -87,12 +87,27 @@ project.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000002">addSlash</a>&nbsp;&nbsp;
-      <a href="#M000006">containsBackups?</a>&nbsp;&nbsp;
-      <a href="#M000003">datetimeFormat?</a>&nbsp;&nbsp;
-      <a href="#M000005">makeBackupDirectory</a>&nbsp;&nbsp;
-      <a href="#M000001">pprint</a>&nbsp;&nbsp;
-      <a href="#M000004">scanBackupDir</a>&nbsp;&nbsp;
+      <a href="#M000004">addSlash</a>&nbsp;&nbsp;
+      <a href="#M000010">ask</a>&nbsp;&nbsp;
+      <a href="#M000011">ask_symbol</a>&nbsp;&nbsp;
+      <a href="#M000015">containsBackups?</a>&nbsp;&nbsp;
+      <a href="#M000007">datetimeFormat?</a>&nbsp;&nbsp;
+      <a href="#M000006">df</a>&nbsp;&nbsp;
+      <a href="#M000017">getExistingFileSignatures</a>&nbsp;&nbsp;
+      <a href="#M000019">getFileSignature</a>&nbsp;&nbsp;
+      <a href="#M000020">hardlinkFile</a>&nbsp;&nbsp;
+      <a href="#M000014">makeBackupDirectory</a>&nbsp;&nbsp;
+      <a href="#M000003">mktempdir</a>&nbsp;&nbsp;
+      <a href="#M000008">newDatetime</a>&nbsp;&nbsp;
+      <a href="#M000002">pprint</a>&nbsp;&nbsp;
+      <a href="#M000012">prompt</a>&nbsp;&nbsp;
+      <a href="#M000022">readFile</a>&nbsp;&nbsp;
+      <a href="#M000021">rsyncErr?</a>&nbsp;&nbsp;
+      <a href="#M000018">saveFileSignatures</a>&nbsp;&nbsp;
+      <a href="#M000013">scanBackupDir</a>&nbsp;&nbsp;
+      <a href="#M000016">shrinkBackupDestination</a>&nbsp;&nbsp;
+      <a href="#M000005">stripSlash</a>&nbsp;&nbsp;
+      <a href="#M000009">symbolize</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -114,30 +129,66 @@ project.
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000002" class="method-detail">
-        <a name="M000002"></a>
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000002.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000002.html');return false;">
-          <span class="method-name">addSlash</span><span class="method-args">(name)</span>
+          <a href="PPCommon.src/M000004.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000004.html');return false;">
+          <span class="method-name">addSlash</span><span class="method-args">(str)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Add a slash to the end of name if there isn&#8216;t already one there.
+Add a slash to the end of str if there isn&#8216;t already one there.
 </p>
         </div>
       </div>
 
-      <div id="method-M000006" class="method-detail">
-        <a name="M000006"></a>
+      <div id="method-M000010" class="method-detail">
+        <a name="M000010"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000006.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000006.html');return false;">
-          <span class="method-name">containsBackups?</span><span class="method-args">(backup_dir)</span>
+          <a href="PPCommon.src/M000010.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000010.html');return false;">
+          <span class="method-name">ask</span><span class="method-args">(question, default=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000010">ask</a> the user question, and return the
+response (with optional default)
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000011.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000011.html');return false;">
+          <span class="method-name">ask_symbol</span><span class="method-args">(question, default)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000010">ask</a> the user a question, return the
+symbolized response with optional default
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000015.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000015.html');return false;">
+          <span class="method-name">containsBackups?</span><span class="method-args">(backup_dest, backup_name=nil)</span>
           </a>
         </div>
       
@@ -148,16 +199,143 @@ Basically, its used to tell if this if the first run backup, or if there
 are others that it can use to help shrink the size of the backup.
 </p>
 <p>
-It will look for any directories underneath backup_dir, if they also
+It will look for any directories underneath backup_dest, if they also
 contain a directory which has the correct date time format, and there is a
-last_backup symlink pointing to a dir, then it will return TRUE that yes
+last_backup symlink pointing to a dir, then it will return true that yes
 there is at least one existing backup meaning this is not the first run.
-Otherwise, if there are no directories underneath backup_dir which also
+Otherwise, if there are no directories underneath backup_dest which also
 contain a dir with the name in the right date time format which also
-contains a last_backup symlink, it will return FALSE signaling that this is
-the first run. If backup_dir does not exist, or there are other files in
-backup_dir, it will simply return FALSE. NOTE - backup_dir is expected to
-be a full path
+contains a last_backup symlink, it will return false signaling that this is
+the first run. If backup_dest does not exist, or there are other files in
+backup_dest, it will simply return false.
+</p>
+<p>
+If backup_name is provided, that one backupDest/backupName dir will be
+checked for backups. NOTE - all paths are expected to be full paths
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000007" class="method-detail">
+        <a name="M000007"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000007.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000007.html');return false;">
+          <span class="method-name">datetimeFormat?</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+returns true if str matches the date time format expected to be found in
+the backup destination folders otherwise, returns false
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000006.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000006.html');return false;">
+          <span class="method-name">df</span><span class="method-args">(debug=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+do a `<a href="PPCommon.html#M000006">df</a>`, parse, return as array.
+example return array below.
+</p>
+<pre>
+      [ ['/dev/sda1', filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+              ['/dev/sdb1', ...] ]
+</pre>
+<p>
+the optional debug argument is for creating/using specs, if debug is
+provided it will be used instead of calling out to `<a
+href="PPCommon.html#M000006">df</a>`.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000017.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000017.html');return false;">
+          <span class="method-name">getExistingFileSignatures</span><span class="method-args">(filename = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000017">getExistingFileSignatures</a>() reads the
+stored hashes in from a file takes an optional filename, otherwise uses the
+default
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000019.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000019.html');return false;">
+          <span class="method-name">getFileSignature</span><span class="method-args">(filename)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000019">getFileSignature</a>(filename) hashes a
+file with sha1 and returns its signature
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000020.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000020.html');return false;">
+          <span class="method-name">hardlinkFile</span><span class="method-args">(new,old)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+hardLinkFile(new, old) makes &#8216;new&#8217; a hardlink to
+&#8216;old&#8217; WARNING - deletes new without checking if hardlinking is
+possible
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000014.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000014.html');return false;">
+          <span class="method-name">makeBackupDirectory</span><span class="method-args">(dir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000014">makeBackupDirectory</a>(dir) creates the
+backup directory structure to store the backups in. dir is expected to be a
+directory, such as say, &quot;/mnt&quot; or &quot;/mnt/&quot;. Using that
+example, it would create the dir &quot;/mnt/backup/&quot;, it will return
+false unless directory (&quot;/mnt/backup/&quot; in this case) exists and
+is not empty. Otherwise, it will return the path of the directory that was
+just created.
 </p>
         </div>
       </div>
@@ -168,15 +346,207 @@ be a full path
         <div class="method-heading">
           <a href="PPCommon.src/M000003.html" target="Code" class="method-signature"
             onclick="popupCode('PPCommon.src/M000003.html');return false;">
-          <span class="method-name">datetimeFormat?</span><span class="method-args">(str)</span>
+          <span class="method-name">mktempdir</span><span class="method-args">(str = 'PP')</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-returns TRUE if str matches the date time format expected to be found in
-the backup destination folders otherwise, returns FALSE
+<a href="PPCommon.html#M000003">mktempdir</a>(prefix = &#8216;PP&#8217;)
+will return a temp directory. This directory is not yet, but should be
+auto-deleted on exit
 </p>
+        </div>
+      </div>
+
+      <div id="method-M000008" class="method-detail">
+        <a name="M000008"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000008.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000008.html');return false;">
+          <span class="method-name">newDatetime</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+return a string to be used as the datetime part of the backup path name the
+string is to be used backup/backupname/HERE/&#8230; Expected to be used
+once at the beginning of running a backup to use in the backup path.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000002.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000002.html');return false;">
+          <span class="method-name">pprint</span><span class="method-args">(str, fatal=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000002">pprint</a> is a function to help control
+output based on silent mode or not. This is called from other internal
+methods to print output, which is then only displayed if we are not in
+silent mode. if fatal is anything except nil, than an exception is raise
+with str instead of printing the output.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000012.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000012.html');return false;">
+          <span class="method-name">prompt</span><span class="method-args">(question, default = :yes, add_options = nil, delete_options = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000010">ask</a> the user question, loop until he
+selects a valid option.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000022.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000022.html');return false;">
+          <span class="method-name">readFile</span><span class="method-args">(file, max_lines=0)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000022">readFile</a> takes a filename, and
+optionally the maximum number of lines to read.
+</p>
+<p>
+returns the lines read as an array.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000021.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000021.html');return false;">
+          <span class="method-name">rsyncErr?</span><span class="method-args">( p, error_log )</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+whatWasError? looks at p, which is expected to be a Process::Status object,
+and if its exit status was not zero it will read the error log and try to
+collect the important lines to show the user. Intended to be used in
+simpleBackup() returns false if there was no error, otherwise will return a
+hash in the form of {:<a href="http://foo.txt,bar.txt">FailedToOpen=></a>}
+for example if there were two files, foo.txt and bar.txt which were not
+readable due to permission issues. error_log is expected to be the full
+path to the error log in question. The error log is expected to be the
+stderr output from running rsync &#8230; &amp;&gt;error_log, from
+simpleBackup().
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000018" class="method-detail">
+        <a name="M000018"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000018.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000018.html');return false;">
+          <span class="method-name">saveFileSignatures</span><span class="method-args">(signatures, filename = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000018">saveFileSignatures</a>(signatures) saves a
+list of signatures to a file takes an optional filename, otherwise uses the
+default returns number of bytes written
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000013.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000013.html');return false;">
+          <span class="method-name">scanBackupDir</span><span class="method-args">(backup)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000013">scanBackupDir</a>(backup) will scan the
+dir/file specified in backup[:BackupTarget], and will return an array with
+the full path of every file covered by backup[:BackupTarget], excluding
+anything specified in backup[:Exclusions].
+</p>
+<p>
+<b>Note</b> backup is expected to be one of the configs from <a
+href="PPConfig.html#M000036">PPConfig.dumpConfig</a> and <a
+href="PPConfig.html#M000028">PPConfig.sanityCheck</a> is expected to have
+been run already.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000016" class="method-detail">
+        <a name="M000016"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000016.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000016.html');return false;">
+          <span class="method-name">shrinkBackupDestination</span><span class="method-args">(backup,wide=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000016">shrinkBackupDestination</a>(backup,wide)
+traverse through backups under backupDestination/backupName/ , hardlinking
+to save space
+</p>
+<p>
+By default, it will only traverse backup directories
+(backupDest/backupName/datetimes). To get it to scan every folder, set
+wide=true.
+</p>
+<p>
+Be warned! This is a very dangerous operation if you forget that
+you&#8216;ve hardlinked to files that are in backupDest/backupName that
+aren&#8216;t your backups, and you use this option to hardlink to them, and
+then you change them, YOU WILL BE CORRUPTING YOUR BACKUPS. This is why
+wide=nil by default, but if you know you won&#8216;t be changing those
+files it could be useful to hardlink them to save a little bit of space.
+</p>
+<p>
+Also note there is no undo for this operation, if you run it once, that
+file is hardlinked and you will have to create a copy, unlink the file, and
+mv the copy into place for every file thats not in a
+backupDest/backupName/datetimes dir to undo this operation!
+</p>
+<pre>
+      NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
+</pre>
         </div>
       </div>
 
@@ -186,65 +556,30 @@ the backup destination folders otherwise, returns FALSE
         <div class="method-heading">
           <a href="PPCommon.src/M000005.html" target="Code" class="method-signature"
             onclick="popupCode('PPCommon.src/M000005.html');return false;">
-          <span class="method-name">makeBackupDirectory</span><span class="method-args">(dir)</span>
+          <span class="method-name">stripSlash</span><span class="method-args">(str)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000005">makeBackupDirectory</a>(dir) creates the
-backup directory structure to store the backups in. dir is expected to be a
-directory, such as say, &quot;/mnt&quot; or &quot;/mnt/&quot;. Using that
-example, it would create the dir &quot;/mnt/backup/&quot;, it will return
-FALSE unless directory (&quot;/mnt/backup/&quot; in this case) exists and
-is not empty. Otherwise, it will return the path of the directory that was
-just created.
+strip any trailing slashes from str if they exist
 </p>
         </div>
       </div>
 
-      <div id="method-M000001" class="method-detail">
-        <a name="M000001"></a>
+      <div id="method-M000009" class="method-detail">
+        <a name="M000009"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000001.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000001.html');return false;">
-          <span class="method-name">pprint</span><span class="method-args">(str)</span>
+          <a href="PPCommon.src/M000009.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000009.html');return false;">
+          <span class="method-name">symbolize</span><span class="method-args">(text)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000001">pprint</a> is a function to help control
-output based on silent mode or not. This is called from other internal
-methods to print output, which is then only displayed if we are not in
-silent mode.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000004" class="method-detail">
-        <a name="M000004"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000004.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000004.html');return false;">
-          <span class="method-name">scanBackupDir</span><span class="method-args">(backup)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000004">scanBackupDir</a>(backup) will scan the
-dir/file specified in backup[:BackupTarget], and will return an array with
-the full path of every file covered by backup[:BackupTarget], excluding
-anything specified in backup[:Exclusions].
-</p>
-<p>
-<b>Note</b> backup is expected to be one of the configs from <a
-href="PPackratConfig.html#M000016">PPackratConfig.dumpConfig</a> and <a
-href="PPackratConfig.html#M000008">PPackratConfig.sanityCheck</a> is
-expected to have been run already.
+<a href="PPCommon.html#M000009">symbolize</a> text
 </p>
         </div>
       </div>

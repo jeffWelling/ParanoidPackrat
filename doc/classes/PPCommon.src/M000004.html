@@ -5,28 +5,15 @@
 
 <html>
 <head>
-  <title>scanBackupDir (PPCommon)</title>
+  <title>addSlash (PPCommon)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 52</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">scanBackupDir</span> <span class="ruby-identifier">backup</span>
-                <span class="ruby-comment cmt">#simple sanity check</span>
-                <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;You idiot&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">backup</span>.<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">Hash</span>
-                <span class="ruby-identifier">collection</span>=[]
-                <span class="ruby-constant">Find</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupTarget</span>]) {<span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
-                        <span class="ruby-identifier">collect</span>=<span class="ruby-keyword kw">true</span>
-                        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:Exclusions</span>].<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">Array</span>
-                                <span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:Exclusions</span>].<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">exclusion</span><span class="ruby-operator">|</span>
-                                        <span class="ruby-identifier">collect</span>=<span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">path</span>[<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">exclusion</span>)]
-                                }
-                                <span class="ruby-identifier">collection</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">path</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">collect</span><span class="ruby-operator">==</span><span class="ruby-keyword kw">false</span>
-                        <span class="ruby-keyword kw">else</span>
-                                <span class="ruby-identifier">collection</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">path</span>
-                        <span class="ruby-keyword kw">end</span>
-                }
-                <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">collection</span>
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 44</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">str</span>)
+                <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;/&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">str</span>[<span class="ruby-value">-1</span>].<span class="ruby-identifier">chr</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'/'</span>
+    <span class="ruby-identifier">str</span>
         <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>
