@@ -33,13 +33,6 @@ module PPCommon
 		puts str
 	end
 
-  #mktempdir(prefix = 'PP') will return a temp directory.
-  #This directory is not yet, but should be auto-deleted on exit
-  def self.mktempdir str = 'PP'
-    str += '.XXXXXX' unless str =~ /X+$/
-    `mktemp -td #{str}`.strip # Is there a better way?
-  end
-	
 	#Add a slash to the end of str if there isn't already one there.
 	def self.addSlash(str)
 		str << "/" unless str[-1].chr == '/'
