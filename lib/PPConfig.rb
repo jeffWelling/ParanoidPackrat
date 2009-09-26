@@ -88,7 +88,7 @@ module PPConfig
 		#
 		#backup_destination must exist and it must be a directory.
 		def setBackupDestination backup_destination
-			PPackrat.checkYourconfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
+			PPConfig.checkYourConfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
 			@BackupDestinations = backup_destination
 			true
 		end
@@ -158,7 +158,7 @@ module PPConfig
 		def setDuplication name, guaranteed_num_of_backups
 			unless @Configs.include?(name)
 				puts "Must first addname('#{name}')"
-				PPackrat.checkYourConfig
+				PPConfig.checkYourConfig
 			end
 			@Configs[name][:GuaranteedNumBackups]==guaranteed_num_of_backups.to_i
 			true
@@ -169,7 +169,7 @@ module PPConfig
 		def setIsCritical? name, anything_but_nil=nil
 			unless @Configs.include?(name)
 				puts "Must first addName('#{name}')"
-				PPackrat.checkYourConfig
+				PPConfig.checkYourConfig
 			end
 			@Configs[name][:CriticalBackup]=true
 			true

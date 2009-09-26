@@ -7,6 +7,13 @@ class Array
 end
 
 module TestLibrary
+  #mktempdir(prefix = 'PP') will return a temp directory.
+  #This directory is not yet, but should be auto-deleted on exit
+  def mktempdir str = 'PP'
+    str += '.XXXXXX' unless str =~ /X+$/
+    `mktemp -td #{str}`.strip # Is there a better way?
+  end
+	
   def rand_file_name
     chars = ('a'..'z').collect + ('A'..'Z').collect + ('0'..'9').collect
     name = (rand(6) + 2).of { chars.random }.join

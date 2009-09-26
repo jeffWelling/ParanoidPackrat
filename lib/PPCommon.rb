@@ -33,13 +33,6 @@ module PPCommon
 		puts str
 	end
 
-  #mktempdir(prefix = 'PP') will return a temp directory.
-  #This directory is not yet, but should be auto-deleted on exit
-  def self.mktempdir str = 'PP'
-    str += '.XXXXXX' unless str =~ /X+$/
-    `mktemp -td #{str}`.strip # Is there a better way?
-  end
-	
 	#Add a slash to the end of str if there isn't already one there.
 	def self.addSlash(str)
 		str << "/" unless str[-1].chr == '/'
@@ -182,15 +175,9 @@ module PPCommon
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
-		raise "You idiot" unless dir.class==String
-		dir=PPCommon.addSlash(dir)
-		#Make sure the directory is empty
-		counter=0
-		Find.find(dir) {|file|
-			counter+=1
-		}
-		return false unless counter==1
-		FileUtils.mkdir( dir + "backup/", 700 )[0]
+		raise "You idiot" unless dir.is_a? String
+		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
+		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
 	end
 	
 	#This method is used to determine if a backup dir contains backups or not.
