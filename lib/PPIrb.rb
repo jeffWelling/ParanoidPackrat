@@ -84,6 +84,7 @@ module PPIrb
 			else
 				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
 			end
+			PPCommon.removeMark(dest_name_date.gsub(' ', '\ '))
 		else #There was an error
 			#
 		end

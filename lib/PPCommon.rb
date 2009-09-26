@@ -356,5 +356,13 @@ module PPCommon
 		`touch #{PPCommon.addSlash(dir) + '.incomplete_backup'}`
 		true
 	end
+
+	#removeMark(dir) is intended to be used after a backup has been completed to remove the mark indicating an incomplete backup
+	#dir must be the same as was applied to PPCommon.mark() before the backup was begun, obviously.
+	def self.removeMark( dir )
+		raise "You stupid individual!" unless dir.is_a? String
+		File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
+		true
+	end
 end
 
