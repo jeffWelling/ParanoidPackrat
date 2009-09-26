@@ -291,7 +291,7 @@ module PPCommon
     # check not the same file
     #File.unlink new
     #File.link old, new
-    puts "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
+    PPCommon.pprint "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
     # check hardlink was made
     # restore original file otherwise
   end
