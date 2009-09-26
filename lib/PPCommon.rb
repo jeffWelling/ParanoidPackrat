@@ -245,6 +245,20 @@ module PPCommon
 	#
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
+#		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
+=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
+
+/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
+        from ./ParanoidPackrat.rb:35
+
+=end
+ 
 		raise "you idiot" unless backup.class==Hash
     sigs = getExistingFileSignatures
     Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
@@ -254,7 +268,7 @@ module PPCommon
       else
         original_file = sigs[sig]
         next if original_file == new_file
-        raise "File #{file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
         hardlinkFile(new_file, original_file)
       end
     }
