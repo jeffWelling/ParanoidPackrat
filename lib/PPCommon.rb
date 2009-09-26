@@ -346,5 +346,15 @@ module PPCommon
 		}
 		read_lines
 	end
+
+	#mark(dir) will mark the backup destination before performing a backup to assist in finding
+	#incomplete backups later on. dir is expected to be the directory of backupDest/'backup'/backupName/datetime/
+	#
+	#See also: PPCommon.removeMark()
+	def self.mark( dir )
+		raise "You idiot!" unless dir.is_a? String
+		`touch #{PPCommon.addSlash(dir) + '.incomplete_backup'}`
+		true
+	end
 end
 

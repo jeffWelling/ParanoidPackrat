@@ -49,6 +49,7 @@ module PPIrb
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
 			first_or_second=:first
 			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
+			PPCommon.mark(dest_name_date.gsub(' ', '\ '))
 			#This isn't the first backup, you can hardlink to the other backups.
 			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		else
