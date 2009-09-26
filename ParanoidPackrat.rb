@@ -26,7 +26,7 @@ load 'ParanoidPackrat.rb'
 load 'PPConfig.rb'
 load 'PPCommon.rb'
 load 'PPIrb.rb'
-load 'ParanoidPackrat.config.rb'
+#load 'ParanoidPackrat.config.rb'
 
 #Just load unless we are being executed from the CLI
 if $0 == __FILE__ 
