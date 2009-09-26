@@ -55,7 +55,7 @@ module PPConfig
         p.banner = "Usage: ParanoidPackrat.rb [options]"
         # Add options
         p.on("-c","--config [FILE]","Specify a non-default config-file location.")    {|file| options.configFile = file }
-        p.on("-s","--silent [BOOL]","Set silent mode - no non-errors will be output") {|bool| options.silentMode = (bool !~ /(no|false)/) }
+        p.on("-s","--silent [BOOL]","Set silent mode - no output will be generated.  Intended for use with cron.") {|bool| options.silentMode = (bool !~ /(no|false)/) }
         p.on("-h","--help",            "Show this message")                           {       puts p ; exit }
         p.separator "Examples:"
         p.separator "\tParanoidPackrat --silent"
