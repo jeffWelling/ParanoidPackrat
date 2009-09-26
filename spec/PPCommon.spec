@@ -85,4 +85,11 @@ describe PPCommon do
     filtered_files = files.select {|file| file !~ excludes.first }
     PPCommon.scanBackupDir(:BackupTarget => dir, :Exclusions => excludes.first).length.should == filtered_files.length
   end
+
+  it "makes a backup directory" do
+    dir = TestLibrary.mktempdir 'PP-test'
+    result = PPCommon.makeBackupDirectory(dir)
+    File.directory?(result).should be_true
+    PPCommon.makeBackupDirectory(dir).should be_false # non-empty now
+  end
 end
