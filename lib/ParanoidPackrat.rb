@@ -1,8 +1,10 @@
 module ParanoidPackrat
   class << self
+		#Run all backups
     def run
-      puts "Stuff goes here!"
-      puts "silentMode = #{PPConfig.silentMode?.inspect}"
+			PPConfig.dumpConfig.each {|config|
+				PPIrb.simpleBackup(config)
+			}
     end
   end
 end
