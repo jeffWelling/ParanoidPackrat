@@ -96,7 +96,7 @@ module PPCommon
 			counter+=1
 		}
 		return FALSE unless counter==1
-		FileUtils.mkdir( dir + "backup/", 700 )[0]
+		FileUtils.mkdir( dir + "backup/", :mode => 700 )[0]
 	end
 	
 	#This method is used to determine if a backup dir contains backups or not.
