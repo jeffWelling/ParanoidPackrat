@@ -3,7 +3,7 @@ module ParanoidPackrat
 		#Run all backups
     def run
 			PPConfig.dumpConfig.each {|config|
-				PPIrb.simpleBackup(config)
+				PPIrb.simpleBackup(config[1])
 			}
     end
   end
