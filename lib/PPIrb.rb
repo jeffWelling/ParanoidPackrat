@@ -55,6 +55,7 @@ module PPIrb
 		else
 			first_or_second=:second
 			PPCommon.pprint('simpleBackup():  First time backing up.')
+			PPCommon.mark(dest_name_date.gsub(' ', '\ '))
 			#This is the first backup.
 			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		end
