@@ -22,14 +22,14 @@ require 'ostruct'
 module PPConfig
 	class <<self
 		#checkYourConfig is called when an error is encountered reading the configuration. 
-		def self.checkYourConfig
+		def checkYourConfig
 			puts "PPConfig:  Please check your configuration."
 			@BadConfig=true
 		end
 		#This function is intended to be run AFTER the the configurations have been set
 		#to make sure the configurations entered are sane.
 		#if silent is not nil, then silent mode is activated for this function.
-		def self.sanityCheck silent=nil
+		def sanityCheck silent=nil
 			@Configs.each {|config_name, config|
 				puts "sanityCheck(): Warning, you have entered a blank configuration for '#{config_name}'!" if silent!=nil and config==nil
 				unless config.nil?
@@ -72,6 +72,10 @@ module PPConfig
       load "#{options.configFile}"
       PPConfig.sanityCheck
     end
+
+		def silentMode?
+			@options.silentMode
+		end
 
 		#To be called once at the beginning of the config file
 		def initialize
