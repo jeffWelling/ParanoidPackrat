@@ -88,15 +88,9 @@ module PPCommon
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
-		raise "You idiot" unless dir.class==String
-		dir=PPCommon.addSlash(dir)
-		#Make sure the directory is empty
-		counter=0
-		Find.find(dir) {|file|
-			counter+=1
-		}
-		return FALSE unless counter==1
-		FileUtils.mkdir( dir + "backup/", :mode => 700 )[0]
+		raise "You idiot" unless dir.is_a? String
+		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
+		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
 	end
 	
 	#This method is used to determine if a backup dir contains backups or not.
