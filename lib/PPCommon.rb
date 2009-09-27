@@ -348,7 +348,7 @@ module PPCommon
 	end
 	
 	#Return a DateTime object representing 6 hours in the past
-	def self.6HoursAgo
+	def self.sixHoursAgo
 		DateTime.parse(Time.new.-(60*60*6).to_s)
 	end
 
@@ -358,14 +358,23 @@ module PPCommon
 	#set to run in cron.
 	#FIXME I need to be set up to also check the global backup destination when it is set!
 	def self.gc buffer=true
+		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
 			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
 			backup_path_incomplete=backup_path + '.incomplete_backup'
-			Find.find(backup_path) {|backup_instance|
+			pp backup_path
+			Dir.glob(backup_path) {|backup_instance|
+				backup_instance.gsub!(backup_path, '')
 				next unless PPCommon.datetimeFormat?(backup_instance)
-				File.delete(backup_path.chop) if File.exist?(backup_path_incomplete) and DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.6HoursAgo
-			}
+				num_deleted+=1
+				if buffer == true
+					File.delete(backup_path.chop) if (File.exist?(backup_path_incomplete) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+				else
+					File.delete(backup_path.chop) if File.exist?(backup_path_incomplete)
+				end
+			}    #And the file was deleted, and jesus' boots were gone.
 		}
+		num_deleted
 	end
 end
 
