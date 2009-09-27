@@ -214,7 +214,7 @@ module PPCommon
 			dest_backup=backup_dest + 'backup/'
 			Dir.entries(dest_backup).each {|l1|
 				next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
-				next if !backup_name.nil? and backup_name!=l1    #If backup_name is specified, only check that directory	
+				next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
 				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
 				Dir.entries(dest_backup_name).each {|l2|
 					next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
