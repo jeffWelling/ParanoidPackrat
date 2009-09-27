@@ -46,4 +46,22 @@ module TestLibrary
     files = Dir.glob("#{dir}/**/*")
     files << dir
   end
+
+  def wrap_io input = ''
+    stdin  = $stdin
+    stdout = $stdout
+    input  = StringIO.new input.to_s unless input.is_a? StringIO
+    output = StringIO.new "w+"
+    begin
+      $stdin  = input
+      $stdout = output
+      yield
+    ensure
+      $stdout = stdout
+      $stdin  = stdin
+      output.rewind
+      return output.read
+    end
+  end
+
 end
