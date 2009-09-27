@@ -70,6 +70,10 @@ module PPIrb
 			keep_fail=true
 			er.each_key {|key|
 				if key==:FailedToOpen
+					if PPConfig.ignorePermissions?
+						keep_fail=false
+						next
+					end
 					er[key].each {|file_that_failed|
 						keep_fail=false if PPCommon.prompt("Rsync error:  #{key.to_s}  -  '#{file_that_failed.strip}' \nIgnore this error? (Do not count this as an error, update the last_backup symlink?)")==:yes
 					}
