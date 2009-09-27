@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>parse_cli_args (PPConfig)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/PPConfig.rb, line 53</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse_cli_args</span> <span class="ruby-identifier">args</span>
+      <span class="ruby-identifier">options</span> = <span class="ruby-ivar">@options</span>
+      <span class="ruby-identifier">parser</span> = <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">banner</span> = <span class="ruby-value str">&quot;Usage: ParanoidPackrat.rb [options]&quot;</span>
+        <span class="ruby-comment cmt"># Add options</span>
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value str">&quot;-c&quot;</span>,<span class="ruby-value str">&quot;--config [FILE]&quot;</span>,<span class="ruby-value str">&quot;Specify a non-default config-file location.&quot;</span>)    {<span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">configFile</span> = <span class="ruby-identifier">file</span> }
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value str">&quot;-s&quot;</span>,<span class="ruby-value str">&quot;--silent [BOOL]&quot;</span>,<span class="ruby-value str">&quot;Set silent mode - no output will be generated.  Intended for use with cron.&quot;</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">bool</span><span class="ruby-operator">|</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">silentMode</span> = (<span class="ruby-identifier">bool</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/(no|false)/</span>) }
+                                <span class="ruby-identifier">p</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value str">&quot;-p&quot;</span>,<span class="ruby-value str">&quot;--permissions [BOOL]&quot;</span>,<span class="ruby-value str">&quot;Silently suppress read errors due to permissions.  Intended for use with cron, intended to be used with -s.&quot;</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">bool</span><span class="ruby-operator">|</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">permissions</span> = (<span class="ruby-identifier">bool</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/(yes|true)/</span>) }
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value str">&quot;-h&quot;</span>,<span class="ruby-value str">&quot;--help&quot;</span>,            <span class="ruby-value str">&quot;Show this message&quot;</span>)                           {       <span class="ruby-identifier">puts</span> <span class="ruby-identifier">p</span> ; <span class="ruby-identifier">exit</span> }
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">separator</span> <span class="ruby-value str">&quot;Examples:&quot;</span>
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">separator</span> <span class="ruby-value str">&quot;\tParanoidPackrat --silent&quot;</span>
+        <span class="ruby-identifier">p</span>.<span class="ruby-identifier">separator</span> <span class="ruby-value str">&quot;\tParanoidPackrat --config ~/ppconfig.rb&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">parser</span>.<span class="ruby-identifier">parse!</span> <span class="ruby-identifier">args</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">configFile</span>)
+        <span class="ruby-identifier">config</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">configFile</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Config file required, can't find it at #{config}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span> <span class="ruby-identifier">config</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Config file #{config} is not readable&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">readable?</span> <span class="ruby-identifier">config</span>
+        <span class="ruby-identifier">options</span>.<span class="ruby-identifier">configFile</span> = <span class="ruby-identifier">config</span>
+      <span class="ruby-keyword kw">end</span>
+<span class="ruby-comment cmt">#      load &quot;#{options.configFile}&quot;</span>
+      <span class="ruby-constant">PPConfig</span>.<span class="ruby-identifier">sanityCheck</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

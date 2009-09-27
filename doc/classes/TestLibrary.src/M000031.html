@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>build_temp_dir (TestLibrary)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File spec/TestLibrary.rb, line 28</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_temp_dir</span> <span class="ruby-identifier">dir</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">dir</span> <span class="ruby-comment cmt"># default case</span>
+      <span class="ruby-identifier">dir</span> = <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">mktempdir</span> <span class="ruby-value str">'PP-test'</span> 
+      (<span class="ruby-identifier">rand</span>(<span class="ruby-value">5</span>) <span class="ruby-operator">+</span> <span class="ruby-value">3</span>).<span class="ruby-identifier">times</span> { <span class="ruby-identifier">create_random_file</span> <span class="ruby-identifier">dir</span> } <span class="ruby-comment cmt"># make more random files in top-level dir</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">dir</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">dir</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">dir</span>)
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">loop</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">rand</span>(<span class="ruby-value">7</span>)
+        <span class="ruby-keyword kw">when</span> (<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">4</span>) ; <span class="ruby-identifier">create_random_file</span> <span class="ruby-identifier">dir</span>
+        <span class="ruby-keyword kw">when</span>     <span class="ruby-value">5</span>  ; <span class="ruby-identifier">build_temp_dir</span> <span class="ruby-node">&quot;#{dir}/#{rand_file_name}&quot;</span>
+        <span class="ruby-keyword kw">else</span>        ; <span class="ruby-keyword kw">break</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">dir</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

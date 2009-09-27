@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>simpleBackup (PPIrb)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/PPIrb.rb, line 33</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">simpleBackup</span>(<span class="ruby-identifier">backup</span>)
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>(<span class="ruby-node">&quot;simpleBackup():  Performing simple backup, '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination]}'&quot;</span>)
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>( <span class="ruby-value str">&quot;simpleBackup():  Running garbage collection...&quot;</span> )
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>( <span class="ruby-node">&quot;simpleBackup():  Garbage collection finished, #{PPCommon.gc.to_s} deleted.&quot;</span> )
+                <span class="ruby-identifier">date</span>=<span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">newDatetime</span>
+                <span class="ruby-identifier">error</span>=<span class="ruby-keyword kw">false</span>
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">makeBackupDirectory</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupDestination</span>]) <span class="ruby-keyword kw">unless</span> (
+                        <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupDestination</span>]) <span class="ruby-keyword kw">and</span>
+                        <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupDestination</span>])
+                )
+                <span class="ruby-identifier">dest_name</span>=<span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupDestination</span>]) <span class="ruby-operator">+</span> <span class="ruby-value str">'backup/'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupName</span>]
+                <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-identifier">dest_name</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">dest_name</span>)
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>(<span class="ruby-value str">&quot;simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.&quot;</span>, <span class="ruby-identifier">:fatal</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">dest_name</span>)
+                <span class="ruby-identifier">dest_name_date</span>=<span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">dest_name</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">date</span>)
+                <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-identifier">dest_name_date</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">dest_name_date</span>)
+                <span class="ruby-identifier">err_log</span>=<span class="ruby-identifier">dest_name_date</span> <span class="ruby-operator">+</span> <span class="ruby-value str">'err_log.txt'</span>
+                <span class="ruby-identifier">first_or_second</span>=<span class="ruby-keyword kw">nil</span>
+
+                <span class="ruby-keyword kw">if</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">containsBackups?</span>(<span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupDestination</span>], <span class="ruby-identifier">backup</span>[<span class="ruby-identifier">:BackupName</span>]).<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">TrueClass</span>
+                        <span class="ruby-identifier">first_or_second</span>=<span class="ruby-identifier">:first</span>
+                        <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>(<span class="ruby-value str">'simpleBackup():  Not first time backing up, hardlinking to old backups to save space'</span>)
+                        <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">mark</span>(<span class="ruby-identifier">dest_name_date</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">' '</span>, <span class="ruby-value str">'\ '</span>))
+                        <span class="ruby-comment cmt">#This isn't the first backup, you can hardlink to the other backups.</span>
+                        <span class="ruby-node">`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &amp;&gt;#{err_log.gsub(' ','\ ')}`</span>
+                <span class="ruby-keyword kw">else</span>
+                        <span class="ruby-identifier">first_or_second</span>=<span class="ruby-identifier">:second</span>
+                        <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>(<span class="ruby-value str">'simpleBackup():  First time backing up.'</span>)
+                        <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">mark</span>(<span class="ruby-identifier">dest_name_date</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">' '</span>, <span class="ruby-value str">'\ '</span>))
+                        <span class="ruby-comment cmt">#This is the first backup.</span>
+                        <span class="ruby-node">`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &amp;&gt;#{err_log.gsub(' ','\ ')}`</span>
+                <span class="ruby-keyword kw">end</span>
+
+                <span class="ruby-identifier">er</span>= <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">rsyncErr?</span>( <span class="ruby-identifier">$?</span>, <span class="ruby-identifier">err_log</span> )
+                <span class="ruby-comment cmt">#maybe a case on the return value of whatWasError?()</span>
+
+                <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">er</span><span class="ruby-operator">==</span><span class="ruby-keyword kw">false</span>  <span class="ruby-comment cmt">#unless there aren't any, process the errors by asking the user.</span>
+                        <span class="ruby-comment cmt">#FIXME This is probly where we'd put the code to store the user response for the long term</span>
+                        <span class="ruby-identifier">keep_fail</span>=<span class="ruby-keyword kw">true</span>
+                        <span class="ruby-identifier">er</span>.<span class="ruby-identifier">each_key</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">key</span><span class="ruby-operator">|</span>
+                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">key</span><span class="ruby-operator">==</span><span class="ruby-identifier">:FailedToOpen</span>
+                                        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">PPConfig</span>.<span class="ruby-identifier">ignorePermissions?</span>
+                                                <span class="ruby-identifier">keep_fail</span>=<span class="ruby-keyword kw">false</span>
+                                                <span class="ruby-keyword kw">next</span>
+                                        <span class="ruby-keyword kw">end</span>
+                                        <span class="ruby-identifier">er</span>[<span class="ruby-identifier">key</span>].<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">file_that_failed</span><span class="ruby-operator">|</span>
+                                                <span class="ruby-identifier">keep_fail</span>=<span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">if</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">prompt</span>(<span class="ruby-node">&quot;Rsync error:  #{key.to_s}  -  '#{file_that_failed.strip}' \nIgnore this error? (Do not count this as an error, update the last_backup symlink?)&quot;</span>)<span class="ruby-operator">==</span><span class="ruby-identifier">:yes</span>
+                                        }
+                                <span class="ruby-keyword kw">end</span>
+                        }
+                        <span class="ruby-identifier">er</span>=<span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">keep_fail</span><span class="ruby-operator">==</span><span class="ruby-keyword kw">false</span>
+                <span class="ruby-keyword kw">end</span>
+
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">er</span><span class="ruby-operator">==</span><span class="ruby-keyword kw">false</span>
+                        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">first_or_second</span><span class="ruby-operator">==</span><span class="ruby-identifier">:first</span>
+                                <span class="ruby-constant">File</span>.<span class="ruby-identifier">unlink</span>( <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">dest_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">'last_backup'</span>)
+                                <span class="ruby-constant">File</span>.<span class="ruby-identifier">symlink</span>( <span class="ruby-identifier">dest_name_date</span>, <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">dest_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">'last_backup'</span> )
+                                <span class="ruby-comment cmt">#run the method to scan all of the backups for duplicates and hardlink them</span>
+                                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">shrinkBackupDestination</span>(<span class="ruby-identifier">backup</span>)
+                        <span class="ruby-keyword kw">else</span>
+                                <span class="ruby-constant">File</span>.<span class="ruby-identifier">symlink</span>( <span class="ruby-identifier">dest_name_date</span>, <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">dest_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">'last_backup'</span> )
+                        <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">removeMark</span>(<span class="ruby-identifier">dest_name_date</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">' '</span>, <span class="ruby-value str">'\ '</span>))
+                <span class="ruby-keyword kw">end</span>
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>( <span class="ruby-value str">&quot;simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!\n\t\tBackup was performed, but some files may not have been copies so last_backup still points to your most recent completed backup.\n&quot;</span> ) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">er</span><span class="ruby-operator">==</span><span class="ruby-keyword kw">false</span>
+                <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span>( <span class="ruby-value str">'simpleBackup():  Done.  Check the log and the backups for bugs and errors.'</span> )
+                
+                <span class="ruby-identifier">dest_name_date</span>
+        <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>hardlinkFile (PPCommon)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 302</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">hardlinkFile</span>(<span class="ruby-identifier">new</span>,<span class="ruby-identifier">old</span>)
+    <span class="ruby-comment cmt"># check both share a filesystem (for hardlinking)</span>
+    <span class="ruby-comment cmt"># check both are identical</span>
+    <span class="ruby-comment cmt"># check not the same file</span>
+    <span class="ruby-comment cmt">#File.unlink new</span>
+    <span class="ruby-comment cmt">#File.link old, new</span>
+    <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">pprint</span> <span class="ruby-node">&quot;Hardlinking #{new} to #{old}&quot;</span> <span class="ruby-comment cmt"># FIXME - use this until checks are coded</span>
+    <span class="ruby-comment cmt"># check hardlink was made</span>
+    <span class="ruby-comment cmt"># restore original file otherwise</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

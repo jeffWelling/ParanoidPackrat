@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>containsBackups? (PPCommon)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 199</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">containsBackups?</span>(<span class="ruby-identifier">backup_dest</span>, <span class="ruby-identifier">backup_name</span>=<span class="ruby-keyword kw">nil</span>)
+                <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">backup_dest</span>) <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">backup_dest</span>) <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">readable?</span>(<span class="ruby-identifier">backup_dest</span>)
+                <span class="ruby-identifier">backup_dest</span>=<span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">backup_dest</span>)
+                <span class="ruby-identifier">has_a_backup</span>=<span class="ruby-keyword kw">false</span>
+                <span class="ruby-identifier">last_backup</span>=<span class="ruby-keyword kw">false</span>
+                <span class="ruby-identifier">files_in_backupdir</span>=[]
+??
+                <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">entries</span>(<span class="ruby-identifier">backup_dest</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">l0</span><span class="ruby-operator">|</span>
+                        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">l0</span>[<span class="ruby-regexp re">/^(\.|\.\.)$/</span>]   <span class="ruby-comment cmt">#Skip '.' and '..'</span>
+                        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">l0</span>[<span class="ruby-regexp re">/^backup$/</span>]
+                        <span class="ruby-identifier">dest_backup</span>=<span class="ruby-identifier">backup_dest</span> <span class="ruby-operator">+</span> <span class="ruby-value str">'backup/'</span>
+                        <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">entries</span>(<span class="ruby-identifier">dest_backup</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">l1</span><span class="ruby-operator">|</span>
+                                <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">l1</span>[<span class="ruby-regexp re">/^(\.|\.\.)$/</span>]   <span class="ruby-comment cmt">#Skip '.' and '..'</span>
+                                <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">backup_name</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">stripSlash</span>(<span class="ruby-identifier">backup_name</span>)<span class="ruby-operator">!=</span><span class="ruby-identifier">l1</span>    <span class="ruby-comment cmt">#If backup_name is specified, only check that directory       </span>
+                                <span class="ruby-identifier">dest_backup_name</span>=<span class="ruby-identifier">dest_backup</span> <span class="ruby-operator">+</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">l1</span>)
+                                <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">entries</span>(<span class="ruby-identifier">dest_backup_name</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">l2</span><span class="ruby-operator">|</span>
+                                        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">l1</span>[<span class="ruby-regexp re">/^(\.|\.\.)$/</span>]   <span class="ruby-comment cmt">#Skip '.' and '..'</span>
+                                        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">PPCommon</span>.<span class="ruby-identifier">datetimeFormat?</span>(<span class="ruby-identifier">l2</span>) <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">l2</span>[<span class="ruby-regexp re">/^last_backup$/</span>]
+                                        <span class="ruby-identifier">has_a_backup</span>=<span class="ruby-keyword kw">true</span>
+                                        <span class="ruby-identifier">dest_backup_name_datetime</span>=(<span class="ruby-identifier">dest_backup_name</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">l2</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">l2</span>[<span class="ruby-regexp re">/^last_backup$/</span>]
+                                        <span class="ruby-identifier">last_backup</span>=<span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">l2</span>[<span class="ruby-regexp re">/^last_backup$/</span>] <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">symlink?</span>(<span class="ruby-identifier">dest_backup_name_datetime</span>)
+                                }
+                        }
+                }
+                <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">has_a_backup</span>.<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">TrueClass</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">last_backup</span>.<span class="ruby-identifier">class</span><span class="ruby-operator">==</span><span class="ruby-constant">TrueClass</span>
+                <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span>
+        <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
