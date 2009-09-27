@@ -5,44 +5,15 @@
 
 <html>
 <head>
-  <title>df (PPCommon)</title>
+  <title>datetimeFormat? (PPCommon)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 59</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">df</span> <span class="ruby-identifier">debug</span>=<span class="ruby-keyword kw">nil</span>
-                <span class="ruby-identifier">debug</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">output</span>=<span class="ruby-value">`df -P`</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">output</span>=<span class="ruby-identifier">debug</span>
-                <span class="ruby-identifier">output</span>=<span class="ruby-identifier">output</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;\n&quot;</span>).<span class="ruby-identifier">reject</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">l</span><span class="ruby-operator">|</span> <span class="ruby-operator">!</span><span class="ruby-identifier">l</span>[<span class="ruby-regexp re">/^Filesystem/</span>].<span class="ruby-identifier">nil?</span> }  <span class="ruby-comment cmt">#Reject the first line of output, which is the columns.</span>
-                <span class="ruby-identifier">output</span>.<span class="ruby-identifier">each_index</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
-                        <span class="ruby-identifier">filesystem</span>= <span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>][<span class="ruby-regexp re">/^[^\s]+/</span>]
-                        <span class="ruby-identifier">total_1k_blocks</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">used</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">available</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">capacity</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">mountpoint</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">temp</span>=<span class="ruby-value str">''</span>
-                        <span class="ruby-identifier">i2</span>=<span class="ruby-value">0</span>  <span class="ruby-comment cmt">#I cant believe I have to use an index, I MUST be tired</span>
-                        <span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>]=<span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>].<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^[^\s]+/</span>, <span class="ruby-value str">''</span>)
-                        <span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>][<span class="ruby-regexp re">/(\s+\d+){3}\s+\d+%\s+\//</span>].<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">chop</span>.<span class="ruby-identifier">chop</span>.<span class="ruby-identifier">chop</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">' '</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">number</span><span class="ruby-operator">|</span>
-                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">i2</span><span class="ruby-operator">==</span><span class="ruby-value">0</span>
-                                        <span class="ruby-identifier">total_1k_blocks</span>=<span class="ruby-identifier">number</span>                     <span class="ruby-comment cmt">#Chef: &quot;Hello children!&quot;</span>
-                                        <span class="ruby-identifier">i2</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>                                                                                              <span class="ruby-comment cmt">#Kids: &quot;Hi Chef!&quot;</span>
-                                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">i2</span><span class="ruby-operator">==</span><span class="ruby-value">1</span>                                                                         <span class="ruby-comment cmt">#Kids: &quot;Chef, what would a priest want to put up our butts?&quot;</span>
-                                        <span class="ruby-identifier">used</span>=<span class="ruby-identifier">number</span>                                                                        <span class="ruby-comment cmt">#Chef: &quot;Goodbye!&quot;</span>
-                                        <span class="ruby-identifier">i2</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>                                                                                              <span class="ruby-comment cmt">#ROFL</span>
-                                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">i2</span><span class="ruby-operator">==</span><span class="ruby-value">2</span>
-                                        <span class="ruby-identifier">available</span>=<span class="ruby-identifier">number</span>
-                                        <span class="ruby-identifier">i2</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>
-                                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">i2</span><span class="ruby-operator">==</span><span class="ruby-value">3</span>
-                                        <span class="ruby-identifier">capacity</span>=<span class="ruby-identifier">number</span>
-                                <span class="ruby-keyword kw">end</span>                                    <span class="ruby-comment cmt">#  &lt;&lt; DAMN thats ugly</span>
-                                <span class="ruby-identifier">temp</span>=[<span class="ruby-identifier">total_1k_blocks</span>, <span class="ruby-identifier">used</span>, <span class="ruby-identifier">available</span>, <span class="ruby-identifier">capacity</span>]
-                        }
-                        <span class="ruby-identifier">temp</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>].<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/(\s+\d+){3}\s+\d+%\s+\//</span>, <span class="ruby-value str">'/'</span>))
-                        <span class="ruby-identifier">output</span>[<span class="ruby-identifier">i</span>]= (<span class="ruby-identifier">temp</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">filesystem</span>).<span class="ruby-identifier">reverse</span>
-                }
-                <span class="ruby-identifier">output</span>   <span class="ruby-comment cmt">#GODAMNYOUJESUS! GET OFF MY PORCH!</span>
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 88</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">datetimeFormat?</span>(<span class="ruby-identifier">str</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">str</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/</span>
+    <span class="ruby-keyword kw">false</span>
         <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

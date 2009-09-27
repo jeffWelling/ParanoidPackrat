@@ -13,7 +13,7 @@
   <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 30</span>
         <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">pprint</span> <span class="ruby-identifier">str</span>, <span class="ruby-identifier">fatal</span>=<span class="ruby-keyword kw">nil</span>
                 <span class="ruby-identifier">raise</span> <span class="ruby-identifier">str</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">fatal</span>.<span class="ruby-identifier">nil?</span>
-<span class="ruby-comment cmt">#               return true if self.silentMode?</span>
+                <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-constant">PPConfig</span>.<span class="ruby-identifier">silentMode?</span>
                 <span class="ruby-identifier">puts</span> <span class="ruby-identifier">str</span>
         <span class="ruby-keyword kw">end</span></pre>
 </body>
