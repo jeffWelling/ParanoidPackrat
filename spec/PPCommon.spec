@@ -94,15 +94,25 @@ describe PPCommon do
   end
 
   it "turns user-input strings into symbols" do
-    PPCommon.symbolize(nil).should == :nil
-    PPCommon.symbolize('').should == :empty
-    PPCommon.symbolize('q').should == :quit
+    PPCommon.symbolize(nil   ).should == :nil
+    PPCommon.symbolize(''    ).should == :empty
+    PPCommon.symbolize('q'   ).should == :quit
     PPCommon.symbolize('quit').should == :quit
-    PPCommon.symbolize('e').should == :edit
+    PPCommon.symbolize('e'   ).should == :edit
     PPCommon.symbolize('edit').should == :edit
-    PPCommon.symbolize('y').should == :yes
-    PPCommon.symbolize('yes').should == :yes
-    PPCommon.symbolize('n').should == :no
-    PPCommon.symbolize('no').should == :no
+    PPCommon.symbolize('y'   ).should == :yes
+    PPCommon.symbolize('yes' ).should == :yes
+    PPCommon.symbolize('n'   ).should == :no
+    PPCommon.symbolize('no'  ).should == :no
+    PPCommon.symbolize('fish').should == :fish
+    # no real failure case...?
   end
+
+  it "asks a question and returns the response downcased, a default, or throws :quit" do 
+    capture_stdout do
+      wrap_input("Blue!\n") { PPCommon.ask "What is your favorite colour!?"         }.should == "blue!" 
+      wrap_input("\n")      { PPCommon.ask "What is your favorite colour!?","BlaCK" }.should == "BlaCK" # default's not downcased
+      wrap_io("test")       { PPCommon.ask "simple question?", "mauve"              }.should == "\nsimple question? "
+    end
+  end 
 end
