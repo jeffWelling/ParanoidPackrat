@@ -398,5 +398,22 @@ module PPCommon
 		}
 		num_deleted
 	end
+
+	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
+	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
+	#Be aware that setting buffer != true may return true if a backup is currently running.
+	def self.hasIncompleteBackups?( backup_destination, buffer=true )
+		Dir.glob(PPCommon.addSlash(backup_destination) + 'backup/*').each {|backup_name|
+			Dir.glob(backup_name + '/*').each {|datetime|
+				next unless PPCommon.datetimeFormat?(File.basename(datetime))
+				if buffer.class==TrueClass
+					return true if PPCommon.marked?(datetime) and (DateTime.parse(File.mtime(datetime).to_s) > PPCommon.sixHoursAgo)
+				else 
+					return true if PPCommon.marked?(datetime)
+				end
+			}
+		}
+		false
+	end
 end
 
