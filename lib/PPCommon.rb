@@ -346,6 +346,11 @@ module PPCommon
 		}
 		read_lines
 	end
+	
+	#Return a DateTime object representing 6 hours in the past
+	def self.6HoursAgo
+		DateTime.parse(Time.new.-(60*60*6).to_s)
+	end
 
 	#gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
 	#optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
