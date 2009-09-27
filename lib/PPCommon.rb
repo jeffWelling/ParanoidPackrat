@@ -101,7 +101,7 @@ module PPCommon
 	end
 	
 	#symbolize text
-	def PPCommon.symbolize text
+	def self.symbolize text
 	 return :nil if text.nil?
 		return :empty if text.empty?
 		return :quit if text =~ /^(q|quit)$/i
