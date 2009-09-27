@@ -5,15 +5,15 @@
 
 <html>
 <head>
-  <title>addSlash (PPCommon)</title>
+  <title>mktempdir (PPCommon)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 37</span>
-        <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">addSlash</span>(<span class="ruby-identifier">str</span>)
-                <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;/&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">str</span>[<span class="ruby-value">-1</span>].<span class="ruby-identifier">chr</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'/'</span>
-    <span class="ruby-identifier">str</span>
-        <span class="ruby-keyword kw">end</span></pre>
+  <pre><span class="ruby-comment cmt"># File lib/PPCommon.rb, line 38</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">mktempdir</span> <span class="ruby-identifier">str</span> = <span class="ruby-value str">'PP'</span>
+    <span class="ruby-identifier">str</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">'.XXXXXX'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">str</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/X+$/</span>
+    <span class="ruby-node">`mktemp -td #{str}`</span>.<span class="ruby-identifier">strip</span> <span class="ruby-comment cmt"># Is there a better way?</span>
+  <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

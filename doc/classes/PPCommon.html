@@ -87,32 +87,27 @@ href="ParanoidPackrat.html">ParanoidPackrat</a> project.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000003">addSlash</a>&nbsp;&nbsp;
-      <a href="#M000009">ask</a>&nbsp;&nbsp;
-      <a href="#M000010">ask_symbol</a>&nbsp;&nbsp;
-      <a href="#M000014">containsBackups?</a>&nbsp;&nbsp;
-      <a href="#M000006">datetimeFormat?</a>&nbsp;&nbsp;
-      <a href="#M000005">df</a>&nbsp;&nbsp;
-      <a href="#M000026">gc</a>&nbsp;&nbsp;
-      <a href="#M000016">getExistingFileSignatures</a>&nbsp;&nbsp;
-      <a href="#M000018">getFileSignature</a>&nbsp;&nbsp;
-      <a href="#M000019">hardlinkFile</a>&nbsp;&nbsp;
-      <a href="#M000027">hasIncompleteBackups?</a>&nbsp;&nbsp;
-      <a href="#M000013">makeBackupDirectory</a>&nbsp;&nbsp;
-      <a href="#M000022">mark</a>&nbsp;&nbsp;
-      <a href="#M000024">marked?</a>&nbsp;&nbsp;
-      <a href="#M000007">newDatetime</a>&nbsp;&nbsp;
+      <a href="#M000004">addSlash</a>&nbsp;&nbsp;
+      <a href="#M000010">ask</a>&nbsp;&nbsp;
+      <a href="#M000011">ask_symbol</a>&nbsp;&nbsp;
+      <a href="#M000015">containsBackups?</a>&nbsp;&nbsp;
+      <a href="#M000007">datetimeFormat?</a>&nbsp;&nbsp;
+      <a href="#M000006">df</a>&nbsp;&nbsp;
+      <a href="#M000017">getExistingFileSignatures</a>&nbsp;&nbsp;
+      <a href="#M000019">getFileSignature</a>&nbsp;&nbsp;
+      <a href="#M000020">hardlinkFile</a>&nbsp;&nbsp;
+      <a href="#M000014">makeBackupDirectory</a>&nbsp;&nbsp;
+      <a href="#M000003">mktempdir</a>&nbsp;&nbsp;
+      <a href="#M000008">newDatetime</a>&nbsp;&nbsp;
       <a href="#M000002">pprint</a>&nbsp;&nbsp;
-      <a href="#M000011">prompt</a>&nbsp;&nbsp;
-      <a href="#M000021">readFile</a>&nbsp;&nbsp;
-      <a href="#M000023">removeMark</a>&nbsp;&nbsp;
-      <a href="#M000020">rsyncErr?</a>&nbsp;&nbsp;
-      <a href="#M000017">saveFileSignatures</a>&nbsp;&nbsp;
-      <a href="#M000012">scanBackupDir</a>&nbsp;&nbsp;
-      <a href="#M000015">shrinkBackupDestination</a>&nbsp;&nbsp;
-      <a href="#M000025">sixHoursAgo</a>&nbsp;&nbsp;
-      <a href="#M000004">stripSlash</a>&nbsp;&nbsp;
-      <a href="#M000008">symbolize</a>&nbsp;&nbsp;
+      <a href="#M000012">prompt</a>&nbsp;&nbsp;
+      <a href="#M000022">readFile</a>&nbsp;&nbsp;
+      <a href="#M000021">rsyncErr?</a>&nbsp;&nbsp;
+      <a href="#M000018">saveFileSignatures</a>&nbsp;&nbsp;
+      <a href="#M000013">scanBackupDir</a>&nbsp;&nbsp;
+      <a href="#M000016">shrinkBackupDestination</a>&nbsp;&nbsp;
+      <a href="#M000005">stripSlash</a>&nbsp;&nbsp;
+      <a href="#M000009">symbolize</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -134,12 +129,12 @@ href="ParanoidPackrat.html">ParanoidPackrat</a> project.
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000003" class="method-detail">
-        <a name="M000003"></a>
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000003.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000003.html');return false;">
+          <a href="PPCommon.src/M000004.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000004.html');return false;">
           <span class="method-name">addSlash</span><span class="method-args">(str)</span>
           </a>
         </div>
@@ -151,48 +146,48 @@ Add a slash to the end of str if there isn&#8216;t already one there.
         </div>
       </div>
 
-      <div id="method-M000009" class="method-detail">
-        <a name="M000009"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000009.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000009.html');return false;">
-          <span class="method-name">ask</span><span class="method-args">(question, default=nil)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000009">ask</a> the user question, and return the
-response (with optional default)
-</p>
-        </div>
-      </div>
-
       <div id="method-M000010" class="method-detail">
         <a name="M000010"></a>
 
         <div class="method-heading">
           <a href="PPCommon.src/M000010.html" target="Code" class="method-signature"
             onclick="popupCode('PPCommon.src/M000010.html');return false;">
+          <span class="method-name">ask</span><span class="method-args">(question, default=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000010">ask</a> the user question, and return the
+response (with optional default)
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000011.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000011.html');return false;">
           <span class="method-name">ask_symbol</span><span class="method-args">(question, default)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000009">ask</a> the user a question, return the
+<a href="PPCommon.html#M000010">ask</a> the user a question, return the
 symbolized response with optional default
 </p>
         </div>
       </div>
 
-      <div id="method-M000014" class="method-detail">
-        <a name="M000014"></a>
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000014.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000014.html');return false;">
+          <a href="PPCommon.src/M000015.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000015.html');return false;">
           <span class="method-name">containsBackups?</span><span class="method-args">(backup_dest, backup_name=nil)</span>
           </a>
         </div>
@@ -221,12 +216,12 @@ checked for backups. NOTE - all paths are expected to be full paths
         </div>
       </div>
 
-      <div id="method-M000006" class="method-detail">
-        <a name="M000006"></a>
+      <div id="method-M000007" class="method-detail">
+        <a name="M000007"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000006.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000006.html');return false;">
+          <a href="PPCommon.src/M000007.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000007.html');return false;">
           <span class="method-name">datetimeFormat?</span><span class="method-args">(str)</span>
           </a>
         </div>
@@ -239,19 +234,19 @@ the backup destination folders otherwise, returns false
         </div>
       </div>
 
-      <div id="method-M000005" class="method-detail">
-        <a name="M000005"></a>
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000005.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000005.html');return false;">
+          <a href="PPCommon.src/M000006.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000006.html');return false;">
           <span class="method-name">df</span><span class="method-args">(debug=nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-do a `<a href="PPCommon.html#M000005">df</a>`, parse, return as array.
+do a `<a href="PPCommon.html#M000006">df</a>`, parse, return as array.
 example return array below.
 </p>
 <pre>
@@ -261,70 +256,26 @@ example return array below.
 <p>
 the optional debug argument is for creating/using specs, if debug is
 provided it will be used instead of calling out to `<a
-href="PPCommon.html#M000005">df</a>`.
+href="PPCommon.html#M000006">df</a>`.
 </p>
         </div>
       </div>
 
-      <div id="method-M000026" class="method-detail">
-        <a name="M000026"></a>
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000026.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000026.html');return false;">
-          <span class="method-name">gc</span><span class="method-args">(buffer=true)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000026">gc</a> will traverse every configured
-backupDestination folder, and will delete incomplete backups, identified by
-a <a href="PPCommon.html#M000022">mark</a> that is 6 hours old or more.
-optionally, setting buffer to nil will skip that 6 hour buffer, which is
-intended to make sure that if <a href="PPCommon.html#M000026">gc</a> is run
-at the same time as a backup is taking place, it doesn&#8216;t delete the
-backup in progress. Obviously this won&#8216;t be a problem if you
-don&#8216;t run it concurrently, and don&#8216;t have it set to run in
-cron. FIXME I need to be set up to also check the global backup destination
-when it is set!
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000016" class="method-detail">
-        <a name="M000016"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000016.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000016.html');return false;">
+          <a href="PPCommon.src/M000017.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000017.html');return false;">
           <span class="method-name">getExistingFileSignatures</span><span class="method-args">(filename = nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000016">getExistingFileSignatures</a>() reads the
+<a href="PPCommon.html#M000017">getExistingFileSignatures</a>() reads the
 stored hashes in from a file takes an optional filename, otherwise uses the
 default
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000018" class="method-detail">
-        <a name="M000018"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000018.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000018.html');return false;">
-          <span class="method-name">getFileSignature</span><span class="method-args">(filename)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000018">getFileSignature</a>(filename) hashes a
-file with sha1 and returns its signature
 </p>
         </div>
       </div>
@@ -335,6 +286,24 @@ file with sha1 and returns its signature
         <div class="method-heading">
           <a href="PPCommon.src/M000019.html" target="Code" class="method-signature"
             onclick="popupCode('PPCommon.src/M000019.html');return false;">
+          <span class="method-name">getFileSignature</span><span class="method-args">(filename)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000019">getFileSignature</a>(filename) hashes a
+file with sha1 and returns its signature
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000020.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000020.html');return false;">
           <span class="method-name">hardlinkFile</span><span class="method-args">(new,old)</span>
           </a>
         </div>
@@ -348,41 +317,19 @@ possible
         </div>
       </div>
 
-      <div id="method-M000027" class="method-detail">
-        <a name="M000027"></a>
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000027.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000027.html');return false;">
-          <span class="method-name">hasIncompleteBackups?</span><span class="method-args">( backup_destination, buffer=true )</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000027">hasIncompleteBackups?</a>() takes a backup
-Destination, and searches it for incomplete backups that are more than 6
-hours old. if buffer != true, than it will return true if there are any
-incomplete backups at all, regardless of when they were cretaed. Be aware
-that setting buffer != true may return true if a backup is currently
-running.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000013" class="method-detail">
-        <a name="M000013"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000013.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000013.html');return false;">
+          <a href="PPCommon.src/M000014.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000014.html');return false;">
           <span class="method-name">makeBackupDirectory</span><span class="method-args">(dir)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000013">makeBackupDirectory</a>(dir) creates the
+<a href="PPCommon.html#M000014">makeBackupDirectory</a>(dir) creates the
 backup directory structure to store the backups in. dir is expected to be a
 directory, such as say, &quot;/mnt&quot; or &quot;/mnt/&quot;. Using that
 example, it would create the dir &quot;/mnt/backup/&quot;, it will return
@@ -393,53 +340,31 @@ just created.
         </div>
       </div>
 
-      <div id="method-M000022" class="method-detail">
-        <a name="M000022"></a>
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000022.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000022.html');return false;">
-          <span class="method-name">mark</span><span class="method-args">( dir )</span>
+          <a href="PPCommon.src/M000003.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000003.html');return false;">
+          <span class="method-name">mktempdir</span><span class="method-args">(str = 'PP')</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000022">mark</a>(dir) will <a
-href="PPCommon.html#M000022">mark</a> the backup destination before
-performing a backup to assist in finding incomplete backups later on. dir
-is expected to be the directory of
-backupDest/&#8217;backup&#8217;/backupName/datetime/
-</p>
-<p>
-See also: <a href="PPCommon.html#M000023">PPCommon.removeMark</a>()
+<a href="PPCommon.html#M000003">mktempdir</a>(prefix = &#8216;PP&#8217;)
+will return a temp directory. This directory is not yet, but should be
+auto-deleted on exit
 </p>
         </div>
       </div>
 
-      <div id="method-M000024" class="method-detail">
-        <a name="M000024"></a>
+      <div id="method-M000008" class="method-detail">
+        <a name="M000008"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000024.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000024.html');return false;">
-          <span class="method-name">marked?</span><span class="method-args">(dir, buffer=nil)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-returns true is dir is marked as being an incomplete backup else true
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000007" class="method-detail">
-        <a name="M000007"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000007.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000007.html');return false;">
+          <a href="PPCommon.src/M000008.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000008.html');return false;">
           <span class="method-name">newDatetime</span><span class="method-args">()</span>
           </a>
         </div>
@@ -474,20 +399,41 @@ with str instead of printing the output.
         </div>
       </div>
 
-      <div id="method-M000011" class="method-detail">
-        <a name="M000011"></a>
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000011.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000011.html');return false;">
+          <a href="PPCommon.src/M000012.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000012.html');return false;">
           <span class="method-name">prompt</span><span class="method-args">(question, default = :yes, add_options = nil, delete_options = nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000009">ask</a> the user question, loop until he
+<a href="PPCommon.html#M000010">ask</a> the user question, loop until he
 selects a valid option.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="PPCommon.src/M000022.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000022.html');return false;">
+          <span class="method-name">readFile</span><span class="method-args">(file, max_lines=0)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="PPCommon.html#M000022">readFile</a> takes a filename, and
+optionally the maximum number of lines to read.
+</p>
+<p>
+returns the lines read as an array.
 </p>
         </div>
       </div>
@@ -498,49 +444,6 @@ selects a valid option.
         <div class="method-heading">
           <a href="PPCommon.src/M000021.html" target="Code" class="method-signature"
             onclick="popupCode('PPCommon.src/M000021.html');return false;">
-          <span class="method-name">readFile</span><span class="method-args">(file, max_lines=0)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000021">readFile</a> takes a filename, and
-optionally the maximum number of lines to read.
-</p>
-<p>
-returns the lines read as an array.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000023" class="method-detail">
-        <a name="M000023"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000023.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000023.html');return false;">
-          <span class="method-name">removeMark</span><span class="method-args">( dir )</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-<a href="PPCommon.html#M000023">removeMark</a>(dir) is intended to be used
-after a backup has been completed to remove the <a
-href="PPCommon.html#M000022">mark</a> indicating an incomplete backup dir
-must be the same as was applied to <a
-href="PPCommon.html#M000022">PPCommon.mark</a>() before the backup was
-begun, obviously.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000020" class="method-detail">
-        <a name="M000020"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000020.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000020.html');return false;">
           <span class="method-name">rsyncErr?</span><span class="method-args">( p, error_log )</span>
           </a>
         </div>
@@ -561,64 +464,64 @@ simpleBackup().
         </div>
       </div>
 
-      <div id="method-M000017" class="method-detail">
-        <a name="M000017"></a>
+      <div id="method-M000018" class="method-detail">
+        <a name="M000018"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000017.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000017.html');return false;">
+          <a href="PPCommon.src/M000018.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000018.html');return false;">
           <span class="method-name">saveFileSignatures</span><span class="method-args">(signatures, filename = nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000017">saveFileSignatures</a>(signatures) saves a
+<a href="PPCommon.html#M000018">saveFileSignatures</a>(signatures) saves a
 list of signatures to a file takes an optional filename, otherwise uses the
 default returns number of bytes written
 </p>
         </div>
       </div>
 
-      <div id="method-M000012" class="method-detail">
-        <a name="M000012"></a>
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000012.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000012.html');return false;">
+          <a href="PPCommon.src/M000013.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000013.html');return false;">
           <span class="method-name">scanBackupDir</span><span class="method-args">(backup)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000012">scanBackupDir</a>(backup) will scan the
+<a href="PPCommon.html#M000013">scanBackupDir</a>(backup) will scan the
 dir/file specified in backup[:BackupTarget], and will return an array with
 the full path of every file covered by backup[:BackupTarget], excluding
 anything specified in backup[:Exclusions].
 </p>
 <p>
 <b>Note</b> backup is expected to be one of the configs from <a
-href="PPConfig.html#M000044">PPConfig.dumpConfig</a> and <a
-href="PPConfig.html#M000034">PPConfig.sanityCheck</a> is expected to have
+href="PPConfig.html#M000036">PPConfig.dumpConfig</a> and <a
+href="PPConfig.html#M000028">PPConfig.sanityCheck</a> is expected to have
 been run already.
 </p>
         </div>
       </div>
 
-      <div id="method-M000015" class="method-detail">
-        <a name="M000015"></a>
+      <div id="method-M000016" class="method-detail">
+        <a name="M000016"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000015.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000015.html');return false;">
+          <a href="PPCommon.src/M000016.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000016.html');return false;">
           <span class="method-name">shrinkBackupDestination</span><span class="method-args">(backup,wide=nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000015">shrinkBackupDestination</a>(backup,wide)
+<a href="PPCommon.html#M000016">shrinkBackupDestination</a>(backup,wide)
 traverse through backups under backupDestination/backupName/ , hardlinking
 to save space
 </p>
@@ -647,29 +550,12 @@ backupDest/backupName/datetimes dir to undo this operation!
         </div>
       </div>
 
-      <div id="method-M000025" class="method-detail">
-        <a name="M000025"></a>
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000025.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000025.html');return false;">
-          <span class="method-name">sixHoursAgo</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-Return a DateTime object representing 6 hours in the past
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000004" class="method-detail">
-        <a name="M000004"></a>
-
-        <div class="method-heading">
-          <a href="PPCommon.src/M000004.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000004.html');return false;">
+          <a href="PPCommon.src/M000005.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000005.html');return false;">
           <span class="method-name">stripSlash</span><span class="method-args">(str)</span>
           </a>
         </div>
@@ -681,19 +567,19 @@ strip any trailing slashes from str if they exist
         </div>
       </div>
 
-      <div id="method-M000008" class="method-detail">
-        <a name="M000008"></a>
+      <div id="method-M000009" class="method-detail">
+        <a name="M000009"></a>
 
         <div class="method-heading">
-          <a href="PPCommon.src/M000008.html" target="Code" class="method-signature"
-            onclick="popupCode('PPCommon.src/M000008.html');return false;">
+          <a href="PPCommon.src/M000009.html" target="Code" class="method-signature"
+            onclick="popupCode('PPCommon.src/M000009.html');return false;">
           <span class="method-name">symbolize</span><span class="method-args">(text)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-<a href="PPCommon.html#M000008">symbolize</a> text
+<a href="PPCommon.html#M000009">symbolize</a> text
 </p>
         </div>
       </div>
