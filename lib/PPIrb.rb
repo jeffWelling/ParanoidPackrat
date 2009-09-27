@@ -72,7 +72,9 @@ module PPIrb
 				end
 			}
 			er=false if keep_fail==false
-		else
+		end
+
+		if er==false
 			if first_or_second==:first
 				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
 				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
