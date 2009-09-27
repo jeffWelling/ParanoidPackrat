@@ -22,14 +22,14 @@ require 'ostruct'
 module PPConfig
 	class <<self
 		#checkYourConfig is called when an error is encountered reading the configuration. 
-		def self.checkYourConfig
+		def checkYourConfig
 			puts "PPConfig:  Please check your configuration."
 			@BadConfig=true
 		end
 		#This function is intended to be run AFTER the the configurations have been set
 		#to make sure the configurations entered are sane.
 		#if silent is not nil, then silent mode is activated for this function.
-		def self.sanityCheck silent=nil
+		def sanityCheck silent=nil
 			@Configs.each {|config_name, config|
 				puts "sanityCheck(): Warning, you have entered a blank configuration for '#{config_name}'!" if silent!=nil and config==nil
 				unless config.nil?
@@ -45,6 +45,7 @@ module PPConfig
 		# 
     def set_default_options
       @options.silentMode = false
+			@options.permissions = false
       configPath = File.expand_path(File.dirname(__FILE__) + '/../')
       @options.configFile = configPath + '/ParanoidPackrat.config.rb'
     end
@@ -55,7 +56,8 @@ module PPConfig
         p.banner = "Usage: ParanoidPackrat.rb [options]"
         # Add options
         p.on("-c","--config [FILE]","Specify a non-default config-file location.")    {|file| options.configFile = file }
-        p.on("-s","--silent [BOOL]","Set silent mode - no non-errors will be output") {|bool| options.silentMode = (bool !~ /(no|false)/) }
+        p.on("-s","--silent [BOOL]","Set silent mode - no output will be generated.  Intended for use with cron.") {|bool| options.silentMode = (bool !~ /(no|false)/) }
+				p.on("-p","--permissions [BOOL]","Silently suppress read errors due to permissions.  Intended for use with cron, intended to be used with -s.") {|bool| options.permissions = (bool !~ /(yes|true)/) }
         p.on("-h","--help",            "Show this message")                           {       puts p ; exit }
         p.separator "Examples:"
         p.separator "\tParanoidPackrat --silent"
@@ -69,9 +71,19 @@ module PPConfig
         raise "Config file #{config} is not readable" unless File.readable? config
         options.configFile = config
       end
-      load "#{options.configFile}"
+#      load "#{options.configFile}"
       PPConfig.sanityCheck
     end
+
+		#
+		def ignorePermissions?
+			@options.permissions
+		end
+
+		#return true if silentMode 
+		def silentMode?
+			@options.silentMode
+		end
 
 		#To be called once at the beginning of the config file
 		def initialize
