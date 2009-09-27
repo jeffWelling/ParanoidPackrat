@@ -48,20 +48,31 @@ module TestLibrary
     files << dir
   end
 
-  def wrap_io input = ''
+   def wrap_io input = ''
+    capture_stdout { wrap_input(input) { yield } }
+  end
+  def wrap_input input = ''
     stdin  = $stdin
-    stdout = $stdout
     input  = StringIO.new input.to_s unless input.is_a? StringIO
-    output = StringIO.new "w+"
     begin
       $stdin  = input
-      $stdout = output
+      yield
+    ensure
+      $stdin  = stdin
+    end
+  end
+  def capture_stdout verbose = false
+    stdout = $stdout
+    out = StringIO.new "w+"
+    begin
+      $stdout = out
       yield
     ensure
       $stdout = stdout
-      $stdin  = stdin
-      output.rewind
-      return output.read
+      out.rewind
+      data = out.read
+      print data if verbose
+      return data
     end
   end
 
