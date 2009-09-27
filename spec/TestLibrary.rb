@@ -25,6 +25,7 @@ module TestLibrary
   end
 
   # Creates a tempdir, recursively populates it, returns a count of files and dirs"
+  # No upper bound on size of tempdir created... can be slow
   def build_temp_dir dir = nil
     unless dir # default case
       dir = PPCommon.mktempdir 'PP-test' 
