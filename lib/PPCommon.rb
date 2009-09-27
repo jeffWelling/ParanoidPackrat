@@ -96,12 +96,12 @@ module PPCommon
 	#in the backup path.
 	def self.newDatetime
 		timestamp = DateTime.now.to_s
-    timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
+    timestamp.sub!(/[-+]\d{4}/,'') # strip off -07:00 modifier
     timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
 	end
 	
 	#symbolize text
-	def PPCommon.symbolize text
+	def self.symbolize text
 	 return :nil if text.nil?
 		return :empty if text.empty?
 		return :quit if text =~ /^(q|quit)$/i
