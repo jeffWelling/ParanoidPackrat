@@ -346,5 +346,21 @@ module PPCommon
 		}
 		read_lines
 	end
+
+	#gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
+	#optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
+	#is taking place, it doesn't delete the backup in progress.  Obviously this won't be a problem if you don't run it concurrently, and don't have it
+	#set to run in cron.
+	#FIXME I need to be set up to also check the global backup destination when it is set!
+	def self.gc buffer=true
+		PPConfig.dumpConfig.each {|config|
+			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+			backup_path_incomplete=backup_path + '.incomplete_backup'
+			Find.find(backup_path) {|backup_instance|
+				next unless PPCommon.datetimeFormat?(backup_instance)
+				File.delete(backup_path.chop) if File.exist?(backup_path_incomplete) and DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.6HoursAgo
+			}
+		}
+	end
 end
 
