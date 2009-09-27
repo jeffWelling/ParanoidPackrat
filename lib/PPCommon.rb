@@ -96,12 +96,12 @@ module PPCommon
 	#in the backup path.
 	def self.newDatetime
 		timestamp = DateTime.now.to_s
-    timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
+    timestamp.sub!(/[-+]\d{4}/,'') # strip off -07:00 modifier
     timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
 	end
 	
 	#symbolize text
-	def PPCommon.symbolize text
+	def self.symbolize text
 	 return :nil if text.nil?
 		return :empty if text.empty?
 		return :quit if text =~ /^(q|quit)$/i
@@ -363,6 +363,37 @@ module PPCommon
 		raise "You stupid individual!" unless dir.is_a? String
 		File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
 		true
+	end
+	
+	#Return a DateTime object representing 6 hours in the past
+	def self.sixHoursAgo
+		DateTime.parse(Time.new.-(60*60*6).to_s)
+	end
+
+	#gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
+	#optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
+	#is taking place, it doesn't delete the backup in progress.  Obviously this won't be a problem if you don't run it concurrently, and don't have it
+	#set to run in cron.
+	#FIXME I need to be set up to also check the global backup destination when it is set!
+	def self.gc buffer=true
+		num_deleted=0
+		PPConfig.dumpConfig.each {|config|
+			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+			pp backup_path
+			Dir.glob(backup_path + '*').each {|backup_instance|
+				backup_path_incomplete=backup_instance + '/.incomplete_backup'
+				backup_instance.gsub!(backup_path, '')
+				pp backup_path_incomplete
+				puts "Delete me!" if File.exist?(backup_path_incomplete)
+				next unless PPCommon.datetimeFormat?(backup_instance)
+				if buffer == true
+					(FileUtils.remove_entry_secure(backup_path + backup_instance) and counter+=1) if (File.exist?(backup_path_incomplete) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+				else
+					(FileUtils.remove_entry_secure(backup_path + backup_instance) and counter+=1) if File.exist?(backup_path_incomplete)
+				end
+			}    #And the file was deleted, and jesus' boots were gone.
+		}
+		num_deleted
 	end
 end
 
