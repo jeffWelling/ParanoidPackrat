@@ -58,17 +58,28 @@ module PPIrb
 			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		end
 
-		er= PPCommon.whatWasError?( $?, err_log )
+		er= PPCommon.rsyncErr?( $?, err_log )
 		#maybe a case on the return value of whatWasError?()
+
+		unless er==false  #unless there aren't any, process the errors by asking the user.
+			#FIXME This is probly where we'd put the code to store the user response for the long term
+			keep_fail=true
+			er.each_key {|key|
+				if key==:FailedToOpen
+					er[key].each {|file_that_failed|
+						keep_fail=false if PPCommon.prompt("Rsync error:  #{key.to_s}  -  '#{file_that_failed.strip}' \nIgnore this error? (Do not count this as an error, update the last_backup symlink?)")==:yes
+					}
+				end
+			}
+			er=false if keep_fail==false
+		end
 
 		if er==false
 			if first_or_second==:first
-				if $?.exitstatus==0
-					File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
-					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
-					#run the method to scan all of the backups for duplicates and hardlink them
-					PPCommon.shrinkBackupDestination(backup)
-				end
+				File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
+				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
+				#run the method to scan all of the backups for duplicates and hardlink them
+				PPCommon.shrinkBackupDestination(backup)
 			else
 				File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' ) if $?.exitstatus==0
 			end
@@ -76,9 +87,9 @@ module PPIrb
 			#
 		end
 
-		PPCommon.pprint( 'simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!' ) if $?.exitstatus!=0
+		PPCommon.pprint( "simpleBackup():  Done with abnormal existatus - rsync gave non-zero exitstatus!\n\t\tBackup was performed, but some files may not have been copies so last_backup still points to your most recent completed backup.\n" ) unless er==false
 		PPCommon.pprint( 'simpleBackup():  Done.  Check the log and the backups for bugs and errors.' )
 		
-		return dest_name_date
+		dest_name_date
 	end
 end

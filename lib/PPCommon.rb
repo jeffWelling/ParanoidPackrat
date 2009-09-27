@@ -29,7 +29,7 @@ module PPCommon
 	#of printing the output.
 	def self.pprint str, fatal=nil
 		raise str unless fatal.nil?
-#		return TRUE if self.silentMode?
+#		return true if self.silentMode?
 		puts str
 	end
 
@@ -44,8 +44,47 @@ module PPCommon
     str.sub(/\/+$/,'')
 	end
 
-	#returns TRUE if str matches the date time format expected to be found in the backup destination folders
-	#otherwise, returns FALSE
+	#do a `df`, parse, return as array.  example return array below.
+	#	[ ['/dev/sda1', filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+	#		['/dev/sdb1', ...] ]
+	#the optional debug argument is for creating/using specs, if debug is provided it will be
+	#used instead of calling out to `df`.
+	def self.df debug=nil
+		debug.nil? ? output=`df -P` : output=debug
+		output=output.split("\n").reject {|l| !l[/^Filesystem/].nil? }  #Reject the first line of output, which is the columns.
+		output.each_index {|i|
+			filesystem= output[i][/^[^\s]+/]
+			total_1k_blocks=''
+			used=''
+			available=''
+			capacity=''
+			mountpoint=''
+			temp=''
+			i2=0  #I cant believe I have to use an index, I MUST be tired
+			output[i]=output[i].gsub(/^[^\s]+/, '')
+			output[i][/(\s+\d+){3}\s+\d+%\s+\//].strip.chop.chop.chop.split(' ').each {|number|
+				if i2==0
+					total_1k_blocks=number			#Chef: "Hello children!"
+					i2+=1												#Kids: "Hi Chef!"
+				elsif i2==1										#Kids: "Chef, what would a priest want to put up our butts?"
+					used=number									#Chef: "Goodbye!"
+					i2+=1												#ROFL
+				elsif i2==2
+					available=number
+					i2+=1
+				elsif i2==3
+					capacity=number
+				end             			   #  << DAMN thats ugly
+				temp=[total_1k_blocks, used, available, capacity]
+			}
+			temp << (output[i].gsub(/(\s+\d+){3}\s+\d+%\s+\//, '/'))
+			output[i]= (temp.reverse << filesystem).reverse
+		}
+		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
+	end
+
+	#returns true if str matches the date time format expected to be found in the backup destination folders
+	#otherwise, returns false
 	def self.datetimeFormat?(str)
     return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
     false
@@ -59,6 +98,54 @@ module PPCommon
 		timestamp = DateTime.now.to_s
     timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
     timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
+	end
+	
+	#symbolize text
+	def PPCommon.symbolize text
+	 return :nil if text.nil?
+		return :empty if text.empty?
+		return :quit if text =~ /^(q|quit)$/i
+		return :edit if text =~ /^(e|edit)$/i
+		return :yes  if text =~ /^(y|yes)$/i
+		return :no   if text =~ /^(n|no)$/i
+		text.to_sym
+	end 
+
+	#ask the user question, and return the response (with optional default)
+	def self.ask question, default=nil
+		print "\n#{question} "
+		answer = STDIN.gets.strip.downcase
+		throw :quit if 'q' == answer
+		return default if PPCommon.symbolize(answer)==:empty
+		answer
+	end
+
+	#ask the user a question, return the symbolized response with optional default
+	def self.ask_symbol question, default
+		answer = PPCommon.symbolize PPCommon.ask(question)
+		throw :quit if :quit == answer
+		return default if :empty == answer
+		answer
+	end
+	
+	#ask the user question, loop until he selects a valid option.
+	def self.prompt question, default = :yes, add_options = nil, delete_options = nil
+		options = ([default] + [:yes,:no] + [add_options] + [:quit]).flatten.uniq
+		if delete_options.class == Array
+			delete_options.each {|del_option|
+			options -= [del_option]
+			}
+		else
+			options -= [delete_options]
+		end
+		option_string = options.collect {|x| x.to_s.capitalize}.join('/')
+		answer = nil
+		loop {
+			answer = PPCommon.ask_symbol "#{question} (#{option_string.gsub('//', '/')}):", default
+			(answer=default if answer==:nil) unless default.nil?
+			break if options.member? answer
+		}
+		answer
 	end
 
 	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
@@ -84,7 +171,7 @@ module PPCommon
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
 	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
-	#Using that example, it would create the dir "/mnt/backup/", it will return FALSE unless
+	#Using that example, it would create the dir "/mnt/backup/", it will return false unless
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
@@ -99,18 +186,18 @@ module PPCommon
 	#
 	#It will look for any directories underneath backup_dest, if they also contain a directory
 	#which has the correct date time format, and there is a last_backup symlink pointing to a dir,
-	#then it will return TRUE that yes there is at least one existing backup meaning
+	#then it will return true that yes there is at least one existing backup meaning
 	#this is not the first run.
 	#Otherwise, if there are no directories underneath backup_dest which also contain a dir
 	#with the name in the right date time format which also contains a last_backup symlink,
-	#it will return FALSE signaling that this is the first run.
+	#it will return false signaling that this is the first run.
 	#If backup_dest does not exist, or there are other files in backup_dest, it will simply
-	#return FALSE.
+	#return false.
 	#
 	#If backup_name is provided, that one backupDest/backupName dir will be checked for backups.
 	#NOTE - all paths are expected to be full paths
 	def self.containsBackups?(backup_dest, backup_name=nil)
-		return FALSE unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
+		return false unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
 		backup_dest=PPCommon.addSlash(backup_dest)
 		has_a_backup=false
 		last_backup=false
@@ -138,8 +225,8 @@ module PPCommon
 				}
 			}
 		}
-		return TRUE if has_a_backup.class==TrueClass and last_backup.class==TrueClass
-		return FALSE
+		return true if has_a_backup.class==TrueClass and last_backup.class==TrueClass
+		return false
 	end
 	
 	#shrinkBackupDestination(backup,wide) traverse through backups under backupDestination/backupName/ , hardlinking to save space
@@ -211,13 +298,39 @@ module PPCommon
      
 	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
 	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
-	#returns false if there was no error, otherwise will return a hash in the form of {:Permissions=>[foo.txt,bar.txt]}
+	#returns false if there was no error, otherwise will return a hash in the form of {:FailedToOpen=>[foo.txt,bar.txt]}
 	#for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
 	#error_log is expected to be the full path to the error log in question.  The error log is expected to be the stderr output
 	#from running rsync ... &>error_log, from simpleBackup().
-	def self.whatWasError?( p, error_log )
+	def self.rsyncErr?( p, error_log )
 		return false if p.exitstatus==0
-		return false
+		results={:FailedToOpen=>[]}
+		log=PPCommon.readFile(error_log)
+		log.each {|log_line|
+			case
+				#In the folloring when tests, the .nil? and ! basically cancel each other out, but the reason they're used is to provide a boolean response
+				#which is required for case/when (methinks)
+				when (!log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?)
+					#oh noes! This file, we can has no read access on it!
+					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
+			end
+		}
+		results
+	end
+	
+	#readFile takes a filename, and optionally the maximum number of lines to read.
+	#
+	#returns the lines read as an array.
+	def self.readFile file, max_lines=0
+		counter=0
+		read_lines=[]
+		File.open(file, 'r') {|f|
+			while (line= f.gets and counter<=max_lines)
+				read_lines << line
+				counter+=1 unless max_lines==0
+			end
+		}
+		read_lines
 	end
 end
 
