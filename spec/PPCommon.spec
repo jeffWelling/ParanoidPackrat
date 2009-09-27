@@ -92,4 +92,17 @@ describe PPCommon do
     File.directory?(result).should be_true
     PPCommon.makeBackupDirectory(dir).should be_false # non-empty now
   end
+
+  it "turns user-input strings into symbols" do
+    PPCommon.symbolize(nil).should == :nil
+    PPCommon.symbolize('').should == :empty
+    PPCommon.symbolize('q').should == :quit
+    PPCommon.symbolize('quit').should == :quit
+    PPCommon.symbolize('e').should == :edit
+    PPCommon.symbolize('edit').should == :edit
+    PPCommon.symbolize('y').should == :yes
+    PPCommon.symbolize('yes').should == :yes
+    PPCommon.symbolize('n').should == :no
+    PPCommon.symbolize('no').should == :no
+  end
 end
