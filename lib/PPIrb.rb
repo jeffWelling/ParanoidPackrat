@@ -48,7 +48,6 @@ module PPIrb
 		err_log=dest_name_date + 'err_log.txt'
 		first_or_second=nil
 
-		pp backup
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
 			first_or_second=:first
 			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
