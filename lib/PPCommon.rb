@@ -96,8 +96,8 @@ module PPCommon
 	#in the backup path.
 	def self.newDatetime
 		timestamp = DateTime.now.to_s
-    timestamp.sub!(/[-+]\d{4}/,'') # strip off -07:00 modifier
-    timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
+    timestamp.sub!(/[-+]\d{2}:\d{2}/,'') # strip off -07:00 modifier
+    timestamp.sub!(/T/,'_')        # use '_' as a separator instead of 'T'
 	end
 	
 	#symbolize text
