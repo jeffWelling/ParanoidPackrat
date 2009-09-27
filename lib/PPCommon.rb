@@ -364,6 +364,12 @@ module PPCommon
 		File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
 		true
 	end
+
+	#returns true is dir is marked as being an incomplete backup
+	#else true
+	def self.marked? dir, buffer=nil
+		File.exist?(PPCommon.addSlash(dir) + '.incomplete_backup')
+	end
 	
 	#Return a DateTime object representing 6 hours in the past
 	def self.sixHoursAgo
@@ -379,17 +385,14 @@ module PPCommon
 		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
 			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
-			pp backup_path
 			Dir.glob(backup_path + '*').each {|backup_instance|
 				backup_path_incomplete=backup_instance + '/.incomplete_backup'
-				backup_instance.gsub!(backup_path, '')
-				pp backup_path_incomplete
-				puts "Delete me!" if File.exist?(backup_path_incomplete)
-				next unless PPCommon.datetimeFormat?(backup_instance)
+				datetime=backup_instance.gsub(backup_path, '')
+				next unless PPCommon.datetimeFormat?(datetime)
 				if buffer == true
-					(FileUtils.remove_entry_secure(backup_path + backup_instance) and counter+=1) if (File.exist?(backup_path_incomplete) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
 				else
-					(FileUtils.remove_entry_secure(backup_path + backup_instance) and counter+=1) if File.exist?(backup_path_incomplete)
+					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
 				end
 			}    #And the file was deleted, and jesus' boots were gone.
 		}
