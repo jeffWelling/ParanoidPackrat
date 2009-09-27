@@ -45,6 +45,7 @@ module PPConfig
 		# 
     def set_default_options
       @options.silentMode = false
+			@options.ignorePermissions = false
       configPath = File.expand_path(File.dirname(__FILE__) + '/../')
       @options.configFile = configPath + '/ParanoidPackrat.config.rb'
     end
@@ -56,6 +57,7 @@ module PPConfig
         # Add options
         p.on("-c","--config [FILE]","Specify a non-default config-file location.")    {|file| options.configFile = file }
         p.on("-s","--silent [BOOL]","Set silent mode - no output will be generated.  Intended for use with cron.") {|bool| options.silentMode = (bool !~ /(no|false)/) }
+				p.on("-P","--ignorePermissions [BOOL]","Silently suppress read errors due to permissions.  Intended for use with cron, intended to be used with -s.") {|bool| options.ignorePermissions = (bool !~ /(yes|true)/) }
         p.on("-h","--help",            "Show this message")                           {       puts p ; exit }
         p.separator "Examples:"
         p.separator "\tParanoidPackrat --silent"
@@ -69,10 +71,16 @@ module PPConfig
         raise "Config file #{config} is not readable" unless File.readable? config
         options.configFile = config
       end
-      load "#{options.configFile}"
+#      load "#{options.configFile}"
       PPConfig.sanityCheck
     end
 
+		#
+		def ignorePermissions?
+			@options.ignorePermissions
+		end
+
+		#return true if silentMode 
 		def silentMode?
 			@options.silentMode
 		end
