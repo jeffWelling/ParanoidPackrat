@@ -29,17 +29,10 @@ module PPCommon
 	#of printing the output.
 	def self.pprint str, fatal=nil
 		raise str unless fatal.nil?
-#		return true if self.silentMode?
+		return true if PPConfig.silentMode?
 		puts str
 	end
 
-  #mktempdir(prefix = 'PP') will return a temp directory.
-  #This directory is not yet, but should be auto-deleted on exit
-  def self.mktempdir str = 'PP'
-    str += '.XXXXXX' unless str =~ /X+$/
-    `mktemp -td #{str}`.strip # Is there a better way?
-  end
-	
 	#Add a slash to the end of str if there isn't already one there.
 	def self.addSlash(str)
 		str << "/" unless str[-1].chr == '/'
@@ -103,12 +96,12 @@ module PPCommon
 	#in the backup path.
 	def self.newDatetime
 		timestamp = DateTime.now.to_s
-    timestamp.sub!(/[-+]\d\d:\d\d/,'') # strip off -07:00 modifier
+    timestamp.sub!(/[-+]\d{4}/,'') # strip off -07:00 modifier
     timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
 	end
 	
 	#symbolize text
-	def PPCommon.symbolize text
+	def self.symbolize text
 	 return :nil if text.nil?
 		return :empty if text.empty?
 		return :quit if text =~ /^(q|quit)$/i
@@ -182,15 +175,9 @@ module PPCommon
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
-		raise "You idiot" unless dir.class==String
-		dir=PPCommon.addSlash(dir)
-		#Make sure the directory is empty
-		counter=0
-		Find.find(dir) {|file|
-			counter+=1
-		}
-		return false unless counter==1
-		FileUtils.mkdir( dir + "backup/", 700 )[0]
+		raise "You idiot" unless dir.is_a? String
+		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
+		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
 	end
 	
 	#This method is used to determine if a backup dir contains backups or not.
@@ -227,7 +214,7 @@ module PPCommon
 			dest_backup=backup_dest + 'backup/'
 			Dir.entries(dest_backup).each {|l1|
 				next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
-				next if !backup_name.nil? and backup_name!=l1    #If backup_name is specified, only check that directory	
+				next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
 				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
 				Dir.entries(dest_backup_name).each {|l2|
 					next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
@@ -258,6 +245,20 @@ module PPCommon
 	#
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
+		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
+=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
+
+/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
+        from ./ParanoidPackrat.rb:35
+
+=end
+ 
 		raise "you idiot" unless backup.class==Hash
     sigs = getExistingFileSignatures
     Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
@@ -267,7 +268,7 @@ module PPCommon
       else
         original_file = sigs[sig]
         next if original_file == new_file
-        raise "File #{file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
         hardlinkFile(new_file, original_file)
       end
     }
@@ -304,7 +305,7 @@ module PPCommon
     # check not the same file
     #File.unlink new
     #File.link old, new
-    puts "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
+    PPCommon.pprint "Hardlinking #{new} to #{old}" # FIXME - use this until checks are coded
     # check hardlink was made
     # restore original file otherwise
   end
@@ -344,6 +345,75 @@ module PPCommon
 			end
 		}
 		read_lines
+	end
+
+	#mark(dir) will mark the backup destination before performing a backup to assist in finding
+	#incomplete backups later on. dir is expected to be the directory of backupDest/'backup'/backupName/datetime/
+	#
+	#See also: PPCommon.removeMark()
+	def self.mark( dir )
+		raise "You idiot!" unless dir.is_a? String
+		`touch #{PPCommon.addSlash(dir) + '.incomplete_backup'}`
+		true
+	end
+
+	#removeMark(dir) is intended to be used after a backup has been completed to remove the mark indicating an incomplete backup
+	#dir must be the same as was applied to PPCommon.mark() before the backup was begun, obviously.
+	def self.removeMark( dir )
+		raise "You stupid individual!" unless dir.is_a? String
+		File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
+		true
+	end
+
+	#returns true is dir is marked as being an incomplete backup
+	#else true
+	def self.marked? dir, buffer=nil
+		File.exist?(PPCommon.addSlash(dir) + '.incomplete_backup')
+	end
+	
+	#Return a DateTime object representing 6 hours in the past
+	def self.sixHoursAgo
+		DateTime.parse(Time.new.-(60*60*6).to_s)
+	end
+
+	#gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
+	#optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
+	#is taking place, it doesn't delete the backup in progress.  Obviously this won't be a problem if you don't run it concurrently, and don't have it
+	#set to run in cron.
+	#FIXME I need to be set up to also check the global backup destination when it is set!
+	def self.gc buffer=true
+		num_deleted=0
+		PPConfig.dumpConfig.each {|config|
+			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+			Dir.glob(backup_path + '*').each {|backup_instance|
+				backup_path_incomplete=backup_instance + '/.incomplete_backup'
+				datetime=backup_instance.gsub(backup_path, '')
+				next unless PPCommon.datetimeFormat?(datetime)
+				if buffer == true
+					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+				else
+					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
+				end
+			}    #And the file was deleted, and jesus' boots were gone.
+		}
+		num_deleted
+	end
+
+	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
+	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
+	#Be aware that setting buffer != true may return true if a backup is currently running.
+	def self.hasIncompleteBackups?( backup_destination, buffer=true )
+		Dir.glob(PPCommon.addSlash(backup_destination) + 'backup/*').each {|backup_name|
+			Dir.glob(backup_name + '/*').each {|datetime|
+				next unless PPCommon.datetimeFormat?(File.basename(datetime))
+				if buffer.class==TrueClass
+					return true if PPCommon.marked?(datetime) and (DateTime.parse(File.mtime(datetime).to_s) > PPCommon.sixHoursAgo)
+				else 
+					return true if PPCommon.marked?(datetime)
+				end
+			}
+		}
+		false
 	end
 end
 

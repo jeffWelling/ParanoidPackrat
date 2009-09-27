@@ -6,13 +6,15 @@ require 'PPCommon'
 load 'TestLibrary.rb'
 include TestLibrary
 
-describe PPCommon do
+describe TestLibrary do
   it "creates an empty temp directory on request" do
     td = PPCommon.mktempdir
     File.exists?(   td).should == true
     File.directory?(td).should == true
   end
+end
 
+describe PPCommon do
   it "adds a slash to strings if they do not already end with one" do
     PPCommon.addSlash('foo' ).should == 'foo/'
     PPCommon.addSlash('foo/').should == 'foo/'
@@ -84,4 +86,10 @@ describe PPCommon do
     PPCommon.scanBackupDir(:BackupTarget => dir, :Exclusions => excludes.first).length.should == filtered_files.length
   end
 
+  it "makes a backup directory" do
+    dir = TestLibrary.mktempdir 'PP-test'
+    result = PPCommon.makeBackupDirectory(dir)
+    File.directory?(result).should be_true
+    PPCommon.makeBackupDirectory(dir).should be_false # non-empty now
+  end
 end
