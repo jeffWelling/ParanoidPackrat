@@ -9,7 +9,7 @@ describe PPConfig do
 	end
 	it "add a backup source by name" do
 		PPConfig.addName 'jesusboots'
-		PPConfig['jesusboots'].should==nil
+		PPConfig['jesusboots'].should=={:BackupName=>"jesusboots"}
 	end
 	it "now contains one config" do
 		PPConfig.length.should==1
@@ -17,7 +17,7 @@ describe PPConfig do
 	it "takes a destination for a backup source" do
 		PPConfig.addName 'Jesus has no boots'
 		PPConfig.setBackupDestinationOn 'Jesus has no boots', '/mnt'
-		PPConfig['Jesus has no boots'].should=={'BackupDestination'=>'/mnt'}
+		PPConfig['Jesus has no boots'].should=={:BackupDestination=>"/mnt", :BackupName=>"Jesus has no boots"}
 	end
 end
 
