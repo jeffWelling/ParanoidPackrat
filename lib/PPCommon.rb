@@ -135,7 +135,7 @@ module PPCommon
 		options = ([default] + [:yes,:no] + [add_options] + [:quit]).flatten.uniq
 		if delete_options.class == Array
 			delete_options.each {|del_option|
-			options -= [del_option]
+			  options -= [del_option]
 			}
 		else
 			options -= [delete_options]
