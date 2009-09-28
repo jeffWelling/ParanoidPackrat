@@ -217,7 +217,7 @@ module PPCommon
 				next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
 				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
 				Dir.entries(dest_backup_name).each {|l2|
-					next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
+					next if l2[/^(\.|\.\.)$/]   #Skip '.' and '..'
 					next unless PPCommon.datetimeFormat?(l2) or l2[/^last_backup$/]
 					has_a_backup=true
 					dest_backup_name_datetime=(dest_backup_name + l2) if l2[/^last_backup$/]
