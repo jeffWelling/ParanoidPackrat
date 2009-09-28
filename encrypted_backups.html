@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>jeffWelling/ParanoidPackrat @ GitHub</title>
+
+<style type="text/css">
+body {
+margin-top: 1.0em;
+background-color: #000000;
+font-family: "Helvetica,Arial,FreeSans"; color: #ffffff;
+}
+#container {
+margin: 0 auto;
+width: 700px;
+}
+h1 { font-size: 3.8em; color: #ebfafe; margin-bottom: 3px; }
+h1 .small { font-size: 0.4em; }
+h1 a { text-decoration: none }
+h2 { font-size: 1.5em; color: #ebfafe; }
+h3 { text-align: center; color: #ebfafe; }
+a { color: #ebfafe; }
+.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+.download { float: right; }
+pre { background: #000; color: #fff; padding: 15px;}
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.footer { text-align:center; padding-top:30px; font-style: italic; }
+</style></head>
+<body>
+<a href="http://github.com/jeffWelling/ParanoidPackrat"><img style="border: 0pt none ; position: absolute; top: 0pt; right: 0pt;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+<div id="container"><br>
+<h1><small><small>Encrypted Backups </small></small>&nbsp;</h1>
+<p><br>
+  ParanoidPackrat will support encrypted backups in a number of ways;</p>
+<h2><em><strong>Backup to encrypted image</strong></em> <strong><em>as backupDest</em> </strong></h2>
+<p>Basically, following a similar setup as is described <a href="http://www.gentoo-wiki.info/Dm-crypt#Using_dmcrypt_with_a_loopback_device">here</a>. This could be combined with storing the keyfile required to access the encrypted partition being stored on a keyfile by combining with <a href="http://www.saout.de/tikiwiki/tiki-index.php?page=EncryptedVarWithUSBKey">this</a>. An encrypted loopback device which requires the keyfile at mount time.</p>
+<div align="center">
+  <table width="692" border="0">
+    <tr>
+      <td width="340"><div align="center">Pros</div></td>
+        <td width="342"><div align="center">Cons</div></td>
+      </tr>
+    <tr>
+      <td><li>Maintain rsyncability (hardlinks) </li>
+          <li></li>
+           </td>
+        <td><li>Requires full image copy to remote backupDest per backup </li>
+         <li> </li></td>
+      </tr>
+  </table>
+</div>
+<p>&nbsp;</p>
+<h2><em><strong>Encrypt specific files/dirs in a backupTarget</strong></em></h2>
+<p>This would get a datetime to use, create the datetime folder in the appropriete backupDest/backup/backupName dir, and for every file/dir in backupTarget to encrypt, it would encrypt it to the backupDest/backup/backupName/datetime/ dir. It would then perform an rsync excluding the files/dirs that are encrypted, and mv the encrypted files/dirs into place into their place in the backup tree.</p>
+<table width="701" border="0">
+  <tr>
+    <td width="345"><div align="center">Pros</div></td>
+    <td width="346"><div align="center">Cons</div></td>
+  </tr>
+  <tr>
+    <td><ul>
+      <li>Don't have to copy entire backupDest per backup, only changes and encrypted parts.</li>
+      <li> </li>
+    </ul></td>
+    <td><ul>
+      <li>Breaks rsyncability for anything encrypted</li>
+      <li> </li>
+    </ul></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h2><em><strong>Encrypt files/dirs in place in backup  </strong></em></h2>
+<p>This would rsync the backup to a temporary directory in backupDest/backup/backupName/datetime/.tmp/ where it would then encrypt every FILE that was configured to be encrypted, in place in the directory tree. Emphasis on FILE because it does not encrypt directories, it will recursively traverse directories looking for files and will encrypt every file under the dir to be encrypted. After the encryption pass is complete, it moves the backup into place, and the backup is complete.</p>
+<table width="700" border="0">
+  <tr>
+    <td width="345"><div align="center">Pros</div></td>
+    <td width="345"><div align="center">
+      <p>Cons</p>
+      </div></td>
+  </tr>
+  <tr>
+    <td><ul>
+      <li>Maintains rsyncability</li>
+      <li> </li>
+    </ul></td>
+    <td><ul>
+      <li>Any directory names and structures will be visible, in contrast to the encrypted image.</li>
+      <li> </li>
+    </ul></td>
+  </tr>
+</table>
+<h2><em><strong>More...?</strong></em></h2>
+<p>     <br>
+  <br>
+    <br>
+</p>
+<div style="text-align: center;"><a href="http://jeffwelling.github.com/ParanoidPackrat/">ParanoidPackrat</a></div><br><div class="footer"> get the source code on GitHub : <a href="http://github.com/jeffWelling/ParanoidPackrat">jeffWelling/ParanoidPackrat</a>
+</div>
+</div>
+</body></html>
