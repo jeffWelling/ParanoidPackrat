@@ -53,7 +53,7 @@ describe PPCommon do
   end
 
   it "creates accurate and properly formatted timestamps" do
-    nil while (Time.now.sec == 59) # avoid roll-over related bugs
+    nil while (Time.now.sec == 59) # avoid roll-over related bugs - Clarification?  Huh?!?  I think this may also manifest as a once-in-a-blue-moon loop to infinity, ran the spec and had to CTRL+C it.
     timestamp = PPCommon.newDatetime
     timestamp.length.should == 19
     time = Time.now
