@@ -102,13 +102,15 @@ module PPCommon
 	
 	#symbolize text
 	def self.symbolize text
-	 return :nil if text.nil?
-		return :empty if text.empty?
-		return :quit if text =~ /^(q|quit)$/i
-		return :edit if text =~ /^(e|edit)$/i
-		return :yes  if text =~ /^(y|yes)$/i
-		return :no   if text =~ /^(n|no)$/i
-		text.to_sym
+    case text
+      when /^$/           ; :empty
+      when nil            ; :nil
+      when /^(q|quit)$/i  ; :quit
+      when /^(e|edit)$/i  ; :edit
+      when /^(y|yes)$/i   ; :yes
+      when /^(n|no)$/i    ; :no
+      else                ; text.to_sym
+    end
 	end 
 
 	#ask the user question, and return the response (with optional default)
