@@ -114,7 +114,7 @@ module PPCommon
 	#ask the user question, and return the response (with optional default)
 	def self.ask question, default=nil
 		print "\n#{question} "
-		answer = gets.strip.downcase
+		answer = STDIN.gets.strip.downcase
 		throw :quit if 'q' == answer
 		return default if PPCommon.symbolize(answer)==:empty
 		answer
