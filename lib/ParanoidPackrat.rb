@@ -5,6 +5,7 @@ module ParanoidPackrat
 			PPConfig.dumpConfig.each {|config|
 				PPIrb.simpleBackup(config[1])
 			}
+			PPConfig.dumpConfig.length
     end
   end
 end
