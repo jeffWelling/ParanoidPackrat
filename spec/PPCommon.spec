@@ -118,6 +118,8 @@ describe PPCommon do
 
 	it "df should return the expected output in the expected format" do
 		PPCommon.df.class.should == Array #Return an array
-		PPCommon.df[0].length.should == 6  #Return all 6 elements of a `df`
+		PPCommon.df.each {|line| 
+			line.length.should == 6		#Each line should have all 6 elements 
+		}
 	end
 end
