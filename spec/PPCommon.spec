@@ -115,4 +115,9 @@ describe PPCommon do
       wrap_io("test")       { PPCommon.ask "simple question?", "mauve"              }.should == "\nsimple question? "
     end
   end 
+
+	it "df should return the expected output in the expected format" do
+		PPCommon.df.class.should == Array #Return an array
+		PPCommon.df[0].length.should == 6  #Return all 6 elements of a `df`
+	end
 end

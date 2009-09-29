@@ -45,8 +45,8 @@ module PPCommon
 	end
 
 	#do a `df`, parse, return as array.  example return array below.
-	#	[ ['/dev/sda1', filesystem, total_1K_blocks, used, available, capacity, mountpoint],
-	#		['/dev/sdb1', ...] ]
+	#	[ [filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+	#		[filesystem, ...] ]
 	#the optional debug argument is for creating/using specs, if debug is provided it will be
 	#used instead of calling out to `df`.
 	def self.df debug=nil
