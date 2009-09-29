@@ -83,6 +83,24 @@ module PPCommon
 		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
 	end
 
+	#takes a dir, and checks to see how much free space the drive that dir is on has.
+	#debug_input is to allow an alternative source to PPCommon.df, generally intended for specs
+	def self.getFreeSpace(dir, debug_input=nil)
+		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
+		dir=PPCommon.addSlash(dir)
+		lump.each {|line|
+			next if line[5].length > dir.length
+			next unless dir.slice(0, line[5].length) == line[5]
+
+			next_slash= dir.index('/', line[5].length)
+			next if next_slash.nil?
+			full_path=dir.slice(0, next_slash+1)
+
+			return line[3] if dir.slice(0, dir.index('/', line[5].length) ) == line[5]
+		}
+		return lump[0][3]
+	end
+
 	#returns true if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns false
 	def self.datetimeFormat?(str)
