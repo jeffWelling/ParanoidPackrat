@@ -423,34 +423,6 @@ module PPCommon
 		`rsync -a  --link-dest=../last_backup #{dry_run.nil? ? ('') : ('--dry-run')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`
 	end
 
-  def self.wrap_io input = ''
-    PPCommon.capture_stdout { PPCommon.wrap_input(input) { yield } }
-  end
-  def self.wrap_input input = ''
-    stdin  = $stdin
-    input  = StringIO.new input.to_s unless input.is_a? StringIO
-    begin
-      $stdin  = input
-      yield
-    ensure
-      $stdin  = stdin
-    end
-  end
-  def self.capture_stdout verbose = false
-    stdout = $stdout
-    out = StringIO.new "w+"
-    begin
-      $stdout = out
-      yield
-    ensure
-      $stdout = stdout
-      out.rewind
-      data = out.read
-      print data if verbose
-      return data
-    end
-  end
-
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
 	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
 	#Be aware that setting buffer != true may return true if a backup is currently running.
