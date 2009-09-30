@@ -417,6 +417,12 @@ module PPCommon
 		num_deleted
 	end
 
+	#simple wrapper for rsync
+	#so that the rsync call is in one place
+	def self.rsync(source, dest)
+		`rsync -a  --link-dest=../last_backup --stats -h --log-file-format="%t [%p] %o %h [%a] %m (%u) %f %l" --log-file=#{dest.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')}`# &>#{err_log.gsub(' ','\ ')}`
+	end
+
   def self.wrap_io input = ''
     PPCommon.capture_stdout { PPCommon.wrap_input(input) { yield } }
   end
