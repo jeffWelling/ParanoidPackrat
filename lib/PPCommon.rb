@@ -420,7 +420,10 @@ module PPCommon
 	#takes a source, and a destination. destination is expected to be a backup directory.
 	#It returns the estimated size the backup will take
 	def self.willTakeUp? source, dest
-		PPCommon.rsync( source, dest, '/dev/null', :dryrun)
+		o=PPCommon.rsync( source, dest, '/dev/null', :dryrun)
+		o.split("\n").each {|line|	
+			return line[/\d+\sbytes$/][/\d+/] if line[/^total transferred file size/i]
+		}
 	end
 
 	#simple wrapper for rsync
