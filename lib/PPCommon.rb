@@ -419,8 +419,8 @@ module PPCommon
 
 	#simple wrapper for rsync
 	#so that the rsync call is in one place
-	def self.rsync(source, dest)
-		`rsync -a  --link-dest=../last_backup --stats -h --log-file-format="%t [%p] %o %h [%a] %m (%u) %f %l" --log-file=#{dest.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')}`# &>#{err_log.gsub(' ','\ ')}`
+	def self.rsync(source, dest, err_log, dry_run=nil)
+		`rsync -a  --link-dest=../last_backup #{dry_run.nil? ? ('') : ('--dry-run')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`
 	end
 
   def self.wrap_io input = ''

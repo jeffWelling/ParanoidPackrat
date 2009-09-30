@@ -45,23 +45,19 @@ module PPIrb
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
 		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
+		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
 		err_log=dest_name_date + 'err_log.txt'
 		first_or_second=nil
 
 		if PPCommon.containsBackups?(backup[:BackupDestination], backup[:BackupName]).class==TrueClass
 			first_or_second=:first
 			PPCommon.pprint('simpleBackup():  Not first time backing up, hardlinking to old backups to save space')
-			PPCommon.mark(dest_name_date.gsub(' ', '\ '))
-			#This isn't the first backup, you can hardlink to the other backups.
-			`rsync -a  --link-dest=../last_backup --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		else
 			first_or_second=:second
 			PPCommon.pprint('simpleBackup():  First time backing up.')
-			PPCommon.mark(dest_name_date.gsub(' ', '\ '))
-			#This is the first backup.
-			`rsync -a --log-file=#{dest_name_date.gsub(' ','\ ')}rsync_log.txt #{PPCommon.stripSlash(backup[:BackupTarget]).gsub(' ','\ ')} #{dest_name_date.gsub(' ','\ ')} &>#{err_log.gsub(' ','\ ')}`
 		end
 
+		PPCommon.rsync( backup[:BackupTarget], dest_name_date, err_log)
 		er= PPCommon.rsyncErr?( $?, err_log )
 		#maybe a case on the return value of whatWasError?()
 
