@@ -1,0 +1,1 @@
+If possible, sanityCheck should raise a big ugly ass warning if it is (detectable?) detected that multiple backupDestinations reside on the same physical disk.  Remote machines (via ssh) shouldn't be a problem either. 
