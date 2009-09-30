@@ -1,0 +1,1 @@
+If there is a backupDestination specified in the config that does not exist, an error should be raise because the user likely misspelled it.  The way it currently is it is, a warning is issued, and if your not looking for it it can be easily missed.

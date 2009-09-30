@@ -1,0 +1,1 @@
+PPConfig should raise instead of warning about non-existant backupDestinations
