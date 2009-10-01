@@ -57,6 +57,19 @@ module PPIrb
 			PPCommon.pprint('simpleBackup():  First time backing up.')
 		end
 
+		# the /1024 is to account for nextBackupWillTake? returning bytes, and df returning 1K blocks, or kilobytes.
+		PPCommon.pprint( "simpleBackup():  Calculating space..." )
+		PPCommon.pprint( "simpleBackup():  Backup is estimated to take #{guess=(PPIrb.nextBackupWillTake?(backup).to_i / 1024 ) } Kilobytes.\nsimpleBackup():  Available space is  #{actual=PPCommon.getFreeSpace(dest_name_date)} Kilobytes." )
+		unless (actual.to_i > guess.to_i)
+			PPCommon.pprint("simpleBackup():  Omgpanic!   Available space is #{actual}, but backup is estimated to take #{guess}.")
+			PPCommon.pprint("simpleBackup():  Attempting to free some space...\n")
+			PPCommon.pprint("simpleBackup():  Running gc.")
+			PPCommon.pprint("simpleBackup():  #{PPCommon.gc.to_s} deleted")
+			PPCommon.pprint("simpleBackup():  Expiring old backups...")
+			PPCommon.pprint("simpleBackup():  #{PPCommon.expireOldBackups(backup) rescue 0} Expired...")
+			#check for free space? only continue if theres space available.
+			#Note, this is where backups with different priorities must be considered.
+		end
 		PPCommon.rsync( backup[:BackupTarget], dest_name_date, err_log)
 		er= PPCommon.rsyncErr?( $?, err_log )
 		#maybe a case on the return value of whatWasError?()
@@ -103,7 +116,7 @@ module PPIrb
 	#returns the estimated size in bytes
 	def self.nextBackupWillTake? backup
 		source=backup[:BackupTarget]
-		destination=PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + PPCommon.addSlash(backup[:BackupName]) + 'fake_destination'
+		destination=(PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + PPCommon.addSlash(backup[:BackupName]) + 'fake_destination')
 		PPCommon.willTakeUp?(source, destination)
 	end
 end
