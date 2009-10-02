@@ -45,8 +45,8 @@ module PPCommon
 	end
 
 	#do a `df`, parse, return as array.  example return array below.
-	#	[ ['/dev/sda1', filesystem, total_1K_blocks, used, available, capacity, mountpoint],
-	#		['/dev/sdb1', ...] ]
+	#	[ [filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+	#		[filesystem, ...] ]
 	#the optional debug argument is for creating/using specs, if debug is provided it will be
 	#used instead of calling out to `df`.
 	def self.df debug=nil
@@ -83,6 +83,24 @@ module PPCommon
 		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
 	end
 
+	#takes a dir, and checks to see how much free space the drive that dir is on has.
+	#debug_input is to allow an alternative source to PPCommon.df, generally intended for specs
+	def self.getFreeSpace(dir, debug_input=nil)
+		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
+		dir=PPCommon.addSlash(dir)
+		lump.each {|line|
+			next if line[5].length > dir.length
+			next unless dir.slice(0, line[5].length) == line[5]
+
+			next_slash= dir.index('/', line[5].length)
+			next if next_slash.nil?
+			full_path=dir.slice(0, next_slash+1)
+
+			return line[3] if dir.slice(0, dir.index('/', line[5].length) ) == line[5]
+		}
+		return lump[0][3]
+	end
+
 	#returns true if str matches the date time format expected to be found in the backup destination folders
 	#otherwise, returns false
 	def self.datetimeFormat?(str)
@@ -116,7 +134,7 @@ module PPCommon
 	#ask the user question, and return the response (with optional default)
 	def self.ask question, default=nil
 		print "\n#{question} "
-		answer = gets.strip.downcase
+		answer = STDIN.gets.strip.downcase
 		throw :quit if 'q' == answer
 		return default if PPCommon.symbolize(answer)==:empty
 		answer
@@ -219,7 +237,7 @@ module PPCommon
 				next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
 				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
 				Dir.entries(dest_backup_name).each {|l2|
-					next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
+					next if l2[/^(\.|\.\.)$/]   #Skip '.' and '..'
 					next unless PPCommon.datetimeFormat?(l2) or l2[/^last_backup$/]
 					has_a_backup=true
 					dest_backup_name_datetime=(dest_backup_name + l2) if l2[/^last_backup$/]
@@ -399,6 +417,21 @@ module PPCommon
 			}    #And the file was deleted, and jesus' boots were gone.
 		}
 		num_deleted
+	end
+
+	#takes a source, and a destination. destination is expected to be a backup directory.
+	#It returns the estimated size the backup will take
+	def self.willTakeUp? source, dest
+		o=PPCommon.rsync( source, dest, '/dev/null', :dryrun)
+		o.split("\n").each {|line|	
+			return line[/\d+\sbytes$/][/\d+/] if line[/^total transferred file size/i]
+		}
+	end
+
+	#simple wrapper for rsync
+	#so that the rsync call is in one place
+	def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
+		`rsync -a  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
 	end
 
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
