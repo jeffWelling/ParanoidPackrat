@@ -108,13 +108,13 @@ describe PPCommon do
     # no real failure case...?
   end
 
-  it "asks a question and returns the response downcased, a default, or throws :quit" do 
+  it "asks a question and returns the response downcased, a default, or throws :quit" # do 
 #    capture_stdout do
-#      wrap_input("Blue!\n") { PPCommon.ask "What is your favorite colour!?"         }.should == "blue!" 
-#      wrap_input("\n")      { PPCommon.ask "What is your favorite colour!?","BlaCK" }.should == "BlaCK" # default's not downcased
-#      wrap_io("test")       { PPCommon.ask "simple question?", "mauve"              }.should == "\nsimple question? "
+#      wrap_input("Blue!\n\n") { PPCommon.ask "What is your favorite colour!?"         }.should == "blue!" 
+#      wrap_input("\n\n")      { PPCommon.ask "What is your favorite colour!?","BlaCK" }.should == "BlaCK" # default's not downcased
+#      wrap_io("test\n\n")       { PPCommon.ask "simple question?", "mauve"              }.should == "\nsimple question? "
 #    end
-  end 
+#  end 
 
 	it "df should return the expected output in the expected format" do
 		PPCommon.df.class.should == Array #Return an array
