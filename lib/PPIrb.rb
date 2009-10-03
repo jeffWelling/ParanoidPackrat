@@ -22,18 +22,6 @@ require 'fileutils'
 #file will interact with the IRB library, in a one on top of the other
 #fashion.
 module PPIrb
-	#takes a backup hash, and tries to guess the next backup size using PPCommon.willTakeUp?()
-	#NOTE that using only the dry-run method, as we currently do, does not accurately report how much space the backup will take
-	#because it seems rsync doesn't account for the space that empty dirs take, 4k.  If you backup something with a lot of empty
-	#directories, and you have barely made any changes, then this may return a very small amount for the next backup but with 
-	#the size of directories it could easily amount to tens or hundreds of megabytes, in relation to the size of your backup target.
-	#returns the estimated size in bytes
-	def self.nextBackupWillTake? backup
-		source=backup[:BackupTarget]
-		destination=(PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + PPCommon.addSlash(backup[:BackupName]) + 'fake_destination')
-		PPCommon.willTakeUp?(source, destination)
-	end
-
 	#simpleBackup(backup) performs a simple backup.
 	#backup is expected to be the hash from @Configs[name] .
 	#It will;
@@ -69,19 +57,6 @@ module PPIrb
 			PPCommon.pprint('simpleBackup():  First time backing up.')
 		end
 
-		# the /1024 is to account for nextBackupWillTake? returning bytes, and df returning 1K blocks, or kilobytes.
-		PPCommon.pprint( "simpleBackup():  Calculating space..." )
-		PPCommon.pprint( "simpleBackup():  Backup is estimated to take #{guess=(PPIrb.nextBackupWillTake?(backup).to_i / 1024 ) } Kilobytes.\nsimpleBackup():  Available space is  #{actual=PPCommon.getFreeSpace(dest_name_date)} Kilobytes." )
-		unless (actual.to_i > guess.to_i)
-			PPCommon.pprint("simpleBackup():  Omgpanic!   Available space is #{actual}, but backup is estimated to take #{guess}.")
-			PPCommon.pprint("simpleBackup():  Attempting to free some space...\n")
-			PPCommon.pprint("simpleBackup():  Running gc.")
-			PPCommon.pprint("simpleBackup():  #{PPCommon.gc.to_s} deleted")
-			PPCommon.pprint("simpleBackup():  Expiring old backups...")
-			PPCommon.pprint("simpleBackup():  #{PPCommon.expireOldBackups(backup) rescue 0} Expired...")
-			return :fail unless actual.to_i > guess.to_i
-			#check for free space? only continue if theres space available.
-		end
 		PPCommon.rsync( backup[:BackupTarget], dest_name_date, err_log)
 		er= PPCommon.rsyncErr?( $?, err_log )
 		#maybe a case on the return value of whatWasError?()
@@ -128,7 +103,7 @@ module PPIrb
 	#returns the estimated size in bytes
 	def self.nextBackupWillTake? backup
 		source=backup[:BackupTarget]
-		destination=(PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + PPCommon.addSlash(backup[:BackupName]) + 'fake_destination')
+		destination=PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + PPCommon.addSlash(backup[:BackupName]) + 'fake_destination'
 		PPCommon.willTakeUp?(source, destination)
 	end
 end
