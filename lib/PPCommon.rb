@@ -191,13 +191,26 @@ module PPCommon
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
 	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
-	#Using that example, it would create the dir "/mnt/backup/", it will return false unless
+	#Using that example, it would create the dir "/mnt/backup/", it will return false if the
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
 		raise "You idiot" unless dir.is_a? String
 		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
 		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
+	end
+
+	#initBackup creates a directory based on dir and name
+	#return value is a string which contains the dir to work with
+	#Intended to be used in PPIrb.rb in the backup methods
+	def self.initBackup dir, name
+		dest_name=PPCommon.addSlash(dir) + 'backup/' + name
+		FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
+		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
+		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
+ 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
+		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
+		dest_name_date.gsub(' ', '\ ')
 	end
 	
 	#This method is used to determine if a backup dir contains backups or not.
