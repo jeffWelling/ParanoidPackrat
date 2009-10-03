@@ -56,7 +56,8 @@ module PPIrb
 
 		# the /1024 is to account for nextBackupWillTake? returning bytes, and df returning 1K blocks, or kilobytes.
 		PPCommon.pprint( "simpleBackup():  Calculating space..." )
-		PPCommon.pprint( "simpleBackup():  Backup is estimated to take #{guess=(PPIrb.nextBackupWillTake?(backup).to_i / 1024 ) } Kilobytes.\nsimpleBackup():  Available space is  #{actual=PPCommon.getFreeSpace(dest_name_date)} Kilobytes." )
+		PPCommon.pprint( "simpleBackup():  Backup is estimated to take #{guess=(PPIrb.nextBackupWillTake?(backup).to_i / 1024 ) } Kilobytes.\n" + 
+			simpleBackup():  Available space is  #{actual=PPCommon.getFreeSpace(dest_name_date)} Kilobytes." )
 		unless (actual.to_i > guess.to_i)
 			PPCommon.pprint("simpleBackup():  Omgpanic!   Available space is #{actual}, but backup is estimated to take #{guess}.")
 			PPCommon.pprint("simpleBackup():  Attempting to free some space...\n")
