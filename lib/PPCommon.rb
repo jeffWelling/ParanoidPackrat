@@ -189,7 +189,7 @@ module PPCommon
 	
 	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
 	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
-	#Using that example, it would create the dir "/mnt/backup/", it will return false unless
+	#Using that example, it would create the dir "/mnt/backup/", it will return false if the
 	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
 	#return the path of the directory that was just created.
 	def self.makeBackupDirectory(dir)
