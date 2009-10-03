@@ -36,16 +36,13 @@ module PPIrb
 		PPCommon.pprint( "simpleBackup():  Garbage collection finished, #{PPCommon.gc.to_s} deleted." )
 		date=PPCommon.newDatetime
 		error=false
+
 		PPCommon.makeBackupDirectory(backup[:BackupDestination]) unless (
 			File.exist?(backup[:BackupDestination]) and
 			File.directory?(backup[:BackupDestination])
 		)
-		dest_name=PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + backup[:BackupName]
-		FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
-		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
-		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
-		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
-		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
+
+		dest_name_date=PPCommon.initBackup(dest_name_date, backup[:BackupName])
 		err_log=dest_name_date + 'err_log.txt'
 		first_or_second=nil
 
