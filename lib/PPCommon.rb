@@ -445,6 +445,11 @@ module PPCommon
 		`rsync -a  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
 	end
 
+	#Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
+	def self.expireOldBackups(backup)
+		#Do naughty, naughty things here.
+	end
+
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
 	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
 	#Be aware that setting buffer != true may return true if a backup is currently running.
