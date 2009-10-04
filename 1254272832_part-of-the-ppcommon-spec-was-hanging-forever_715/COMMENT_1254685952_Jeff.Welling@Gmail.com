@@ -1,0 +1,1 @@
+Hmm.  For me in my environment, if I don't use STDIN I get these errors:  http://gist.github.com/201570 .  If I change it to use STDIN, the errors go away but it seems to cause that hanging forever problem.  Whats different between our two systems?  I do my tests on Shmee which runs Debian, you run Debian.  I have no packages available for upgrade (or dist-upgrade).
