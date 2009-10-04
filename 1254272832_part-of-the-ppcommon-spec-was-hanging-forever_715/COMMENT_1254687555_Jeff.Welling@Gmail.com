@@ -1,0 +1,1 @@
+I have ARGV.concat ["--readline"] in my .irbrc file, and I'm guessing wnight doesn't because if I comment out that line and run the tests, they work just fine.  Searching for more flexible workaround, until one is found I am commenting out that line in .irbrc.
