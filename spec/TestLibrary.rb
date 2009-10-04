@@ -25,18 +25,19 @@ module TestLibrary
   end
 
   # Creates a tempdir, recursively populates it, returns a count of files and dirs"
-  # No upper bound on size of tempdir created... can be slow
-  def build_temp_dir dir = nil
+  # Created a bound on the size of the tempdir
+  def build_temp_dir dir = nil, count = nil
+    count ||= [300] # max number of files and dirs to be created - stored in an array to allow passing by reference
     unless dir # default case
       dir = PPCommon.mktempdir 'PP-test' 
-      (rand(5) + 3).times { create_random_file dir } # make more random files in top-level dir
     else
       Dir.mkdir(dir) unless File.exists?(dir) && File.directory?(dir)
     end
     loop do
-      case rand(7)
-        when (0..4) ; create_random_file dir
-        when     5  ; build_temp_dir "#{dir}/#{rand_file_name}"
+      break if count[0].zero?
+      case rand(8)
+        when (0..4) ; count[0] -= 1 ; create_random_file dir
+        when (5..6) ; count[0] -= 1 ; build_temp_dir "#{dir}/#{rand_file_name}", count
         else        ; break
       end
     end
@@ -49,7 +50,7 @@ module TestLibrary
     files << dir
   end
 
-   def wrap_io input = ''
+  def wrap_io input = ''
     capture_stdout { wrap_input(input) { yield } }
   end
   def wrap_input input = ''
