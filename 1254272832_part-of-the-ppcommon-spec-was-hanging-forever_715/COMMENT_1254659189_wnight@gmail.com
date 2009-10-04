@@ -1,0 +1,3 @@
+I think the problem is that it was using STDIN.gets, instead of just gets, so overriding $stdin made no difference. It was probably hanging waiting for enter.
+
+I've removed the STDIN and it should just work...
