@@ -207,7 +207,7 @@ module PPCommon
 		dest_name=PPCommon.addSlash(dir) + 'backup/' + name
 		FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
-		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
+		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(PPCommon.newDatetime)
  		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
 		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
 		dest_name_date.gsub(' ', '\ ')
