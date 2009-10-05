@@ -90,7 +90,7 @@ module PPConfig
 			@numOfConfigs||=0
 			@Configs||={}
 			@BadConfig||=false
-			@BackupDestinations||=''
+			@BackupDestinations||=[]
       @options = OpenStruct.new
       set_default_options
 		end
@@ -101,7 +101,7 @@ module PPConfig
 		#backup_destination must exist and it must be a directory.
 		def setBackupDestination backup_destination
 			PPConfig.checkYourConfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
-			@BackupDestinations = backup_destination
+			@BackupDestinations << backup_destination
 			true
 		end
 
@@ -195,8 +195,8 @@ module PPConfig
 				PPConfig.checkYourConfig 
 			end
 			@Configs[name]||={}
-			@Configs[name][:BackupDestination]||=''
-			@Configs[name][:BackupDestination]= backup_destination
+			@Configs[name][:BackupDestination]||=[]
+			@Configs[name][:BackupDestination]<< backup_destination
 			true
 		end
 	end
