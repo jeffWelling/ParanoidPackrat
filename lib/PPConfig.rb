@@ -199,11 +199,6 @@ module PPConfig
 			@Configs[name][:BackupDestination]= backup_destination
 			true
 		end
-		#Sets the guaranteed minimum number of duplicates of your backups to keep.  Using this requires that you have >num configured, 
-		#or it will cause critical errors (and consequently will attempt to notify you) when you go to run your backups.
-		def setGuaranteedMin num
-			false
-		end
 	end
 	initialize
 end

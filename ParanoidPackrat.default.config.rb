@@ -82,6 +82,6 @@ load 'lib/PPConfig.rb'
 #PPConfig.setBackupDestination "/mnt/sdh"
 #PPConfig.setBackupDestination "/mnt/sdj"
 #PPConfig.setBackupTarget "christ_pants", "/var/media/home/jeff"
-#PPConfig.setGuaranteedMin 3
+#PPConfig.setDuplication "christ_pants", 3
 
 
