@@ -200,6 +200,14 @@ module PPConfig
 			@Configs[name][:BackupDestination]<< backup_destination
 			true
 		end
+    #Sets the backup named name to inherit the globally set backup destinations as well as their locally defined ones.
+    #Note that if no locally defined backup destinations are configured, it should default to using the globally defined
+    #ones regardless, so this should only be needed if you've configured both global ones and local ones and want the backup
+    #to inherit the global ones as well.
+    def self.setInheritDests name
+    
+    end 
+
 	end
 	initialize
 end
