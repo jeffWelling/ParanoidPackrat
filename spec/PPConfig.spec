@@ -17,7 +17,11 @@ describe PPConfig do
 	it "takes a destination for a backup source" do
 		PPConfig.addName 'Jesus has no boots'
 		PPConfig.setBackupDestinationOn 'Jesus has no boots', '/mnt'
-		PPConfig['Jesus has no boots'].should=={:BackupDestination=>"/mnt", :BackupName=>"Jesus has no boots"}
+		PPConfig['Jesus has no boots'].should=={:BackupDestination=>["/mnt"], :BackupName=>"Jesus has no boots"}
+		PPConfig.addName 'christ booties'
+		PPConfig.setBackupDestinationOn 'christ booties', '/mnt'
+		PPConfig.setBackupDestinationOn 'christ booties', '/'
+		PPConfig['christ booties'].should=={:BackupDestination=>["/mnt","/"], :BackupName=>"christ booties"}
 	end
 end
 
