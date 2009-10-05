@@ -61,8 +61,6 @@ module PPIrb
 		unless (actual.to_i > guess.to_i)
 			PPCommon.pprint("simpleBackup():  Omgpanic!   Available space is #{actual}, but backup is estimated to take #{guess}.")
 			PPCommon.pprint("simpleBackup():  Attempting to free some space...\n")
-			PPCommon.pprint("simpleBackup():  Running gc.")
-			PPCommon.pprint("simpleBackup():  #{PPCommon.gc.to_s} deleted")
 			PPCommon.pprint("simpleBackup():  Expiring old backups...")
 			PPCommon.pprint("simpleBackup():  #{PPCommon.expireOldBackups(backup) rescue 0} Expired...")
 			unless actual.to_i > guess.to_i
