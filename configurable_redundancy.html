@@ -30,7 +30,7 @@ hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
 <h1><small><small>Configurable redundancy </small></small></h1>
 <p><br>
   Will allow for configurable redundancy across multiple HDs, meaning that for example it can be configured to use directories on 5 different HDs for backup and to keep a guaranteed minimum of 3 duplicates, so it would store a copy of the backup on 3 drives. If one of the drives that your using to backup vanishes, say if you unplug it to store offsite, it automatically copies your backups from your other 2 HDs onto one of the 2 other configured HDs to maintain the guaranteed minimum number of 3 duplicates. 5 HDs and 3 guaranteed minimum number of duplicates are completely arbitrary, it could be ten drives and 2 guaranteed duplicates, or 3 drives and 2 guaranteed duplicates.</p>
-<p>This would be done simply by configuring multiple backup destinations, and then setting the guaranteed minimum number of backups by using the PPConf.setGuaranteedMin(backupName, Num). There is an example in the <a href="http://github.com/jeffWelling/ParanoidPackrat/blob/master/ParanoidPackrat.default.config.rb">default config file</a>. <br>
+<p>This would be done simply by configuring multiple backup destinations, and then setting the guaranteed minimum number of backups by using the PPConf.setDuplication(backupName, Num). There is an example in the <a href="http://github.com/jeffWelling/ParanoidPackrat/blob/master/ParanoidPackrat.default.config.rb">default config file</a>. <br>
   <br>
   <br>
 </p>
