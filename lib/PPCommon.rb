@@ -417,18 +417,20 @@ module PPCommon
 	def self.gc buffer=true
 		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
-			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
-			Dir.glob(backup_path + '*').each {|backup_instance|
-				backup_path_incomplete=backup_instance + '/.incomplete_backup'
-				datetime=backup_instance.gsub(backup_path, '')
-				next unless PPCommon.datetimeFormat?(datetime)
-				if buffer == true
-					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
-				else
-					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
-				end
-			}    #And the file was deleted, and jesus' boots were gone.
-		}
+			config[1][:BackupDestination].each {|dest|
+				backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+				Dir.glob(backup_path + '*').each {|backup_instance|
+					backup_path_incomplete=backup_instance + '/.incomplete_backup'
+					datetime=backup_instance.gsub(backup_path, '')
+					next unless PPCommon.datetimeFormat?(datetime)
+					if buffer == true
+						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+					else
+						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
+					end
+				}    #And the file was deleted, and jesus' boots were gone.
+			}
+		} #end of dumpConfig.each
 		num_deleted
 	end
 
