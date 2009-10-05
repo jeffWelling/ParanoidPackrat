@@ -42,6 +42,7 @@ module PPIrb
 			File.directory?(backup[:BackupDestination])
 		)
 
+		dest_name=PPCommon.addSlash(backup[:BackupDestination]) + 'backup/' + backup[:BackupName]
 		dest_name_date=PPCommon.initBackup(backup[:BackupDestination], backup[:BackupName])
 		err_log=dest_name_date + 'err_log.txt'
 		first_or_second=nil
