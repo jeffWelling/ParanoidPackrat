@@ -69,12 +69,12 @@ load 'lib/PPConfig.rb'
 #Define several global backup destinations, and set a guaranteed number of backups.
 #
 #This will assure that you always have at minimum a copy of this backup on at least 3 backupDestinations
-#( 3 being the number used in setGuaranteedmin() ).  As long as you make sure your backupDestinatoins
+#( 3 being the number used in setDuplication() ).  As long as you make sure your backupDestinatoins
 #always reside on individual devices, this assures that you have 3 devices with a copy of the backup at
 #any given time.
 #If for any reason one of the backupDestinations becomes unavailable, it will begin to use one
 #of the other global backup destinations if there are any.  If there are no more available drives
-#to use and one of the backups disappears leaving the number of backupDestinations below setGuaranteedMin, 
+#to use and one of the backups disappears leaving the number of backupDestinations below setDuplication, 
 #it will attempt to notify the user of the critical situation.
 #PPConfig.addName "christ_pants"
 #PPConfig.setBackupDestination "/mnt/sdg"
