@@ -191,7 +191,8 @@ module PPConfig
 		#subsequent calls simply overwrite the previous entry.
 		def setBackupDestinationOn name, backup_destination
 			unless @Configs.include?(name) and File.exist?(backup_destination) and File.directory?(backup_destination)
-				puts "Must first addName('#{name}'), and '#{backup_destination}' must first exist and be a directory."
+				PPCommon.pprint("PPConf:  Must first addName('#{name}')") unless @Configs.include?(name)
+				PPCommon.pprint("PPConf:  Must point us to an existing backupDestination! #{backup_destination}") unless File.exist?(backup_destination) and File.directory?(backup_destination)
 				PPConfig.checkYourConfig 
 			end
 			@Configs[name]||={}
