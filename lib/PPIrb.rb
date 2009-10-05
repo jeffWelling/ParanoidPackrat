@@ -65,7 +65,10 @@ module PPIrb
 			PPCommon.pprint("simpleBackup():  #{PPCommon.gc.to_s} deleted")
 			PPCommon.pprint("simpleBackup():  Expiring old backups...")
 			PPCommon.pprint("simpleBackup():  #{PPCommon.expireOldBackups(backup) rescue 0} Expired...")
-			return :fail unless actual.to_i > guess.to_i
+			unless actual.to_i > guess.to_i
+				PPCommon.pprint("simpleBackup(): FAIL - She just can't do it captain!")
+				return :fail
+			end
 			#check for free space? only continue if theres space available.
 		end
 		PPCommon.rsync( backup[:BackupTarget], dest_name_date, err_log)
