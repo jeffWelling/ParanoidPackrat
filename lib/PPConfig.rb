@@ -26,7 +26,8 @@ module PPConfig
 			puts "PPConfig:  Please check your configuration."
 			@BadConfig=true
 		end
-		#This function is intended to be run AFTER the the configurations have been set
+		#This function is intended to be run AFTER the the configurations have been set,
+		#but before any of the backup functions are run
 		#to make sure the configurations entered are sane.
 		#if silent is not nil, then silent mode is activated for this function.
 		def sanityCheck silent=nil
@@ -121,6 +122,7 @@ module PPConfig
 		end
 		#To look at the configuration
 		def [] configName
+			return @BackupDestinations if configName == :globalDests
 			@Configs[configName]
 		end
 		#Dump configuration
