@@ -49,6 +49,8 @@ load 'lib/PPConfig.rb'
 #This will create a directory called 'backup' in '/mnt/sdi' if it does not yet exist
 #and will then create a directory called /mnt/sdi/backup/slapd , the name of the 
 #config and will store a backup of the file in there within dated directories.
+#Because we've set setBackupDestination above, this config would backup to '/mnt/sdg' even
+#though we haven't configured a backup destination explicitely.
 #PPConfig.addName 'slapd'
 #PPConfig.setBackupTarget 'slapd', "/etc/ldap/slapd.conf"
 

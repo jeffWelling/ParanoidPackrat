@@ -204,8 +204,12 @@ module PPConfig
     #Note that if no locally defined backup destinations are configured, it should default to using the globally defined
     #ones regardless, so this should only be needed if you've configured both global ones and local ones and want the backup
     #to inherit the global ones as well.
-    def self.setInheritDests name
-    
+    def setInheritDests name
+    	unless @Configs.include? name
+				PPCommon.pprint "You have to use addName('#{name}') first, pinhead."
+				PPConfig.checkYourConfig
+			end
+			@Configs[name][:BackupDestination]= @BackupDestinations + @Configs[name][:BackupDestination]
     end 
 
 	end
