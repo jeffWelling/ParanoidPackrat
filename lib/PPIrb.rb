@@ -98,7 +98,6 @@ module PPIrb
 					File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
 					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
 					#run the method to scan all of the backups for duplicates and hardlink them
-					PPCommon.shrinkBackupDestination(backup)
 				else
 					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
 				end
@@ -125,4 +124,56 @@ module PPIrb
 		PPCommon.willTakeUp?(source, destination)
 	end
 =end
+
+	#shrinkBackupDestination(backup,wide) scan backupDestination/backupName/ for duplicates, hardlinking to save space
+	#
+	#By default, it will only traverse backup directories (backupDest/backupName/datetimes).  To get it to
+	#scan every folder, set wide=true. 
+	#Regardless of the state of wide, it will not hardlink duplicate files inside the same backup
+	#in order to preserve the convention of being able to restore from your backups exactly what you put in; If it were to hardlink
+	#duplicates in the same backup then when you restored them you would either have to replace every hardlink'd file with a whole
+	#copy of the originional or you would have to restore keeping the hardlinks as they are.  Restoring and keeping the hardlinks
+	#as they are would only really be bad because of the potential of forgetting that you've hardlinked every duplicate and then
+	#inadvertently changing all when you tried to change one, but a safe default has been chosen to avoid confusion and trouble.
+	#
+	#Be warned! This is a very dangerous operation if you forget that you've hardlinked
+	#to files that are in backupDest/backupName that aren't your backups, and you use this option to hardlink to them, and then
+	#you change them, YOU WILL BE CORRUPTING YOUR BACKUPS.  This is why wide=nil by default, but if you know you won't be
+	#changing those files it could be useful to hardlink them to save a little bit of space.  
+	#
+	#Also note there is no undo for
+	#this operation, if you run it once, that file is hardlinked and you will have to create a copy, unlink the file, and mv
+	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
+	#
+	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
+	def self.shrinkBackupDestination(backup,wide=nil)
+		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
+=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
+
+/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
+        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
+        from ./ParanoidPackrat.rb:35
+
+=end
+ 
+		raise "you idiot" unless backup.class==Hash
+    sigs = getExistingFileSignatures
+    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
+      sig = getFileSignature(new_file)
+      unless sigs[sig]
+        sigs[sig] = new_file
+      else
+        original_file = sigs[sig]
+        next if original_file == new_file
+        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        hardlinkFile(new_file, original_file)
+      end
+    }
+    saveFileSignatures(sigs)
+	end
 end

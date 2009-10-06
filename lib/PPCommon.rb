@@ -262,52 +262,6 @@ module PPCommon
 		return false
 	end
 	
-	#shrinkBackupDestination(backup,wide) traverse through backups under backupDestination/backupName/ , hardlinking to save space
-	#
-	#By default, it will only traverse backup directories (backupDest/backupName/datetimes).  To get it to
-	#scan every folder, set wide=true.  
-	#
-	#Be warned! This is a very dangerous operation if you forget that you've hardlinked
-	#to files that are in backupDest/backupName that aren't your backups, and you use this option to hardlink to them, and then
-	#you change them, YOU WILL BE CORRUPTING YOUR BACKUPS.  This is why wide=nil by default, but if you know you won't be
-	#changing those files it could be useful to hardlink them to save a little bit of space.  
-	#
-	#Also note there is no undo for
-	#this operation, if you run it once, that file is hardlinked and you will have to create a copy, unlink the file, and mv
-	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
-	#
-	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
-	def self.shrinkBackupDestination(backup,wide=nil)
-		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
-=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
-
-/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
-        from ./ParanoidPackrat.rb:35
-
-=end
- 
-		raise "you idiot" unless backup.class==Hash
-    sigs = getExistingFileSignatures
-    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
-      sig = getFileSignature(new_file)
-      unless sigs[sig]
-        sigs[sig] = new_file
-      else
-        original_file = sigs[sig]
-        next if original_file == new_file
-        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
-        hardlinkFile(new_file, original_file)
-      end
-    }
-    saveFileSignatures(sigs)
-	end
-	
   require 'yaml'
   #getExistingFileSignatures() reads the stored hashes in from a file
   #takes an optional filename, otherwise uses the default
