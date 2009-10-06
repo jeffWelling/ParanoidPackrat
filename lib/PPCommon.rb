@@ -284,6 +284,11 @@ module PPCommon
     PPCommon.sha1 filename
   end
 
+	#Given a full file path, return which backup instance it is part of, such as "backupDest/backup/backupName/datetime"
+	def self.whichBackupInstance?(full_path)
+		full_path[/^(\/[^\/]+){1,}?\/backup\/[^\\]+\/\d{4}-\d{1,2}-\d{1,2}_(\d{2}:){2}\d{2}\//]
+	end
+
 	require 'digest/sha1'
 	#SHA1 a file and return it's hash
 	def self.sha1 file
