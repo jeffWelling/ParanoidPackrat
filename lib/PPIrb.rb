@@ -31,7 +31,7 @@ module PPIrb
 	#
 	#In that order.  It returns the path that the backup was stored in, for example "/backupDest/backupName/datetime/"
 	def self.simpleBackup(backup)
-		PPCommon.pprint("simpleBackup():  Performing simple backup, '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination]}'")
+		PPCommon.pprint( "simpleBackup():  Performing simple backup on '#{backup[:BackupName]}' - '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination].join("', '")}'")
 		PPCommon.pprint( "simpleBackup():  Running garbage collection..." )
 		PPCommon.pprint( "simpleBackup():  Garbage collection finished, #{PPCommon.gc.to_s} deleted." )
 		date=PPCommon.newDatetime
