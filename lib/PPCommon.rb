@@ -461,7 +461,7 @@ module PPCommon
 	#simple wrapper for rsync
 	#so that the rsync call is in one place
 	def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
-		`rsync -a  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
+		`rsync -aH  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
 	end
 
 	#Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
