@@ -327,8 +327,23 @@ module PPCommon
 
   #getFileSignature(filename) hashes a file with sha1 and returns its signature
   def self.getFileSignature(filename)
-    `sha1sum #{filename}`.split.first   #  Output looks like: 66b4e9c23697c5aa947b00f92c56ded95b0122e3  lib/PPCommon.rb
+    PPCommon.sha1 filename
   end
+
+	require 'digest/sha1'
+	#SHA1 a file and return it's hash
+	def self.sha1 file
+		hash_func= Digest::SHA1.new
+		so_far=0
+		size=File.size(file)
+		open(file, 'rb') do |io|
+			while(!io.eof)
+				readBuf=io.readpartial(1024)
+				hash_func.update(readBuf)
+			end
+		end
+		hash_func.hexdigest
+	end
 
   #hardLinkFile(new, old) makes 'new' a hardlink to 'old'
   #WARNING - deletes new without checking if hardlinking is possible
