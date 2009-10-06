@@ -402,7 +402,9 @@ module PPCommon
 	def self.gc buffer=true
 		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
-			config[1][:BackupDestination].each {|dest|
+			dests=config[1][:BackupDestination]
+			dests=PPConfig[:globalDests] if dests.nil?
+			dests.each {|dest|
 				backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
 				Dir.glob(backup_path + '*').each {|backup_instance|
 					backup_path_incomplete=backup_instance + '/.incomplete_backup'
