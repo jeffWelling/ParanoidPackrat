@@ -279,7 +279,7 @@ module PPCommon
   def self.getExistingFileSignatures(filename = nil)
     filename ||= '~/file_hashes.yaml'
     return {} unless File.exists?(File.expand_path(filename))
-    YAML.load(File.read(File.expand_path(filename))) || {}
+    YAML.load(File.read(File.expand_path(filename))) || [{},{}]
   end
 
   #saveFileSignatures(signatures) saves a list of signatures to a file

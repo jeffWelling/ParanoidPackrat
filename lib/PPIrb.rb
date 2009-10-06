@@ -147,20 +147,56 @@ module PPIrb
 	#
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
-		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
-=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
-
-/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
-        from ./ParanoidPackrat.rb:35
-
+	raise "you idiot!" unless backup.class==Hash
+	sigs= PPCommon.getExistingFileSignatures
+	list=[]
+=begin
+#sigs format
+sigs=[
+{inode=>[path1,path2,...]},
+{path1=>[size,inode],
+ path2=>[size,inode],
+ ...}
+]
 =end
- 
+	backup[:BackupDestination].each {|backup_dest|
+		Dir.glob("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/**/*") {|new_file|
+			#Collect list of files
+			next if new_file.index("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/last_backup")==0  #Don't double process the last backup by traversing this symlink
+			next if sigs[1].has_key? new_file    #Next if this path is already in sigs
+			inode=File.stat(new_file).ino
+			size=File.size(new_file)
+			sigs[1].merge!({ new_file=>[size,inode] })
+			if sigs[0].has_key? inode
+				sigs[0][inode] << new_file
+			else
+				sigs[0].merge!({ inode=>[new_file] })
+			end
+			list << new_file
+		}
+	}
+	
+	list.each {|path1|
+		#Process list of files
+		list.each {|path2|
+			next if path1==path2 or PPCommon.getMountBase(path1)!=PPCommon.getMountBase(path2)  #skip if its itself, or if it's on different drives
+			next unless sigs[1][path1][0] == sigs[1][path2][0]  #Next unless size==size
+			next if sigs[1][path1][1] == sigs[1][path2][1]  #Next if inode==inode
+			next if PPCommon.whichBackupInstance?(path1) == PPCommon.whichBackupInstance?(path2)   #Don't link files in the same backup
+			skip=false
+			sigs[0][ sigs[1][path2][1] ].each {|path_with_this_inode|
+				skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
+			}
+			next if skip==true
+
+			puts "Omg hardlinking '#{path1}' to '#{path2}'"
+		}
+		#Remove from the path from the list; we've compared it against every file, it doesn't need to be compared again.
+		list.delete path1
+	}
+
+	PPCommon.saveFileSignatures(sigs)
+=begin 
 		raise "you idiot" unless backup.class==Hash
     sigs = getExistingFileSignatures
     Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
@@ -175,5 +211,6 @@ module PPIrb
       end
     }
     saveFileSignatures(sigs)
+=end
 	end
 end
