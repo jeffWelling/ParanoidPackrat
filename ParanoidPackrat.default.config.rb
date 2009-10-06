@@ -49,6 +49,8 @@ load 'lib/PPConfig.rb'
 #This will create a directory called 'backup' in '/mnt/sdi' if it does not yet exist
 #and will then create a directory called /mnt/sdi/backup/slapd , the name of the 
 #config and will store a backup of the file in there within dated directories.
+#Because we've set setBackupDestination above, this config would backup to '/mnt/sdg' even
+#though we haven't configured a backup destination explicitely.
 #PPConfig.addName 'slapd'
 #PPConfig.setBackupTarget 'slapd', "/etc/ldap/slapd.conf"
 
@@ -64,3 +66,24 @@ load 'lib/PPConfig.rb'
 #PPConfig.setBackupDestination "/mnt/sdg"
 #PPConfig.addName "downloads_dir"
 #PPConfig.setBackupTarget "downloads_dir", "/home/users/Downloads"
+
+
+#Define several global backup destinations, and set a guaranteed number of backups.
+#
+#This will assure that you always have at minimum a copy of this backup on at least 3 backupDestinations
+#( 3 being the number used in setDuplication() ).  As long as you make sure your backupDestinatoins
+#always reside on individual devices, this assures that you have 3 devices with a copy of the backup at
+#any given time.
+#If for any reason one of the backupDestinations becomes unavailable, it will begin to use one
+#of the other global backup destinations if there are any.  If there are no more available drives
+#to use and one of the backups disappears leaving the number of backupDestinations below setDuplication, 
+#it will attempt to notify the user of the critical situation.
+#PPConfig.addName "christ_pants"
+#PPConfig.setBackupDestination "/mnt/sdg"
+#PPConfig.setBackupDestination "/mnt/sdi"
+#PPConfig.setBackupDestination "/mnt/sdh"
+#PPConfig.setBackupDestination "/mnt/sdj"
+#PPConfig.setBackupTarget "christ_pants", "/var/media/home/jeff"
+#PPConfig.setDuplication "christ_pants", 3
+
+

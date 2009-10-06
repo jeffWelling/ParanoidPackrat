@@ -26,7 +26,8 @@ module PPConfig
 			puts "PPConfig:  Please check your configuration."
 			@BadConfig=true
 		end
-		#This function is intended to be run AFTER the the configurations have been set
+		#This function is intended to be run AFTER the the configurations have been set,
+		#but before any of the backup functions are run
 		#to make sure the configurations entered are sane.
 		#if silent is not nil, then silent mode is activated for this function.
 		def sanityCheck silent=nil
@@ -90,7 +91,7 @@ module PPConfig
 			@numOfConfigs||=0
 			@Configs||={}
 			@BadConfig||=false
-			@BackupDestinations||=''
+			@BackupDestinations||=[]
       @options = OpenStruct.new
       set_default_options
 		end
@@ -101,7 +102,7 @@ module PPConfig
 		#backup_destination must exist and it must be a directory.
 		def setBackupDestination backup_destination
 			PPConfig.checkYourConfig unless File.exist?(backup_destination) and File.directory?(backup_destination)
-			@BackupDestinations = backup_destination
+			@BackupDestinations << backup_destination
 			true
 		end
 
@@ -121,6 +122,7 @@ module PPConfig
 		end
 		#To look at the configuration
 		def [] configName
+			return @BackupDestinations if configName == :globalDests
 			@Configs[configName]
 		end
 		#Dump configuration
@@ -191,14 +193,27 @@ module PPConfig
 		#subsequent calls simply overwrite the previous entry.
 		def setBackupDestinationOn name, backup_destination
 			unless @Configs.include?(name) and File.exist?(backup_destination) and File.directory?(backup_destination)
-				puts "Must first addName('#{name}'), and '#{backup_destination}' must first exist and be a directory."
+				PPCommon.pprint("PPConf:  Must first addName('#{name}')") unless @Configs.include?(name)
+				PPCommon.pprint("PPConf:  Must point us to an existing backupDestination! #{backup_destination}") unless File.exist?(backup_destination) and File.directory?(backup_destination)
 				PPConfig.checkYourConfig 
 			end
 			@Configs[name]||={}
-			@Configs[name][:BackupDestination]||=''
-			@Configs[name][:BackupDestination]= backup_destination
+			@Configs[name][:BackupDestination]||=[]
+			@Configs[name][:BackupDestination]<< backup_destination
 			true
 		end
+    #Sets the backup named name to inherit the globally set backup destinations as well as their locally defined ones.
+    #Note that if no locally defined backup destinations are configured, it should default to using the globally defined
+    #ones regardless, so this should only be needed if you've configured both global ones and local ones and want the backup
+    #to inherit the global ones as well.
+    def setInheritDests name
+    	unless @Configs.include? name
+				PPCommon.pprint "You have to use addName('#{name}') first, pinhead."
+				PPConfig.checkYourConfig
+			end
+			@Configs[name][:BackupDestination]= @BackupDestinations + @Configs[name][:BackupDestination]
+    end 
+
 	end
 	initialize
 end

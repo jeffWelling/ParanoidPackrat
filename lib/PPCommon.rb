@@ -207,7 +207,7 @@ module PPCommon
 		dest_name=PPCommon.addSlash(dir) + 'backup/' + name
 		FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
 		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
-		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(date)
+		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(PPCommon.newDatetime)
  		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
 		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
 		dest_name_date.gsub(' ', '\ ')
@@ -417,18 +417,20 @@ module PPCommon
 	def self.gc buffer=true
 		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
-			backup_path=PPCommon.addSlash(config[1][:BackupDestination]) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
-			Dir.glob(backup_path + '*').each {|backup_instance|
-				backup_path_incomplete=backup_instance + '/.incomplete_backup'
-				datetime=backup_instance.gsub(backup_path, '')
-				next unless PPCommon.datetimeFormat?(datetime)
-				if buffer == true
-					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
-				else
-					(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
-				end
-			}    #And the file was deleted, and jesus' boots were gone.
-		}
+			config[1][:BackupDestination].each {|dest|
+				backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+				Dir.glob(backup_path + '*').each {|backup_instance|
+					backup_path_incomplete=backup_instance + '/.incomplete_backup'
+					datetime=backup_instance.gsub(backup_path, '')
+					next unless PPCommon.datetimeFormat?(datetime)
+					if buffer == true
+						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+					else
+						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
+					end
+				}    #And the file was deleted, and jesus' boots were gone.
+			}
+		} #end of dumpConfig.each
 		num_deleted
 	end
 
@@ -445,6 +447,11 @@ module PPCommon
 	#so that the rsync call is in one place
 	def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
 		`rsync -a  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
+	end
+
+	#Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
+	def self.expireOldBackups(backup)
+		#Do naughty, naughty things here.
 	end
 
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
