@@ -89,16 +89,27 @@ module PPCommon
 		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
 		dir=PPCommon.addSlash(dir)
 		lump.each {|line|
-			next if line[5].length > dir.length
-			next unless dir.slice(0, line[5].length) == line[5]
-
-			next_slash= dir.index('/', line[5].length)
-			next if next_slash.nil?
-			full_path=dir.slice(0, next_slash+1)
-
-			return line[3] if dir.slice(0, dir.index('/', line[5].length) ) == line[5]
+			return line[3] if PPCommon.getMountBase(dir)  == line[5]
 		}
 		return lump[0][3]
+	end
+
+	#takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
+	#FIXME Make sure it handles nested mountpoints properly, think it does but not 100% sure ><
+	def self.getMountBase path, debug_input=nil
+		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
+		path=PPCommon.addSlash(path)
+		lump.each {|line|
+			next if line[5].length > path.length
+			next unless path.slice(0, line[5].length) == line[5]
+
+			next_slash= path.index('/', line[5].length)
+			next if next_slash.nil?
+			full_path=path.slice(0, next_slash+1)
+
+			return full_path if path.slice(0, path.index('/', line[5].length) ) == line[5]
+		}
+		return lump[0][5]
 	end
 
 	#returns true if str matches the date time format expected to be found in the backup destination folders
