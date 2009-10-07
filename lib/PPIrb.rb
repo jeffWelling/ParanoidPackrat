@@ -148,7 +148,9 @@ module PPIrb
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
 	raise "you idiot!" unless backup.class==Hash
+	return true #Not yet ready for use, so just return true until it is.
 	sigs= PPCommon.getExistingFileSignatures
+	puts 'loaded sigs'
 	list=[]
 =begin
 #sigs format
@@ -160,7 +162,9 @@ sigs=[
 ]
 =end
 	backup[:BackupDestination].each {|backup_dest|
+		puts 'not null'
 		Dir.glob("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/**/*") {|new_file|
+			next if File.symlink?(new_file)==true and File.exist?(new_file)==false  #Don't try to follow the broken symlinks, they have herpes.
 			#Collect list of files
 			next if new_file.index("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/last_backup")==0  #Don't double process the last backup by traversing this symlink
 			next if sigs[1].has_key? new_file    #Next if this path is already in sigs
@@ -172,17 +176,29 @@ sigs=[
 			else
 				sigs[0].merge!({ inode=>[new_file] })
 			end
-			list << new_file
+			next if new_file[/\/$/]
+			list << new_file if new_file[/\/$/].nil?
 		}
 	}
-	
+	df=PPCommon.df
+	$it=list
+	puts 'ghj'
 	list.each {|path1|
+		next if path1[/\/$/]
+		puts 'gggg'
 		#Process list of files
 		list.each {|path2|
-			next if path1==path2 or PPCommon.getMountBase(path1)!=PPCommon.getMountBase(path2)  #skip if its itself, or if it's on different drives
-			next unless sigs[1][path1][0] == sigs[1][path2][0]  #Next unless size==size
-			next if sigs[1][path1][1] == sigs[1][path2][1]  #Next if inode==inode
-			next if PPCommon.whichBackupInstance?(path1) == PPCommon.whichBackupInstance?(path2)   #Don't link files in the same backup
+			next if path1==path2 or PPCommon.getMountBase(path1.clone,df)!=PPCommon.getMountBase(path2.clone,df)  #skip if its itself, or if it's on different drives
+			next if path2[/\/$/]     #Why this isn't filtered out by the line above, I have no fucking clue.  They exist DESPITE the fact that the line only adds them if theres no trailing '/'
+			begin
+				next unless sigs[1][path1][0] == sigs[1][path2][0]  #Next unless size==size
+				next if sigs[1][path1][1] == sigs[1][path2][1]  #Next if inode==inode
+				next if PPCommon.whichBackupInstance?(path1) == PPCommon.whichBackupInstance?(path2)   #Don't link files in the same backup
+			rescue
+				pp path1
+				pp path2
+				raise
+			end
 			skip=false
 			sigs[0][ sigs[1][path2][1] ].each {|path_with_this_inode|
 				skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
@@ -192,6 +208,7 @@ sigs=[
 			puts "Omg hardlinking '#{path1}' to '#{path2}'"
 		}
 		#Remove from the path from the list; we've compared it against every file, it doesn't need to be compared again.
+		puts list.length
 		list.delete path1
 	}
 

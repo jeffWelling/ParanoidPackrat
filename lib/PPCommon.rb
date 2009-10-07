@@ -89,7 +89,7 @@ module PPCommon
 		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
 		dir=PPCommon.addSlash(dir)
 		lump.each {|line|
-			return line[3] if PPCommon.getMountBase(dir)  == line[5]
+			return line[3] if PPCommon.getMountBase(dir, lump)  == line[5]
 		}
 		return lump[0][3]
 	end
@@ -278,7 +278,7 @@ module PPCommon
   #takes an optional filename, otherwise uses the default
   def self.getExistingFileSignatures(filename = nil)
     filename ||= '~/file_hashes.yaml'
-    return {} unless File.exists?(File.expand_path(filename))
+    return [{},{}] unless File.exists?(File.expand_path(filename))
     YAML.load(File.read(File.expand_path(filename))) || [{},{}]
   end
 
