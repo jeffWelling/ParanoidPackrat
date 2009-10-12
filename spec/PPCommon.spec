@@ -122,4 +122,18 @@ describe PPCommon do
 			line.length.should == 6		#Each line should have all 6 elements 
 		}
 	end
+
+	#shrinkBackupDestination
+	it "does not hardlink two identical files in the same backup instance"
+	it "does not hardlink two files if doing so would create a hardlink within the same backup instance"
+	it "hardlinks all identical files between all backups"
+
+	it "creates identical backup of backupTarget, and puts it in backupDest/backup/backupName"
+
+	it "expires old backups in backupDest/backup/BackupName according to appropriate expiration policy"
+
+	it "monitors backup destinations to guarantee minimum number of backups available"
+
+	it ""
+
 end
