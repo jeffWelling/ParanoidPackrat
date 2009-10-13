@@ -107,9 +107,9 @@ module PPCommon
 			next if next_slash.nil?
 			full_path=path.slice(0, next_slash+1)
 
-			return full_path if path.slice(0, path.index('/', line[5].length) ) == line[5]
+			return PPCommon.stripSlash(full_path) if path.slice(0, path.index('/', line[5].length) ) == line[5]
 		}
-		return lump[0][5]
+		return PPCommon.stripSlash(lump[0][5])
 	end
 
 	#returns true if str matches the date time format expected to be found in the backup destination folders

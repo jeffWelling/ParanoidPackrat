@@ -40,6 +40,8 @@ module PPIrb
 		dests=[]
 
 		backup[:BackupDestination].each {|dest|
+                        PPCommon.pprint("\n")
+                        fail_happened=false
 			PPCommon.makeBackupDirectory(dest) unless (
 				File.exist?(dest) and
 				File.directory?(dest)
@@ -67,11 +69,15 @@ module PPIrb
 				PPCommon.pprint("simpleBackup():  Expiring old backups...")
 				PPCommon.pprint("simpleBackup():  #{PPCommon.expireOldBackups(backup) rescue 0} Expired...")
 				unless actual.to_i > guess.to_i
+                                        fail_happened=true
 					PPCommon.pprint("simpleBackup(): FAIL - She just can't do it captain!")
-					return :fail
 				end
 				#check for free space? only continue if theres space available.
 			end
+                        if fail_happened==true
+                                PPCommon.pprint("simpleBackup():  Failed backing up #{backup[:BackupName]}, #{backup[:BackupTarget]} to #{dest}, see log output reasons why.")
+                                next
+                        end
 			PPCommon.rsync( backup[:BackupTarget], dest_name_date, err_log)
 			er= PPCommon.rsyncErr?( $?, err_log )
 			#maybe a case on the return value of whatWasError?()
@@ -103,8 +109,8 @@ module PPIrb
 				end
 				PPCommon.removeMark(dest_name_date.gsub(' ', '\ '))
 			end
-			PPCommon.pprint( "simpleBackup():  Done '#{dest}' with abnormal existatus - rsync gave non-zero exitstatus!\n\t\tBackup was performed, but some files may not have been copies so last_backup still points to your most recent completed backup.\n" ) unless er==false
-			PPCommon.pprint( "simpleBackup():  Done '#{dest}'.  Check the log and the backups for bugs and errors." )
+			PPCommon.pprint( "simpleBackup():  Done #{backup[:BackupName]}, '#{backup[:BackupTarget]}' to '#{dest}' with abnormal existatus - rsync gave non-zero exitstatus!\n\t\tBackup was performed, but some files may not have been copies so last_backup still points to your most recent completed backup.\n\n\n\n" ) unless er==false
+			PPCommon.pprint( "simpleBackup():  Done #{backup[:BackupName]}, '#{backup[:BackupTarget]}' to '#{dest}'.  Check the log and the backups for bugs and errors.\n\n\n" )
 			
 			dests << dest_name_date
 		}
