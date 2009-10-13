@@ -98,7 +98,6 @@ module PPIrb
 					File.unlink( PPCommon.addSlash(dest_name) + 'last_backup')
 					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
 					#run the method to scan all of the backups for duplicates and hardlink them
-					PPCommon.shrinkBackupDestination(backup)
 				else
 					File.symlink( dest_name_date, PPCommon.addSlash(dest_name) + 'last_backup' )
 				end
@@ -125,4 +124,110 @@ module PPIrb
 		PPCommon.willTakeUp?(source, destination)
 	end
 =end
+
+	#shrinkBackupDestination(backup,wide) scan backupDestination/backupName/ for duplicates, hardlinking to save space
+	#
+	#By default, it will only traverse backup directories (backupDest/backupName/datetimes).  To get it to
+	#scan every folder, set wide=true. 
+	#Regardless of the state of wide, it will not hardlink duplicate files inside the same backup
+	#in order to preserve the convention of being able to restore from your backups exactly what you put in; If it were to hardlink
+	#duplicates in the same backup then when you restored them you would either have to replace every hardlink'd file with a whole
+	#copy of the originional or you would have to restore keeping the hardlinks as they are.  Restoring and keeping the hardlinks
+	#as they are would only really be bad because of the potential of forgetting that you've hardlinked every duplicate and then
+	#inadvertently changing all when you tried to change one, but a safe default has been chosen to avoid confusion and trouble.
+	#
+	#Be warned! This is a very dangerous operation if you forget that you've hardlinked
+	#to files that are in backupDest/backupName that aren't your backups, and you use this option to hardlink to them, and then
+	#you change them, YOU WILL BE CORRUPTING YOUR BACKUPS.  This is why wide=nil by default, but if you know you won't be
+	#changing those files it could be useful to hardlink them to save a little bit of space.  
+	#
+	#Also note there is no undo for
+	#this operation, if you run it once, that file is hardlinked and you will have to create a copy, unlink the file, and mv
+	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
+	#
+	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
+	def self.shrinkBackupDestination(backup,wide=nil)
+	raise "you idiot!" unless backup.class==Hash
+	return true #Not yet ready for use, so just return true until it is.
+	sigs= PPCommon.getExistingFileSignatures
+	puts 'loaded sigs'
+	list=[]
+=begin
+#sigs format
+sigs=[
+{inode=>[path1,path2,...]},
+{path1=>[size,inode],
+ path2=>[size,inode],
+ ...}
+]
+=end
+	backup[:BackupDestination].each {|backup_dest|
+		puts 'not null'
+		Dir.glob("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/**/*") {|new_file|
+			next if File.symlink?(new_file)==true and File.exist?(new_file)==false  #Don't try to follow the broken symlinks, they have herpes.
+			#Collect list of files
+			next if new_file.index("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/last_backup")==0  #Don't double process the last backup by traversing this symlink
+			next if sigs[1].has_key? new_file    #Next if this path is already in sigs
+			inode=File.stat(new_file).ino
+			size=File.size(new_file)
+			sigs[1].merge!({ new_file=>[size,inode] })
+			if sigs[0].has_key? inode
+				sigs[0][inode] << new_file
+			else
+				sigs[0].merge!({ inode=>[new_file] })
+			end
+			next if new_file[/\/$/]
+			list << new_file if new_file[/\/$/].nil?
+		}
+	}
+	df=PPCommon.df
+	$it=list
+	puts 'ghj'
+	list.each {|path1|
+		next if path1[/\/$/]
+		puts 'gggg'
+		#Process list of files
+		list.each {|path2|
+			next if path1==path2 or PPCommon.getMountBase(path1.clone,df)!=PPCommon.getMountBase(path2.clone,df)  #skip if its itself, or if it's on different drives
+			next if path2[/\/$/]     #Why this isn't filtered out by the line above, I have no fucking clue.  They exist DESPITE the fact that the line only adds them if theres no trailing '/'
+			begin
+				next unless sigs[1][path1][0] == sigs[1][path2][0]  #Next unless size==size
+				next if sigs[1][path1][1] == sigs[1][path2][1]  #Next if inode==inode
+				next if PPCommon.whichBackupInstance?(path1) == PPCommon.whichBackupInstance?(path2)   #Don't link files in the same backup
+			rescue
+				pp path1
+				pp path2
+				raise
+			end
+			skip=false
+			sigs[0][ sigs[1][path2][1] ].each {|path_with_this_inode|
+				skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
+			}
+			next if skip==true
+
+			puts "Omg hardlinking '#{path1}' to '#{path2}'"
+		}
+		#Remove from the path from the list; we've compared it against every file, it doesn't need to be compared again.
+		puts list.length
+		list.delete path1
+	}
+
+	PPCommon.saveFileSignatures(sigs)
+=begin 
+		raise "you idiot" unless backup.class==Hash
+    sigs = getExistingFileSignatures
+    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
+      sig = getFileSignature(new_file)
+      unless sigs[sig]
+        sigs[sig] = new_file
+      else
+        original_file = sigs[sig]
+        next if original_file == new_file
+        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
+        hardlinkFile(new_file, original_file)
+      end
+    }
+    saveFileSignatures(sigs)
+=end
+	end
 end

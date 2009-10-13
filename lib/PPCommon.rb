@@ -89,16 +89,27 @@ module PPCommon
 		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
 		dir=PPCommon.addSlash(dir)
 		lump.each {|line|
-			next if line[5].length > dir.length
-			next unless dir.slice(0, line[5].length) == line[5]
-
-			next_slash= dir.index('/', line[5].length)
-			next if next_slash.nil?
-			full_path=dir.slice(0, next_slash+1)
-
-			return line[3] if dir.slice(0, dir.index('/', line[5].length) ) == line[5]
+			return line[3] if PPCommon.getMountBase(dir, lump)  == line[5]
 		}
 		return lump[0][3]
+	end
+
+	#takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
+	#FIXME Make sure it handles nested mountpoints properly, think it does but not 100% sure ><
+	def self.getMountBase path, debug_input=nil
+		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
+		path=PPCommon.addSlash(path)
+		lump.each {|line|
+			next if line[5].length > path.length
+			next unless path.slice(0, line[5].length) == line[5]
+
+			next_slash= path.index('/', line[5].length)
+			next if next_slash.nil?
+			full_path=path.slice(0, next_slash+1)
+
+			return full_path if path.slice(0, path.index('/', line[5].length) ) == line[5]
+		}
+		return lump[0][5]
 	end
 
 	#returns true if str matches the date time format expected to be found in the backup destination folders
@@ -262,59 +273,13 @@ module PPCommon
 		return false
 	end
 	
-	#shrinkBackupDestination(backup,wide) traverse through backups under backupDestination/backupName/ , hardlinking to save space
-	#
-	#By default, it will only traverse backup directories (backupDest/backupName/datetimes).  To get it to
-	#scan every folder, set wide=true.  
-	#
-	#Be warned! This is a very dangerous operation if you forget that you've hardlinked
-	#to files that are in backupDest/backupName that aren't your backups, and you use this option to hardlink to them, and then
-	#you change them, YOU WILL BE CORRUPTING YOUR BACKUPS.  This is why wide=nil by default, but if you know you won't be
-	#changing those files it could be useful to hardlink them to save a little bit of space.  
-	#
-	#Also note there is no undo for
-	#this operation, if you run it once, that file is hardlinked and you will have to create a copy, unlink the file, and mv
-	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
-	#
-	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
-	def self.shrinkBackupDestination(backup,wide=nil)
-		return false #until   "raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig" Doesn't throw an error anymore.
-=begin		its throwing this;    (Keep in mind, line numbers may become skewed as commits progress.
-
-/var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:271:in `shrinkBackupDestination': File /var/media/home/jeff/Documents/Projects//ParanoidPackrat/xaa has changed since hashing!! (RuntimeError)
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `glob'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPCommon.rb:264:in `shrinkBackupDestination'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/PPIrb.rb:82:in `simpleBackup'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:6:in `run'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `each'
-        from /var/media/home/jeff/Documents/Projects/ParanoidPackrat/lib/ParanoidPackrat.rb:5:in `run'
-        from ./ParanoidPackrat.rb:35
-
-=end
- 
-		raise "you idiot" unless backup.class==Hash
-    sigs = getExistingFileSignatures
-    Dir.glob("#{backup[:BackupTarget]}/**/*") {|new_file|
-      sig = getFileSignature(new_file)
-      unless sigs[sig]
-        sigs[sig] = new_file
-      else
-        original_file = sigs[sig]
-        next if original_file == new_file
-        raise "File #{original_file} has changed since hashing!!" unless getFileSignature(original_file) == sig
-        hardlinkFile(new_file, original_file)
-      end
-    }
-    saveFileSignatures(sigs)
-	end
-	
   require 'yaml'
   #getExistingFileSignatures() reads the stored hashes in from a file
   #takes an optional filename, otherwise uses the default
   def self.getExistingFileSignatures(filename = nil)
     filename ||= '~/file_hashes.yaml'
-    return {} unless File.exists?(File.expand_path(filename))
-    YAML.load(File.read(File.expand_path(filename))) || {}
+    return [{},{}] unless File.exists?(File.expand_path(filename))
+    YAML.load(File.read(File.expand_path(filename))) || [{},{}]
   end
 
   #saveFileSignatures(signatures) saves a list of signatures to a file
@@ -327,8 +292,28 @@ module PPCommon
 
   #getFileSignature(filename) hashes a file with sha1 and returns its signature
   def self.getFileSignature(filename)
-    `sha1sum #{filename}`.split.first   #  Output looks like: 66b4e9c23697c5aa947b00f92c56ded95b0122e3  lib/PPCommon.rb
+    PPCommon.sha1 filename
   end
+
+	#Given a full file path, return which backup instance it is part of, such as "backupDest/backup/backupName/datetime"
+	def self.whichBackupInstance?(full_path)
+		full_path[/^(\/[^\/]+){1,}?\/backup\/[^\\]+\/\d{4}-\d{1,2}-\d{1,2}_(\d{2}:){2}\d{2}\//]
+	end
+
+	require 'digest/sha1'
+	#SHA1 a file and return it's hash
+	def self.sha1 file
+		hash_func= Digest::SHA1.new
+		so_far=0
+		size=File.size(file)
+		open(file, 'rb') do |io|
+			while(!io.eof)
+				readBuf=io.readpartial(1024)
+				hash_func.update(readBuf)
+			end
+		end
+		hash_func.hexdigest
+	end
 
   #hardLinkFile(new, old) makes 'new' a hardlink to 'old'
   #WARNING - deletes new without checking if hardlinking is possible
@@ -417,7 +402,9 @@ module PPCommon
 	def self.gc buffer=true
 		num_deleted=0
 		PPConfig.dumpConfig.each {|config|
-			config[1][:BackupDestination].each {|dest|
+			dests=config[1][:BackupDestination]
+			dests=PPConfig[:globalDests] if dests.nil?
+			dests.each {|dest|
 				backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
 				Dir.glob(backup_path + '*').each {|backup_instance|
 					backup_path_incomplete=backup_instance + '/.incomplete_backup'
@@ -446,7 +433,7 @@ module PPCommon
 	#simple wrapper for rsync
 	#so that the rsync call is in one place
 	def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
-		`rsync -a  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
+		`rsync -aH  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
 	end
 
 	#Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
