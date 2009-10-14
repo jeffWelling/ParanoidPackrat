@@ -441,6 +441,24 @@ module PPCommon
 		#Do naughty, naughty things here.
 	end
 
+        #Look for a pid file.  If there is one, check that it's process is still running.
+        #returns true or false
+        def self.alreadyRunning?
+                pid=PPCommon.readFile('/var/run/ParanoidPackrat.rb.pid') rescue (return false)
+                Process.kill(0,pid[0].to_i)==1 rescue false
+        end
+
+        #echo our pid into our .pid file
+        def self.starting
+                (File.open('/var/run/ParanoidPackrat.rb.pid', 'w') {|f| f.write(Process.pid.to_s) } and return true) unless PPCommon.alreadyRunning?
+                false
+        end
+
+        #echo remove our pid file, we're exiting.
+        def self.exiting
+                (File.delete('/var/run/ParanoidPackrat.rb.pid') and return true) rescue false
+        end
+
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
 	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
 	#Be aware that setting buffer != true may return true if a backup is currently running.
