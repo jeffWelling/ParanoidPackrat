@@ -445,7 +445,11 @@ module PPCommon
         #returns true or false
         def self.alreadyRunning?
                 pid=PPCommon.readFile('/var/run/ParanoidPackrat.rb.pid') rescue (return false)
-                Process.kill(0,pid[0].to_i)==1 rescue false
+                begin
+                        return true if Process.kill(0,pid[0].to_i)==1
+                rescue
+                end
+                File.delete('/var/run/ParanoidPackrat.rb.pid') and false
         end
 
         #echo our pid into our .pid file
