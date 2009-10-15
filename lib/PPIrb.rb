@@ -154,14 +154,15 @@ module PPIrb
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
 	def self.shrinkBackupDestination(backup,wide=nil)
 	raise "you idiot!" unless backup.class==Hash
-	return true #Not yet ready for use, so just return true until it is.
-	sigs= PPCommon.getExistingFileSignatures
+#	return true #Not yet ready for use, so just return true until it is.
+#	sigs= PPCommon.getExistingFileSignatures
+        sigs=[{},{}]
 	puts 'loaded sigs'
 	list=[]
 =begin
 #sigs format
 sigs=[
-{inode=>[path1,path2,...]},
+{inode=>[[path1,path2,...], hash_of_file_at_inode]},
 {path1=>[size,inode],
  path2=>[size,inode],
  ...}
@@ -170,17 +171,19 @@ sigs=[
 	backup[:BackupDestination].each {|backup_dest|
 		puts 'not null'
 		Dir.glob("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/**/*") {|new_file|
+                        next if File.directory?(new_file)
+                        next if File.size(new_file) == 0     #Do not hardlink empty files!!!
 			next if File.symlink?(new_file)==true and File.exist?(new_file)==false  #Don't try to follow the broken symlinks, they have herpes.
 			#Collect list of files
 			next if new_file.index("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/last_backup")==0  #Don't double process the last backup by traversing this symlink
-			next if sigs[1].has_key? new_file    #Next if this path is already in sigs
+			((list << new_file) and next) if sigs[1].has_key? new_file    #Next if this path is already in sigs
 			inode=File.stat(new_file).ino
 			size=File.size(new_file)
 			sigs[1].merge!({ new_file=>[size,inode] })
 			if sigs[0].has_key? inode
-				sigs[0][inode] << new_file
+				sigs[0][inode][0] << new_file
 			else
-				sigs[0].merge!({ inode=>[new_file] })
+				sigs[0].merge!({ inode=>[[new_file],[]] })
 			end
 			next if new_file[/\/$/]
 			list << new_file if new_file[/\/$/].nil?
@@ -191,7 +194,6 @@ sigs=[
 	puts 'ghj'
 	list.each {|path1|
 		next if path1[/\/$/]
-		puts 'gggg'
 		#Process list of files
 		list.each {|path2|
 			next if path1==path2 or PPCommon.getMountBase(path1.clone,df)!=PPCommon.getMountBase(path2.clone,df)  #skip if its itself, or if it's on different drives
@@ -206,19 +208,75 @@ sigs=[
 				raise
 			end
 			skip=false
-			sigs[0][ sigs[1][path2][1] ].each {|path_with_this_inode|
-				skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
+   #                     puts 'the fuck?'
+  #                      pp path2
+ #                       pp path1
+			sigs[0][ sigs[1][path2][1] ][0].each {|path_with_this_inode|
+                                if path2.match(/Bang/i)
+                                        pp path1
+                                        pp path2
+                                        pp path_with_this_inode
+                                        pp sigs[0][sigs[1][path1][1]][0]
+                                        pp sigs[0][sigs[1][path2][1]][0]
+                                        pp sigs[1][path1][1]
+                                        pp sigs[1][path2][1]
+                                end
+
+                                next if path2==path_with_this_inode
+                                skip=true if path1==path_with_this_inode
+#                                pp path_with_this_inode
+                                #skip is hardlinking path1 to path2 would mean indirectly hardlinking two files within the same backup (this would contaiminate the backup)
+                                skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
 			}
+                        puts 'omg skipped?' if path2.match(/Bang/i) and skip==true
 			next if skip==true
 
-			puts "Omg hardlinking '#{path1}' to '#{path2}'"
+ #                       pp sigs[0][sigs[1][path1][1]]
+                        #If it hasn't been hashed yet  (hashing would store the value here)
+                        sigs[0][sigs[1][path1][1]][1]= PPCommon.getFileSignature(path1) if sigs[0][sigs[1][path1][1]][1].empty?   
+                        sigs[0][sigs[1][path2][1]][1]= PPCommon.getFileSignature(path2) if sigs[0][sigs[1][path2][1]][1].empty?
+#                       pp PPCommon.getFileSignature(path1)
+#                        puts "comparing #{sigs[0][sigs[1][path1][1]][1]}  #{path1}"
+#                        puts "comparing #{sigs[0][sigs[1][path2][1]][1]}  #{path2}"
+                        next unless sigs[0][sigs[1][path1][1]][1] == sigs[0][sigs[1][path2][1]][1]  #Next unless the hashes match
+
+			puts "Omg hardlinking"
+                        pp sigs[0][sigs[1][path1][1]][0]
+                        puts 'to'
+                        pp sigs[0][sigs[1][path1][1]][0]
+                        puts "\n"
+
+                        #Is this even necessary?
+                        if sigs[0][ sigs[1][path1][1] ][0].length >  1
+                                if sigs[0][ sigs[1][path2][1] ][0].length >  1
+                                        pp path1
+                                        pp path2
+                                        pp sigs[0][ sigs[1][path2][1] ][0]
+                                        pp sigs[0][ sigs[1][path1][1] ][0]
+                                        pp sigs[0][ sigs[1][path1][1] ][1]
+                                        pp sigs[0][ sigs[1][path2][1] ][1]
+                                        raise "panic,  both files have multiple hardlinks!"
+                                end
+                                #Hardlink path2 to path1
+
+                                sigs[0][ sigs[1][path1][1] ][0] << path2
+                                sigs[1][path2][1] = sigs[1][path1][1]
+
+                        elsif sigs[0][ sigs[1][path2][1] ][0].length >  1
+                                #Hardlink path1 to path2
+                                
+                                sigs[0][ sigs[1][path2][1] ][0] << path1
+                                sigs[1][path1][1] = sigs[1][path2][1]
+                        end
+
+#                        sleep 1
 		}
 		#Remove from the path from the list; we've compared it against every file, it doesn't need to be compared again.
-		puts list.length
 		list.delete path1
 	}
 
-	PPCommon.saveFileSignatures(sigs)
+#	PPCommon.saveFileSignatures(sigs)
+        list.length
 =begin 
 		raise "you idiot" unless backup.class==Hash
     sigs = getExistingFileSignatures
