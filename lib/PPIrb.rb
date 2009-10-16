@@ -32,7 +32,7 @@ module PPIrb
 	#In that order.  It returns the path that the backup was stored in, for example "/backupDest/backupName/datetime/"
 	def self.simpleBackup(backup)
 		backup[:BackupDestination]=PPConfig[:globalDests] if backup[:BackupDestination].nil?
-		PPCommon.pprint( "simpleBackup():  Performing simple backup, '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination].join("', '")}'")
+		PPCommon.pprint( "simpleBackup():  Performing simple backup on '#{backup[:BackupName]}' - '#{backup[:BackupTarget]}'  to  '#{backup[:BackupDestination].join("', '")}'")
 		PPCommon.pprint( "simpleBackup():  Running garbage collection..." )
 		PPCommon.pprint( "simpleBackup():  Garbage collection finished, #{PPCommon.gc.to_s} deleted." )
 		date=PPCommon.newDatetime
@@ -157,8 +157,8 @@ module PPIrb
 #	return true #Not yet ready for use, so just return true until it is.
 #	sigs= PPCommon.getExistingFileSignatures
         sigs=[{},{}]
-	puts 'loaded sigs'
 	list=[]
+        PPCommon.pprint "shrinkBackupDestination():  Beginning.  This will take a very, _very_ long time."
 =begin
 #sigs format
 sigs=[
@@ -169,7 +169,6 @@ sigs=[
 ]
 =end
 	backup[:BackupDestination].each {|backup_dest|
-		puts 'not null'
 		Dir.glob("#{PPCommon.addSlash(backup_dest)}backup/#{backup[:BackupName]}/**/*") {|new_file|
                         next if File.directory?(new_file)
                         next if File.size(new_file) == 0     #Do not hardlink empty files!!!
@@ -191,7 +190,6 @@ sigs=[
 	}
 	df=PPCommon.df
 	$it=list
-	puts 'ghj'
 	list.each {|path1|
 		next if path1[/\/$/]
 		#Process list of files
@@ -208,16 +206,13 @@ sigs=[
 				raise
 			end
 			skip=false
-   #                     puts 'the fuck?'
-  #                      pp path2
- #                       pp path1
 			sigs[0][ sigs[1][path2][1] ][0].each {|path_with_this_inode|
                                 if path2.match(/Bang/i)
                                         pp path1
                                         pp path2
                                         pp path_with_this_inode
-                                        pp sigs[0][sigs[1][path1][1]][0]
-                                        pp sigs[0][sigs[1][path2][1]][0]
+                                        pp sigs[0][ sigs[1][path1][1] ][0]
+                                        pp sigs[0][ sigs[1][path2][1] ][0]
                                         pp sigs[1][path1][1]
                                         pp sigs[1][path2][1]
                                 end
@@ -231,20 +226,26 @@ sigs=[
                         puts 'omg skipped?' if path2.match(/Bang/i) and skip==true
 			next if skip==true
 
- #                       pp sigs[0][sigs[1][path1][1]]
                         #If it hasn't been hashed yet  (hashing would store the value here)
+                        begin
                         sigs[0][sigs[1][path1][1]][1]= PPCommon.getFileSignature(path1) if sigs[0][sigs[1][path1][1]][1].empty?   
                         sigs[0][sigs[1][path2][1]][1]= PPCommon.getFileSignature(path2) if sigs[0][sigs[1][path2][1]][1].empty?
-#                       pp PPCommon.getFileSignature(path1)
-#                        puts "comparing #{sigs[0][sigs[1][path1][1]][1]}  #{path1}"
-#                        puts "comparing #{sigs[0][sigs[1][path2][1]][1]}  #{path2}"
                         next unless sigs[0][sigs[1][path1][1]][1] == sigs[0][sigs[1][path2][1]][1]  #Next unless the hashes match
+                        rescue NoMethodError => e
+                                puts "the fuck?"
+                                pp path1
+                                pp path2
+                                pp sigs[0][sigs[1][path1][1]]
+                                pp sigs[0][sigs[1][path2][1]]
+                                raise
+                        end
 
 			puts "Omg hardlinking"
                         pp sigs[0][sigs[1][path1][1]][0]
                         puts 'to'
-                        pp sigs[0][sigs[1][path1][1]][0]
+                        pp sigs[0][sigs[1][path2][1]][0]
                         puts "\n"
+                        PPCommon.prompt "continue?"
 
                         #Is this even necessary?
                         if sigs[0][ sigs[1][path1][1] ][0].length >  1
@@ -255,20 +256,32 @@ sigs=[
                                         pp sigs[0][ sigs[1][path1][1] ][0]
                                         pp sigs[0][ sigs[1][path1][1] ][1]
                                         pp sigs[0][ sigs[1][path2][1] ][1]
-                                        raise "panic,  both files have multiple hardlinks!"
+                                        puts "EGADS!  panic,  both files have multiple hardlinks!  Waiting..."
+                                        PPCommon.prompt "continue?"
+
                                 end
                                 #Hardlink path2 to path1
-
-                                sigs[0][ sigs[1][path1][1] ][0] << path2
-                                sigs[1][path2][1] = sigs[1][path1][1]
+=begin
+                                sigs[0][ sigs[1][path2][1] ][0].each {|path2_path|
+                                        sigs[0][ sigs[1][path1][1] ][0] << path2_path
+                                        sigs[1][path2_path][1]= sigs[1][path1][1]
+                                }
+                                sigs[0].delete sigs[1][path2][1]
+=end                                
 
                         elsif sigs[0][ sigs[1][path2][1] ][0].length >  1
                                 #Hardlink path1 to path2
                                 
-                                sigs[0][ sigs[1][path2][1] ][0] << path1
-                                sigs[1][path1][1] = sigs[1][path2][1]
+#                                sigs[0][ sigs[1][path2][1] ][0] << path1
+ #                               sigs[1][path1][1] = sigs[1][path2][1]
                         end
 
+
+                        sigs[0][ sigs[1][path2][1] ][0].each {|path2_path|
+                                sigs[0][ sigs[1][path1][1] ][0] << path2_path
+                                sigs[1][path2_path][1]= sigs[1][path1][1]
+                        }
+                        sigs[0].delete sigs[1][path2][1]
 #                        sleep 1
 		}
 		#Remove from the path from the list; we've compared it against every file, it doesn't need to be compared again.
