@@ -17,6 +17,7 @@
 =end
 require 'find'
 require 'fileutils'
+require 'ftools'
 require 'date'
 
 #This is the collection of methods that are common to the ParanoidPackrat
@@ -208,6 +209,7 @@ module PPCommon
 	def self.makeBackupDirectory(dir)
 		raise "You idiot" unless dir.is_a? String
 		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
+                FileUtils.makedirs(addSlash(dir))
 		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
 	end
 
