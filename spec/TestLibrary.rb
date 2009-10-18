@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'facets/integer/of'
+require 'ftools'
+load 'ParanoidPackrat.rb'
 
 class Array
   def random
@@ -78,4 +80,34 @@ module TestLibrary
     end
   end
 
+  #create a fake backup to assist with testing and specing shrinkBackupDestination
+  #creates a set of files, backs them up once, makes some changes, backs them up again,
+  #makes one last set of changes, backs those up, and is done.  So it creates files, and
+  #and then makes changes and backs them up twice.
+  #It returns the directory containing the fake backup target and destination.
+  def create_fake_backup_target
+    dir=mktempdir
+    backupTarget=dir + '/stuffs'
+    File.makedirs backupTarget + '/dir'
+    `echo "I'm data that always changes! #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
+    `echo "I'm data that never changes. #{same=rand.to_s}" >> #{backupTarget}/never_changes.txt`
+    `touch #{backupTarget}/emptyfile.txt`
+    `echo "I'm data that always changes! #{rand.to_s}" >> #{backupTarget + '/dir/'}/always_changes.txt`
+    `echo "I'm data that never changes. #{same} " >> #{backupTarget + '/dir/'}/never_changing.txt`
+    `touch #{backupTarget}/dir/emptyfilez.txt`
+    File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
+
+    PPConfig.addName 'test_backup'
+    PPConfig.setBackupTarget 'test_backup', backupTarget
+    PPConfig.setBackupDestinationOn 'test_backup', dir + '/dest'
+    PPIrb.simpleBackup PPConfig['test_backup']
+    `echo " #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
+    `echo " #{rand.to_s}" >> #{backupTarget + '/dir/'}/always_changes.txt`
+    PPIrb.simpleBackup PPConfig['test_backup']
+    `echo " #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
+    `echo " #{rand.to_s}" >> #{backupTarget + '/dir/'}/always_changes.txt`
+    PPIrb.simpleBackup PPConfig['test_backup']
+
+    backupTarget
+  end
 end

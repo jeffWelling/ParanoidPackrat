@@ -210,7 +210,7 @@ module PPCommon
 		raise "You idiot" unless dir.is_a? String
 		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
                 FileUtils.makedirs(addSlash(dir))
-		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 700)[0]
+		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 0700)[0]
 	end
 
 	#initBackup creates a directory based on dir and name

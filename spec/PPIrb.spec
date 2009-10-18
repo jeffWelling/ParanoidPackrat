@@ -7,7 +7,7 @@ load 'PPIrb.rb'
 
 describe PPIrb do
         it "simpleBackup performs a backup"
-	it "simpleBackup identical backup of backupTarget, and puts it in backupDest/backup/backupName"
+        it "simpleBackup identical backup of backupTarget, and puts it in backupDest/backup/backupName"
 
         #Need to make some fake datas, back them up, and examine the backup for this part.
         it "shrinkBackupDestination does not hardlink files which are not identical"
