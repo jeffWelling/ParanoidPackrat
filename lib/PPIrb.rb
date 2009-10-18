@@ -237,7 +237,8 @@ sigs=[
                                 pp path2
                                 pp sigs[0][sigs[1][path1][1]]
                                 pp sigs[0][sigs[1][path2][1]]
-                                raise
+                                PPCommon.prompt "the fuck?"
+                                next
                         end
 
 			puts "Omg hardlinking"
