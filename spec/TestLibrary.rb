@@ -89,6 +89,7 @@ module TestLibrary
     dir=mktempdir
     backupTarget=dir + '/stuffs'
     File.makedirs backupTarget + '/dir'
+    File.makedirs dir + '/dest'
     `echo "I'm data that always changes! #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
     `echo "I'm data that never changes. #{same=rand.to_s}" >> #{backupTarget}/never_changes.txt`
     `touch #{backupTarget}/emptyfile.txt`
@@ -96,16 +97,19 @@ module TestLibrary
     `echo "I'm data that never changes. #{same} " >> #{backupTarget + '/dir/'}/never_changing.txt`
     `touch #{backupTarget}/dir/emptyfilez.txt`
     File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
-
     PPConfig.addName 'test_backup'
     PPConfig.setBackupTarget 'test_backup', backupTarget
     PPConfig.setBackupDestinationOn 'test_backup', dir + '/dest'
     PPIrb.simpleBackup PPConfig['test_backup']
+
     `echo " #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
     `echo " #{rand.to_s}" >> #{backupTarget + '/dir/'}/always_changes.txt`
+    File.delete backupTarget + '/vanishing_file.rand'
     PPIrb.simpleBackup PPConfig['test_backup']
+
     `echo " #{rand.to_s}" >> #{backupTarget}/always_changing.txt`
     `echo " #{rand.to_s}" >> #{backupTarget + '/dir/'}/always_changes.txt`
+    File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
     PPIrb.simpleBackup PPConfig['test_backup']
 
     backupTarget
