@@ -6,7 +6,17 @@ require 'ParanoidPackrat'
 load 'PPIrb.rb'
 
 describe PPIrb do
-        it "simpleBackup performs a backup"
+        before :each do
+                @bdir = create_fake_backup_target
+                #
+        end
+        it "simpleBackup performs a backup" do
+                filename = make_fake_backup_file @bdir
+                configure_backup 'test_backup', @bdir
+                PPIrb.simpleBackup PPConfig['test_backup']
+                filename_in_backup = PPIrb.getLastBackupFor PPConfig['test_backup'], filename
+                sha(filename).should == sha(filename_in_backup)
+        end
         it "simpleBackup identical backup of backupTarget, and puts it in backupDest/backup/backupName"
 
         it "by default stores two copies of a file that is in an initial backup, not the next, and is restored in the last"
