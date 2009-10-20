@@ -7,15 +7,17 @@ load 'PPIrb.rb'
 
 describe PPIrb do
         before :each do
-                @bdir = create_fake_backup_target
+                @bdir = create_fake_backup
                 #
         end
-        it "simpleBackup performs a backup" do
+        it "simpleBackup performs a backup of a file" do
                 filename = make_fake_backup_file @bdir
                 configure_backup 'test_backup', @bdir
+                PPConfig.silentMode
                 PPIrb.simpleBackup PPConfig['test_backup']
-                filename_in_backup = PPIrb.getLastBackupFor PPConfig['test_backup'], filename
-                sha(filename).should == sha(filename_in_backup)
+                PPConfig.silentMode
+                filename_in_backup = PPCommon.getLastBackupFor(PPConfig['test_backup']).chop+filename  #.chop for extraneous '/'
+                PPCommon.sha1(@bdir + filename).should == PPCommon.sha1(filename_in_backup)
         end
         it "simpleBackup identical backup of backupTarget, and puts it in backupDest/backup/backupName"
 

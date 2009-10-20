@@ -85,6 +85,10 @@ module PPConfig
 		def silentMode?
 			@options.silentMode
 		end
+                #Toggle silentMode
+                def silentMode
+                        @options.silentMode == true ? @options.silentMode=false : @options.silentMode=true
+                end
 
 		#To be called once at the beginning of the config file
 		def initialize

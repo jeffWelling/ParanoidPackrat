@@ -80,6 +80,29 @@ module TestLibrary
     end
   end
 
+  #Instantiate a fake backup to work with in specing and testing
+  #returns the name of the newly created temp fake backup
+  def create_fake_backup
+        dir=mktempdir
+        File.makedirs dir + '/stuffs/dir'
+        File.makedirs dir + '/dest'
+        dir
+  end
+
+  #create files in the temp fake backup provided by bdir
+  def make_fake_backup_file bdir
+       `echo 'DEADBEEF' >> #{bdir}/stuffs/never_changes.txt`
+       '/stuffs/never_changes.txt'
+  end
+
+  #wrapper to config
+  def configure_backup name, bdir
+        PPConfig.addName name
+        PPConfig.setBackupTarget name, bdir + '/stuffs'
+        PPConfig.setBackupDestinationOn name, bdir + '/dest'
+        :christ_waffers!
+  end
+
   #create a fake backup to assist with testing and specing shrinkBackupDestination
   #creates a set of files, backs them up once, makes some changes, backs them up again,
   #makes one last set of changes, backs those up, and is done.  So it creates files, and
@@ -97,6 +120,8 @@ module TestLibrary
     `echo "I'm data that never changes. #{same} " >> #{backupTarget + '/dir/'}/never_changing.txt`
     `touch #{backupTarget}/dir/emptyfilez.txt`
     File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
+    File.copy File.expand_path('spec/hardlinked_file.rand'), backupTarget + '/hardlinked_file1.rand'
+    File.link File.expand_path( backupTarget + '/hardlinked_file1.rand'), backupTarget + '/hardlinked_file2.rand'
     PPConfig.addName 'test_backup'
     PPConfig.setBackupTarget 'test_backup', backupTarget
     PPConfig.setBackupDestinationOn 'test_backup', dir + '/dest'

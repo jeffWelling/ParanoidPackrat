@@ -443,6 +443,19 @@ module PPCommon
 		#Do naughty, naughty things here.
 	end
 
+        #return the path that the last_backup symlink points to for the backup defined by config
+        def self.getLastBackupFor config
+                oldest=''
+                config[:BackupDestination].each {|backup_dest|
+                        last_backup=File.readlink(PPCommon.addSlash(backup_dest) + 'backup/' + config[:BackupName] + 'last_backup' )
+                        datetime=last_backup[/\/[^\/]+\/$/].gsub('/','')
+                        (oldest=last_backup and next) if oldest.empty?
+                        next if DateTime.parse(datetime) == DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
+                        oldest=last_backup if DateTime.parse(datetime) > DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
+                }
+                oldest
+        end
+
 	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
 	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
 	#Be aware that setting buffer != true may return true if a backup is currently running.
