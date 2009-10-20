@@ -6,12 +6,12 @@ require 'ParanoidPackrat'
 load 'PPIrb.rb'
 
 describe PPIrb do
-        before :each do
+        before :all do
                 @bdir = create_fake_backup
                 #
         end
-        it "simpleBackup performs a backup of a file" do
-                filename = make_fake_backup_file @bdir
+        it "simpleBackup performs a backup of a file and directory" do
+                filename = make_fake_backup_file(@bdir+'/stuffs')
                 configure_backup 'test_backup', @bdir
                 PPConfig.silentMode
                 PPIrb.simpleBackup PPConfig['test_backup']
@@ -25,9 +25,17 @@ describe PPIrb do
         it "will hardlink this files to save space when shrink backup is run"
 
         #Need to make some fake datas, back them up, and examine the backup for this part.
-        it "shrinkBackupDestination does not hardlink files which are not identical"
+        dir=create_fake_backup_target
+        it "shrinkBackupDestination does not hardlink files which are not identical" do
+               Dir.glob(dir.gsub(/\/stuffs$/,  '') + '/dest/backup/test_backup/*').each {|a|
+                       File.stat(a + '/stuffs/never_changes.txt').ino.should_not ==
+                       File.stat(dir + '/never_changes.txt').ino
+               }
+        end
+
         it "shrinkBackupDestination does not hardlink two files if doing so would create a hardlink between files in the same backup instance"
         it "shrinkBackupDestination does not hardlink two files if the paths of those files are in the same backup instance"
         it "shrinkBackupDestination does not hardlink empty files"
+        PPConfig.resetConfigs
 
 end

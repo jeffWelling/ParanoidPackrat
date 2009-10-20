@@ -90,6 +90,10 @@ module PPConfig
                         @options.silentMode == true ? @options.silentMode=false : @options.silentMode=true
                 end
 
+                def resetConfigs
+                        @Configs={}
+                end
+
 		#To be called once at the beginning of the config file
 		def initialize
 			@numOfConfigs||=0

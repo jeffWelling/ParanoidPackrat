@@ -91,7 +91,7 @@ module TestLibrary
 
   #create files in the temp fake backup provided by bdir
   def make_fake_backup_file bdir
-       `echo 'DEADBEEF' >> #{bdir}/stuffs/never_changes.txt`
+       `echo 'DEADBEEF' >> #{bdir}/never_changes.txt`
        '/stuffs/never_changes.txt'
   end
 

@@ -153,7 +153,7 @@ module PPIrb
 	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
 	#
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
-	def self.shrinkBackupDestination(backup,wide=nil)
+	def self.shrinkBackupDestination(backup,wide=nil,p=nil)
 	raise "you idiot!" unless backup.class==Hash
 #	return true #Not yet ready for use, so just return true until it is.
 #	sigs= PPCommon.getExistingFileSignatures
@@ -247,7 +247,7 @@ sigs=[
                         puts 'to'
                         pp sigs[0][sigs[1][path2][1]][0]
                         puts "\n"
-                        PPCommon.prompt "continue?"
+                        PPCommon.prompt "continue?" unless p.nil?
 
                         #Is this even necessary?
                         if sigs[0][ sigs[1][path1][1] ][0].length >  1
@@ -259,7 +259,7 @@ sigs=[
                                         pp sigs[0][ sigs[1][path1][1] ][1]
                                         pp sigs[0][ sigs[1][path2][1] ][1]
                                         puts "EGADS!  panic,  both files have multiple hardlinks!  Waiting..."
-                                        PPCommon.prompt "continue?"
+                                        PPCommon.prompt "continue?" unless p.nil?
 
                                 end
                                 #Hardlink path2 to path1
@@ -269,7 +269,7 @@ sigs=[
                                         sigs[1][path2_path][1]= sigs[1][path1][1]
                                 }
                                 sigs[0].delete sigs[1][path2][1]
-=end                                
+=end
 
                         elsif sigs[0][ sigs[1][path2][1] ][0].length >  1
                                 #Hardlink path1 to path2
