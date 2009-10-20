@@ -109,6 +109,7 @@ module TestLibrary
   #and then makes changes and backs them up twice.
   #It returns the directory containing the fake backup target and destination.
   def create_fake_backup_target
+    PPConfig.silentMode
     dir=mktempdir
     backupTarget=dir + '/stuffs'
     File.makedirs backupTarget + '/dir'
@@ -137,6 +138,7 @@ module TestLibrary
     File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
     PPIrb.simpleBackup PPConfig['test_backup']
 
+    PPConfig.silentMode
     backupTarget
   end
 end
