@@ -26,10 +26,18 @@ describe PPIrb do
 
         #Need to make some fake datas, back them up, and examine the backup for this part.
         dir=create_fake_backup_target
+        PPIrb.shrinkBackupDestination(PPConfig['test_backup'], nil, nil)
         it "shrinkBackupDestination does not hardlink files which are not identical" do
-               Dir.glob(dir.gsub(/\/stuffs$/,  '') + '/dest/backup/test_backup/*').each {|a|
-                       File.stat(a + '/stuffs/never_changes.txt').ino.should_not ==
-                       File.stat(dir + '/never_changes.txt').ino
+               Dir.glob(dir.gsub(/\/stuffs$/,  '') + '/dest/backup/test_backup/*').each {|path_datetime|
+                       #obviously these should never match either
+                       File.stat(path_datetime + '/stuffs/never_changes.txt').ino.should_not ==
+                       File.stat(path_datetime + '/stuffs/always_changing.txt').ino
+
+                       #the inodes of 'always_changing.txt' should never match
+                       Dir.glob(dir.gsub(/\/stuffs$/,  '') + '/dest/backup/test_backup/*').each {|path_datetime2
+                                File.stat(path_datetime + '/stuffs/always_changing.txt').ino.should_not == 
+                                File.stat(path_datetime2 + '/stuffs/always_changing.txt').ino
+                       }
                }
         end
 

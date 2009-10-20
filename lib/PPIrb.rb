@@ -153,7 +153,7 @@ module PPIrb
 	#the copy into place for every file thats not in a backupDest/backupName/datetimes dir to undo this operation!
 	#
 	#	NOTE THIS REQUIRES THAT YOUR BACKUPS ARE ATOMIC - NEVER EDIT YOUR BACKUPS
-	def self.shrinkBackupDestination(backup,wide=nil,p=nil)
+	def self.shrinkBackupDestination(backup,wide=nil,p=1)
 	raise "you idiot!" unless backup.class==Hash
 #	return true #Not yet ready for use, so just return true until it is.
 #	sigs= PPCommon.getExistingFileSignatures
@@ -247,7 +247,7 @@ sigs=[
                         puts 'to'
                         pp sigs[0][sigs[1][path2][1]][0]
                         puts "\n"
-                        PPCommon.prompt "continue?" unless p.nil?
+                        PPCommon.prompt("continue?") unless p.nil?
 
                         #Is this even necessary?
                         if sigs[0][ sigs[1][path1][1] ][0].length >  1
@@ -259,7 +259,7 @@ sigs=[
                                         pp sigs[0][ sigs[1][path1][1] ][1]
                                         pp sigs[0][ sigs[1][path2][1] ][1]
                                         puts "EGADS!  panic,  both files have multiple hardlinks!  Waiting..."
-                                        PPCommon.prompt "continue?" unless p.nil?
+                                        PPCommon.prompt("continue?") unless p.nil?
 
                                 end
                                 #Hardlink path2 to path1
@@ -280,6 +280,13 @@ sigs=[
 
 
                         sigs[0][ sigs[1][path2][1] ][0].each {|path2_path|
+                                begin
+                                        File.move(path2_path, path2_path + '_')
+                                        File.link(path1, path2_path)
+                                        File.delete(path2_path + '_')
+                                rescue
+                                        File.move(path2_path + '_', path2_path)
+                                end
                                 sigs[0][ sigs[1][path1][1] ][0] << path2_path
                                 sigs[1][path2_path][1]= sigs[1][path1][1]
                         }
