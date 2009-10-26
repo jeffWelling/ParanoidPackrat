@@ -122,6 +122,7 @@ module TestLibrary
     `touch #{backupTarget}/dir/emptyfilez.txt`
     File.copy File.expand_path('spec/vanishing_file.rand'), backupTarget + '/.'
     File.copy File.expand_path('spec/hardlinked_file.rand'), backupTarget + '/hardlinked_file1.rand'
+    File.copy File.expand_path('spec/hardlinked_file.rand'), backupTarget + '/omg_hardlinkedfile1.rand'
     File.link File.expand_path( backupTarget + '/hardlinked_file1.rand'), backupTarget + '/hardlinked_file2.rand'
     PPConfig.addName 'test_backup'
     PPConfig.setBackupTarget 'test_backup', backupTarget

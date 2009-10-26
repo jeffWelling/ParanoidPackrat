@@ -224,7 +224,7 @@ sigs=[
                                 #skip is hardlinking path1 to path2 would mean indirectly hardlinking two files within the same backup (this would contaiminate the backup)
                                 skip=true if PPCommon.whichBackupInstance?(path2) == PPCommon.whichBackupInstance?(path_with_this_inode)
 			}
-                        puts 'omg skipped?' if path2.match(/Bang/i) and skip==true
+                        PPCommon.pprint 'omg skipped?' if path2.match(/Bang/i) and skip==true
 			next if skip==true
 
                         #If it hasn't been hashed yet  (hashing would store the value here)
@@ -242,12 +242,14 @@ sigs=[
                                 next
                         end
 
-			puts "Omg hardlinking"
-                        pp sigs[0][sigs[1][path1][1]][0]
-                        puts 'to'
-                        pp sigs[0][sigs[1][path2][1]][0]
-                        puts "\n"
-                        PPCommon.prompt("continue?") unless p.nil?
+                        unless PPConfig.silentMode?.class==TrueClass
+        			puts "Omg hardlinking"
+                                pp sigs[0][sigs[1][path1][1]][0]
+                                puts 'to'
+                                pp sigs[0][sigs[1][path2][1]][0]
+                                puts "\n"
+                                PPCommon.prompt("continue?") unless p.nil?
+                        end
 
                         #Is this even necessary?
                         if sigs[0][ sigs[1][path1][1] ][0].length >  1

@@ -26,7 +26,9 @@ describe PPIrb do
 
         #Need to make some fake datas, back them up, and examine the backup for this part.
         dir=create_fake_backup_target
+        PPConfig.silentMode
         PPIrb.shrinkBackupDestination(PPConfig['test_backup'], nil, nil)
+        PPConfig.silentMode
         it "shrinkBackupDestination does not hardlink files which are not identical" do
                Dir.glob(dir.gsub(/\/stuffs$/,  '') + '/dest/backup/test_backup/*').each {|path_datetime|
                        #obviously these should never match either
