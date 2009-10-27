@@ -80,7 +80,11 @@ module PPConfig
 		def ignorePermissions?
 			@options.permissions
 		end
-
+                
+                #return the config file
+                def configFile
+                        @options.configFile
+                end
 		#return true if silentMode 
 		def silentMode?
 			@options.silentMode
