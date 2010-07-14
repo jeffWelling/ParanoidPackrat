@@ -81,22 +81,22 @@ module PPConfig
 			@options.permissions
 		end
                 
-                #return the config file
-                def configFile
-                        @options.configFile
-                end
+    #return the config file
+    def configFile
+            @options.configFile
+    end
 		#return true if silentMode 
 		def silentMode?
 			@options.silentMode
 		end
-                #Toggle silentMode
-                def silentMode
-                        @options.silentMode == true ? @options.silentMode=false : @options.silentMode=true
-                end
+    #Toggle silentMode
+    def silentMode
+            @options.silentMode == true ? @options.silentMode=false : @options.silentMode=true
+    end
 
-                def resetConfigs
-                        @Configs={}
-                end
+    def resetConfigs
+            @Configs={}
+    end
 
 		#To be called once at the beginning of the config file
 		def initialize
