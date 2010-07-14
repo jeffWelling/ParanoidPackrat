@@ -1,1 +1,0 @@
-Use /var/run to store PID to assure single-instance operation

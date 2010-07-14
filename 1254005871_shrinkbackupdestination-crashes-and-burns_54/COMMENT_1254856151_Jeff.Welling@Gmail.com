@@ -1,1 +1,0 @@
-Continued - HOWEVER, if you run shrinkBackupDest on your backups, and it hardlinks two duplicates from in the same backup, then when you restore those files will be hardlinked, which breaks the convention of getting out exactly what you put in.  Perhaps shrinkBackupDest should be an optional compression argument as breaking that convention isn't a showstopper.

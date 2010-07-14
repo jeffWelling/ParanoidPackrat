@@ -1,1 +1,0 @@
-This would work by configuring a number of backupDestinations greater than the that of the guaranteed number of duplicates.  Say, you configure 5 seperate backup destinations, and set the guranteed number of duplicates to 3; this would guarantee that a copy of the backup was stored on at least 3 of the configured backup Destinations.

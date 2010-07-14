@@ -1,1 +1,0 @@
-This will be _very_ usefull when running from cron to make sure that we don't start a process if there is still another process doing its thing.  This will also prevent hundreds and hundreds of processes from spawning if there is any hangups.

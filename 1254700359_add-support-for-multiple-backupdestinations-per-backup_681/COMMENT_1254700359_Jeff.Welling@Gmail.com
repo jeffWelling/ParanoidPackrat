@@ -1,1 +1,0 @@
-Should be able to define multiple backup destinations per backup item, so that the backup goes to multiple devices/locations.  Currently, backupDestinations are expected to be a single string, likely need to be modified to be an array of strings, modifying their accompanying methods as well.
