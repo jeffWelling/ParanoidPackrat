@@ -1,0 +1,1 @@
+Should be able to specify a backupTarget as 'jeff@192.168.1.1:/etc' and as long as you have read access you should be able to backup that dir on that machine using that kind of addressing.  This should work for backupDestinations as well, not JUST backupTargets. 

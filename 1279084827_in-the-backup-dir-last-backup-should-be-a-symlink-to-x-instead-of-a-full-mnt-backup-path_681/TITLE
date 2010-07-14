@@ -1,0 +1,1 @@
+In the backup dir, last_backup should be a symlink to '../X' instead of a full '/mnt/backup/...' path
