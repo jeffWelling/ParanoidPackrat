@@ -19,6 +19,8 @@ require 'find'
 require 'fileutils'
 require 'ftools'
 require 'date'
+require 'digest/sha1'
+require 'yaml'
 
 #This is the collection of methods that are common to the ParanoidPackrat
 #project.
@@ -275,7 +277,6 @@ module PPCommon
     return false
   end
 	
-  require 'yaml'
   #getExistingFileSignatures() reads the stored hashes in from a file
   #takes an optional filename, otherwise uses the default
   def self.getExistingFileSignatures(filename = nil)
@@ -302,7 +303,6 @@ module PPCommon
     full_path[/^(\/[^\/]+){1,}?\/backup\/[^\\]+\/\d{4}-\d{1,2}-\d{1,2}_(\d{2}:){2}\d{2}\//]
   end
 
-  require 'digest/sha1'
   #SHA1 a file and return it's hash
   def self.sha1 file
     hash_func= Digest::SHA1.new
