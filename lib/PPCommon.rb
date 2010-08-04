@@ -103,6 +103,12 @@ module PPCommon
 	#takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
 	#FIXME Make sure it handles nested mountpoints properly, think it does but not 100% sure ><
 	def self.getMountBase path, debug_input=nil
+    if debug_input.nil?
+     #Everything else in the function after the next line handles debugging only
+     return PPCommon.df(path)[0][5]
+    else
+      lump= debug_input
+    end
 		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
 		path=PPCommon.addSlash(path)
 		lump.each {|line|
