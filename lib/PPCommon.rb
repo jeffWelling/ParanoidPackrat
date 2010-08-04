@@ -1,6 +1,6 @@
 =begin
-		Copyright 2009 Jeff Welling (jeff.welling (a) gmail.com)
-		This file is part of ParanoidPackrat.
+    Copyright 2009 Jeff Welling (jeff.welling (a) gmail.com)
+    This file is part of ParanoidPackrat.
 
     ParanoidPackrat is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,14 +45,14 @@ module PPCommon
   #strip any trailing slashes from str if they exist
   def self.stripSlash(str)
     str.sub(/\/+$/,'')
-	end
+  end
 
-	#do a `df`, parse, return as array.  example return array below.
-	#	[ [filesystem, total_1K_blocks, used, available, capacity, mountpoint],
-	#		[filesystem, ...] ]
-	#the optional debug argument is for creating/using specs, if debug is provided it will be
-	#used instead of calling out to `df`.
-	def self.df path=nil, debug=nil
+  #do a `df`, parse, return as array.  example return array below.
+  #	[ [filesystem, total_1K_blocks, used, available, capacity, mountpoint],
+  #		[filesystem, ...] ]
+  #the optional debug argument is for creating/using specs, if debug is provided it will be
+  #used instead of calling out to `df`.
+  def self.df path=nil, debug=nil
     if debug.nil?
       if path.nil?
         output=`df -P`
@@ -62,71 +62,71 @@ module PPCommon
     else
       output=debug
     end
-		output=output.split("\n").reject {|l| !l[/^Filesystem/].nil? }  #Reject the first line of output, which is the columns.
-		output.each_index {|i|
-			filesystem= output[i][/^[^\s]+/]
-			total_1k_blocks=''
-			used=''
-			available=''
-			capacity=''
-			mountpoint=''
-			temp=''
-			i2=0  #I cant believe I have to use an index, I MUST be tired
-			output[i]=output[i].gsub(/^[^\s]+/, '')
-			output[i][/(\s+\d+){3}\s+\d+%\s+\//].strip.chop.chop.chop.split(' ').each {|number|
-				if i2==0
-					total_1k_blocks=number			#Chef: "Hello children!"
-					i2+=1												#Kids: "Hi Chef!"
-				elsif i2==1										#Kids: "Chef, what would a priest want to put up our butts?"
-					used=number									#Chef: "Goodbye!"
-					i2+=1												#ROFL
-				elsif i2==2
-					available=number
-					i2+=1
-				elsif i2==3
-					capacity=number
-				end             			   #  << DAMN thats ugly
-				temp=[total_1k_blocks, used, available, capacity]
-			}
-			temp << (output[i].gsub(/(\s+\d+){3}\s+\d+%\s+\//, '/'))
-			output[i]= (temp.reverse << filesystem).reverse
-		}
-		output   #GODAMNYOUJESUS! GET OFF MY PORCH!
-	end
+      output=output.split("\n").reject {|l| !l[/^Filesystem/].nil? }  #Reject the first line of output, which is the columns.
+      output.each_index {|i|
+        filesystem= output[i][/^[^\s]+/]
+        total_1k_blocks=''
+        used=''
+        available=''
+        capacity=''
+        mountpoint=''
+        temp=''
+        i2=0  #I cant believe I have to use an index, I MUST be tired
+        output[i]=output[i].gsub(/^[^\s]+/, '')
+        output[i][/(\s+\d+){3}\s+\d+%\s+\//].strip.chop.chop.chop.split(' ').each {|number|
+          if i2==0
+            total_1k_blocks=number			#Chef: "Hello children!"
+            i2+=1												#Kids: "Hi Chef!"
+          elsif i2==1										#Kids: "Chef, what would a priest want to put up our butts?"
+            used=number									#Chef: "Goodbye!"
+            i2+=1												#ROFL
+          elsif i2==2
+            available=number
+            i2+=1
+          elsif i2==3
+            capacity=number
+          end             			   #  << DAMN thats ugly
+          temp=[total_1k_blocks, used, available, capacity]
+        }
+        temp << (output[i].gsub(/(\s+\d+){3}\s+\d+%\s+\//, '/'))
+        output[i]= (temp.reverse << filesystem).reverse
+      }
+      output   #GODAMNYOUJESUS! GET OFF MY PORCH!
+  end
 
-	#takes a dir, and checks to see how much free space the drive that dir is on has.
-	#debug_input is to allow an alternative source to PPCommon.df, generally intended for specs
-	def self.getFreeSpace(dir, debug_input=nil)
+  #takes a dir, and checks to see how much free space the drive that dir is on has.
+  #debug_input is to allow an alternative source to PPCommon.df, generally intended for specs
+  def self.getFreeSpace(dir, debug_input=nil)
     debug_input[0][3] rescue nil || PPCommon.df(dir)[0][3]
-	end
+  end
 
-	#takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
-	#FIXME Make sure it handles nested mountpoints properly, think it does but not 100% sure ><
-	def self.getMountBase path, debug_input=nil
+  #takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
+  #FIXME Make sure it handles nested mountpoints properly, think it does but not 100% sure ><
+  def self.getMountBase path, debug_input=nil
     if debug_input.nil?
      #Everything else in the function after the next line handles debugging only
      return PPCommon.df(path)[0][5]
     else
       lump= debug_input
     end
-		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
-		path=PPCommon.addSlash(path)
-		lump.each {|line|
-			next if line[5].length > path.length
-			next unless path.slice(0, line[5].length) == line[5]
+      lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
+      path=PPCommon.addSlash(path)
+      lump.each {|line|
+        next if line[5].length > path.length
+        next unless path.slice(0, line[5].length) == line[5]
 
-			next_slash= path.index('/', line[5].length)
-			next if next_slash.nil?
-			full_path=path.slice(0, next_slash+1)
+        next_slash= path.index('/', line[5].length)
+        next if next_slash.nil?
+        full_path=path.slice(0, next_slash+1)
 
-			return PPCommon.stripSlash(full_path) if path.slice(0, path.index('/', line[5].length) ) == line[5]
-		}
-		return PPCommon.stripSlash(lump[0][5])
-	end
+        return PPCommon.stripSlash(full_path) if path.slice(0, path.index('/', line[5].length) ) == line[5]
+      }
+      return PPCommon.stripSlash(lump[0][5])
+  end
 
-	#returns true if str matches the date time format expected to be found in the backup destination folders
-	#otherwise, returns false
-	def self.datetimeFormat?(str)
+  #returns true if str matches the date time format expected to be found in the backup destination folders
+  #otherwise, returns false
+  def self.datetimeFormat?(str)
     return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
     false
   end
