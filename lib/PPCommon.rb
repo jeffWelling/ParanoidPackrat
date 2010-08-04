@@ -50,8 +50,16 @@ module PPCommon
 	#		[filesystem, ...] ]
 	#the optional debug argument is for creating/using specs, if debug is provided it will be
 	#used instead of calling out to `df`.
-	def self.df debug=nil
-		debug.nil? ? output=`df -P` : output=debug
+	def self.df path=nil, debug=nil
+    if debug.nil?
+      if path.nil?
+        output=`df -P`
+      else
+        FileUtils.chdir( File.expand_path(path) ) { output=`df -P .` }
+      end
+    else
+      output=debug
+    end
 		output=output.split("\n").reject {|l| !l[/^Filesystem/].nil? }  #Reject the first line of output, which is the columns.
 		output.each_index {|i|
 			filesystem= output[i][/^[^\s]+/]
