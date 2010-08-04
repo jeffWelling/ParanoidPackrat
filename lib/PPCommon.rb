@@ -95,12 +95,7 @@ module PPCommon
 	#takes a dir, and checks to see how much free space the drive that dir is on has.
 	#debug_input is to allow an alternative source to PPCommon.df, generally intended for specs
 	def self.getFreeSpace(dir, debug_input=nil)
-		lump= debug_input.nil? ? (PPCommon.df) : (debug_input)
-		dir=PPCommon.addSlash(dir)
-		lump.each {|line|
-			return line[3] if PPCommon.getMountBase(dir, lump)  == line[5]
-		}
-		return lump[0][3]
+    debug_input[0][3] rescue nil || PPCommon.df(dir)[0][3]
 	end
 
 	#takes a path, returns the mountpoint that it resides under, such as "/mnt/sdi" for "/mnt/sdi/backup/foobar/"
