@@ -19,29 +19,31 @@ require 'find'
 require 'fileutils'
 require 'ftools'
 require 'date'
+require 'digest/sha1'
+require 'yaml'
 
 #This is the collection of methods that are common to the ParanoidPackrat
 #project.
 module PPCommon
-	#pprint is a function to help control output based on silent mode or not.
-	#This is called from other internal methods to print output, which is then
-	#only displayed if we are not in silent mode.
-	#if fatal is anything except nil, than an exception is raise with str instead
-	#of printing the output.
-	def self.pprint str, fatal=nil
-		raise str unless fatal.nil?
-		return true if PPConfig.silentMode?
-		puts str
-	end
+  #pprint is a function to help control output based on silent mode or not.
+  #This is called from other internal methods to print output, which is then
+  #only displayed if we are not in silent mode.
+  #if fatal is anything except nil, than an exception is raise with str instead
+  #of printing the output.
+  def self.pprint str, fatal=nil
+    raise str unless fatal.nil?
+    return true if PPConfig.silentMode?
+    puts str
+  end
 
-	#Add a slash to the end of str if there isn't already one there.
-	def self.addSlash(str)
-		str << "/" unless str[-1].chr == '/'
+  #Add a slash to the end of str if there isn't already one there.
+  def self.addSlash(str)
+    str << "/" unless str[-1].chr == '/'
     str
-	end
+  end
 
-	#strip any trailing slashes from str if they exist
-	def self.stripSlash(str)
+  #strip any trailing slashes from str if they exist
+  def self.stripSlash(str)
     str.sub(/\/+$/,'')
 	end
 
@@ -121,20 +123,20 @@ module PPCommon
 	def self.datetimeFormat?(str)
     return true if str =~ /^[012][\d]{3}\-([0]\d|[1][0-2])\-([0-2]\d|[3][0-1])_([01]\d|[2][0-3]):([0-5]\d):([0-5]\d)$/
     false
-	end
+  end
 
-	#return a string to be used as the datetime part of the backup path name
-	#the string is to be used   backup/backupname/HERE/...
-	#Expected to be used once at the beginning of running a backup to use
-	#in the backup path.
-	def self.newDatetime
-		timestamp = DateTime.now.to_s
+  #return a string to be used as the datetime part of the backup path name
+  #the string is to be used   backup/backupname/HERE/...
+  #Expected to be used once at the beginning of running a backup to use
+  #in the backup path.
+  def self.newDatetime
+    timestamp = DateTime.now.to_s
     timestamp.sub!(/[-+]\d{2}:?\d{2}/,'') # strip off -07:00 modifier
     timestamp.sub!(/T/,'_')            # use '_' as a separator instead of 'T'
-	end
-	
-	#symbolize text
-	def self.symbolize text
+  end
+  
+  #symbolize text
+  def self.symbolize text
     case text
       when /^$/           ; :empty
       when nil            ; :nil
@@ -144,141 +146,140 @@ module PPCommon
       when /^(n|no)$/i    ; :no
       else                ; text.to_sym
     end
-	end 
+  end 
 
-	#ask the user question, and return the response (with optional default)
-	def self.ask question, default=nil
-		print "\n#{question} "
-		answer = $stdin.gets.strip.downcase
-		throw :quit if 'q' == answer
-		return default if PPCommon.symbolize(answer)==:empty
-		answer
-	end
+  #ask the user question, and return the response (with optional default)
+  def self.ask question, default=nil
+    print "\n#{question} "
+    answer = $stdin.gets.strip.downcase
+    throw :quit if 'q' == answer
+    return default if PPCommon.symbolize(answer)==:empty
+    answer
+  end
 
-	#ask the user a question, return the symbolized response with optional default
-	def self.ask_symbol question, default
-		answer = PPCommon.symbolize PPCommon.ask(question)
-		throw :quit if :quit == answer
-		return default if :empty == answer
-		answer
-	end
-	
-	#ask the user question, loop until he selects a valid option.
-	def self.prompt question, default = :yes, add_options = nil, delete_options = nil
-		options = ([default] + [:yes,:no] + [add_options] + [:quit]).flatten.uniq
-		if delete_options.class == Array
-			delete_options.each {|del_option|
-			  options -= [del_option]
-			}
-		else
-			options -= [delete_options]
-		end
-		option_string = options.collect {|x| x.to_s.capitalize}.join('/')
-		answer = nil
-		loop {
-			answer = PPCommon.ask_symbol "#{question} (#{option_string.gsub('//', '/')}):", default
-			(answer=default if answer==:nil) unless default.nil?
-			break if options.member? answer
-		}
-		answer
-	end
+  #ask the user a question, return the symbolized response with optional default
+  def self.ask_symbol question, default
+    answer = PPCommon.symbolize PPCommon.ask(question)
+    throw :quit if :quit == answer
+    return default if :empty == answer
+    answer
+  end
+  
+  #ask the user question, loop until he selects a valid option.
+  def self.prompt question, default = :yes, add_options = nil, delete_options = nil
+    options = ([default] + [:yes,:no] + [add_options] + [:quit]).flatten.uniq
+    if delete_options.class == Array
+      delete_options.each {|del_option|
+        options -= [del_option]
+      }
+    else
+      options -= [delete_options]
+    end
+    option_string = options.collect {|x| x.to_s.capitalize}.join('/')
+    answer = nil
+    loop {
+      answer = PPCommon.ask_symbol "#{question} (#{option_string.gsub('//', '/')}):", default
+      (answer=default if answer==:nil) unless default.nil?
+      break if options.member? answer
+    }
+    answer
+  end
 
-	#scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
-	#and will return an array with the full path of every file covered by
-	#backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
-	#
-	#<b>Note</b> backup is expected to be one of the configs from 
-	#PPConfig.dumpConfig and PPConfig.sanityCheck is expected
-	#to have been run already.
-	def self.scanBackupDir backup
+  #scanBackupDir(backup) will scan the dir/file specified in backup[:BackupTarget],
+  #and will return an array with the full path of every file covered by
+  #backup[:BackupTarget], excluding anything specified in backup[:Exclusions].
+  #
+  #<b>Note</b> backup is expected to be one of the configs from 
+  #PPConfig.dumpConfig and PPConfig.sanityCheck is expected
+  #to have been run already.
+  def self.scanBackupDir backup
     path = if backup.respond_to? :keys
       backup[:BackupTarget]
     else
       backup.to_s
     end
-		raise "You idiot - specify a path!" unless path
-		raise "You idiot - #{path} doesn't exists!" unless File.exists?(path)
+    raise "You idiot - specify a path!" unless path
+    raise "You idiot - #{path} doesn't exists!" unless File.exists?(path)
     collection = []
     Find.find(path) {|file| collection << file }
     return collection unless backup.respond_to?(:keys) && (exclusions = backup[:Exclusions])
     collection.reject {|file| [*exclusions].any? {|exclusion| file =~ exclusion } }
-	end
-	
-	#makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
-	#dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
-	#Using that example, it would create the dir "/mnt/backup/", it will return false if the
-	#directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
-	#return the path of the directory that was just created.
-	def self.makeBackupDirectory(dir)
-		raise "You idiot" unless dir.is_a? String
-		return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
-                FileUtils.makedirs(addSlash(dir))
-		FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 0700)[0]
-	end
+  end
+  
+  #makeBackupDirectory(dir) creates the backup directory structure to store the backups in.
+  #dir is expected to be a directory, such as say, "/mnt" or "/mnt/".  
+  #Using that example, it would create the dir "/mnt/backup/", it will return false if the
+  #directory ("/mnt/backup/" in this case) exists and is not empty.  Otherwise, it will
+  #return the path of the directory that was just created.
+  def self.makeBackupDirectory(dir)
+    raise "You idiot" unless dir.is_a? String
+    return false unless Dir.glob("#{dir}/**/*").length.zero? # fail unless the directory is empty
+    FileUtils.makedirs(addSlash(dir))
+    FileUtils.mkdir(addSlash(dir) + "backup/", :mode => 0700)[0]
+  end
 
-	#initBackup creates a directory based on dir and name
-	#return value is a string which contains the dir to work with
-	#Intended to be used in PPIrb.rb in the backup methods
-	def self.initBackup dir, name
-		dest_name=PPCommon.addSlash(dir) + 'backup/' + name
-		FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
-		PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
-		dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(PPCommon.newDatetime)
- 		FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
-		PPCommon.mark(dest_name_date.gsub(' ', '\ '))
-		dest_name_date.gsub(' ', '\ ')
-	end
-	
-	#This method is used to determine if a backup dir contains backups or not.
-	#Basically, its used to tell if this if the first run backup, or if there are others
-	#that it can use to help shrink the size of the backup.
-	#
-	#It will look for any directories underneath backup_dest, if they also contain a directory
-	#which has the correct date time format, and there is a last_backup symlink pointing to a dir,
-	#then it will return true that yes there is at least one existing backup meaning
-	#this is not the first run.
-	#Otherwise, if there are no directories underneath backup_dest which also contain a dir
-	#with the name in the right date time format which also contains a last_backup symlink,
-	#it will return false signaling that this is the first run.
-	#If backup_dest does not exist, or there are other files in backup_dest, it will simply
-	#return false.
-	#
-	#If backup_name is provided, that one backupDest/backupName dir will be checked for backups.
-	#NOTE - all paths are expected to be full paths
-	def self.containsBackups?(backup_dest, backup_name=nil)
-		return false unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
-		backup_dest=PPCommon.addSlash(backup_dest)
-		has_a_backup=false
-		last_backup=false
-		files_in_backupdir=[]
+  #initBackup creates a directory based on dir and name
+  #return value is a string which contains the dir to work with
+  #Intended to be used in PPIrb.rb in the backup methods
+  def self.initBackup dir, name
+    dest_name=PPCommon.addSlash(dir) + 'backup/' + name
+    FileUtils.mkdir_p(dest_name) unless File.exist?(dest_name)
+    PPCommon.pprint("simpleBackup():  Fatal error, conflict between backup name and existing file/dir in backup destination.", :fatal) unless File.directory?(dest_name)
+    dest_name_date=PPCommon.addSlash(dest_name) + PPCommon.addSlash(PPCommon.newDatetime)
+    FileUtils.mkdir_p(dest_name_date) unless File.exist?(dest_name_date)
+    PPCommon.mark(dest_name_date.gsub(' ', '\ '))
+    dest_name_date.gsub(' ', '\ ')
+  end
+  
+  #This method is used to determine if a backup dir contains backups or not.
+  #Basically, its used to tell if this if the first run backup, or if there are others
+  #that it can use to help shrink the size of the backup.
+  #
+  #It will look for any directories underneath backup_dest, if they also contain a directory
+  #which has the correct date time format, and there is a last_backup symlink pointing to a dir,
+  #then it will return true that yes there is at least one existing backup meaning
+  #this is not the first run.
+  #Otherwise, if there are no directories underneath backup_dest which also contain a dir
+  #with the name in the right date time format which also contains a last_backup symlink,
+  #it will return false signaling that this is the first run.
+  #If backup_dest does not exist, or there are other files in backup_dest, it will simply
+  #return false.
+  #
+  #If backup_name is provided, that one backupDest/backupName dir will be checked for backups.
+  #NOTE - all paths are expected to be full paths
+  def self.containsBackups?(backup_dest, backup_name=nil)
+    return false unless File.exist?(backup_dest) and File.directory?(backup_dest) and File.readable?(backup_dest)
+    backup_dest=PPCommon.addSlash(backup_dest)
+    has_a_backup=false
+    last_backup=false
+    files_in_backupdir=[]
 =begin
-		backupDest/* = l0
-		backupDest/backup/* =l1
-		backupDest/backup/backupName/* =l2
-		backupDest/backup/backupName/datetime/* =l3
+    backupDest/* = l0
+    backupDest/backup/* =l1
+    backupDest/backup/backupName/* =l2
+    backupDest/backup/backupName/datetime/* =l3
 =end
-		Dir.entries(backup_dest).each {|l0|
-			next if l0[/^(\.|\.\.)$/]   #Skip '.' and '..'
-			next unless l0[/^backup$/]
-			dest_backup=backup_dest + 'backup/'
-			Dir.entries(dest_backup).each {|l1|
-				next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
-				next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
-				dest_backup_name=dest_backup + PPCommon.addSlash(l1)
-				Dir.entries(dest_backup_name).each {|l2|
-					next if l2[/^(\.|\.\.)$/]   #Skip '.' and '..'
-					next unless PPCommon.datetimeFormat?(l2) or l2[/^last_backup$/]
-					has_a_backup=true
-					dest_backup_name_datetime=(dest_backup_name + l2) if l2[/^last_backup$/]
-					last_backup=true if l2[/^last_backup$/] and File.symlink?(dest_backup_name_datetime)
-				}
-			}
-		}
-		return true if has_a_backup.class==TrueClass and last_backup.class==TrueClass
-		return false
-	end
+    Dir.entries(backup_dest).each {|l0|
+      next if l0[/^(\.|\.\.)$/]   #Skip '.' and '..'
+      next unless l0[/^backup$/]
+      dest_backup=backup_dest + 'backup/'
+      Dir.entries(dest_backup).each {|l1|
+        next if l1[/^(\.|\.\.)$/]   #Skip '.' and '..'
+        next if !backup_name.nil? and PPCommon.stripSlash(backup_name)!=l1    #If backup_name is specified, only check that directory	
+        dest_backup_name=dest_backup + PPCommon.addSlash(l1)
+        Dir.entries(dest_backup_name).each {|l2|
+          next if l2[/^(\.|\.\.)$/]   #Skip '.' and '..'
+          next unless PPCommon.datetimeFormat?(l2) or l2[/^last_backup$/]
+          has_a_backup=true
+          dest_backup_name_datetime=(dest_backup_name + l2) if l2[/^last_backup$/]
+          last_backup=true if l2[/^last_backup$/] and File.symlink?(dest_backup_name_datetime)
+        }
+      }
+    }
+    return true if has_a_backup.class==TrueClass and last_backup.class==TrueClass
+    return false
+  end
 	
-  require 'yaml'
   #getExistingFileSignatures() reads the stored hashes in from a file
   #takes an optional filename, otherwise uses the default
   def self.getExistingFileSignatures(filename = nil)
@@ -300,25 +301,24 @@ module PPCommon
     PPCommon.sha1 filename
   end
 
-	#Given a full file path, return which backup instance it is part of, such as "backupDest/backup/backupName/datetime"
-	def self.whichBackupInstance?(full_path)
-		full_path[/^(\/[^\/]+){1,}?\/backup\/[^\\]+\/\d{4}-\d{1,2}-\d{1,2}_(\d{2}:){2}\d{2}\//]
-	end
+  #Given a full file path, return which backup instance it is part of, such as "backupDest/backup/backupName/datetime"
+  def self.whichBackupInstance?(full_path)
+    full_path[/^(\/[^\/]+){1,}?\/backup\/[^\\]+\/\d{4}-\d{1,2}-\d{1,2}_(\d{2}:){2}\d{2}\//]
+  end
 
-	require 'digest/sha1'
-	#SHA1 a file and return it's hash
-	def self.sha1 file
-		hash_func= Digest::SHA1.new
-		so_far=0
-		size=File.size(file)
-		open(file, 'rb') do |io|
-			while(!io.eof)
-				readBuf=io.readpartial(1024)
-				hash_func.update(readBuf)
-			end
-		end
-		hash_func.hexdigest
-	end
+  #SHA1 a file and return it's hash
+  def self.sha1 file
+    hash_func= Digest::SHA1.new
+    so_far=0
+    size=File.size(file)
+    open(file, 'rb') do |io|
+      while(!io.eof)
+        readBuf=io.readpartial(1024)
+        hash_func.update(readBuf)
+      end
+    end
+    hash_func.hexdigest
+  end
 
   #hardLinkFile(new, old) makes 'new' a hardlink to 'old'
   #WARNING - deletes new without checking if hardlinking is possible
@@ -333,169 +333,169 @@ module PPCommon
     # restore original file otherwise
   end
      
-	#whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
-	#it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
-	#returns false if there was no error, otherwise will return a hash in the form of {:FailedToOpen=>[foo.txt,bar.txt]}
-	#for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
-	#error_log is expected to be the full path to the error log in question.  The error log is expected to be the stderr output
-	#from running rsync ... &>error_log, from simpleBackup().
-	def self.rsyncErr?( p, error_log )
-		return false if p.exitstatus==0
-		results={:FailedToOpen=>[]}
-		log=PPCommon.readFile(error_log)
-		log.each {|log_line|
-			case
-				#In the folloring when tests, the .nil? and ! basically cancel each other out, but the reason they're used is to provide a boolean response
-				#which is required for case/when (methinks)
-				when (!log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?)
-					#oh noes! This file, we can has no read access on it!
-					results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
-			end
-		}
-		results
-	end
-	
-	#readFile takes a filename, and optionally the maximum number of lines to read.
-	#
-	#returns the lines read as an array.
-	def self.readFile file, max_lines=0
-		counter=0
-		read_lines=[]
-		File.open(file, 'r') {|f|
-			while (line= f.gets and counter<=max_lines)
-				read_lines << line
-				counter+=1 unless max_lines==0
-			end
-		}
-		read_lines
-	end
+  #whatWasError?  looks at p, which is expected to be a Process::Status object, and if its exit status was not zero
+  #it will read the error log and try to collect the important lines to show the user.  Intended to be used in simpleBackup()
+  #returns false if there was no error, otherwise will return a hash in the form of {:FailedToOpen=>[foo.txt,bar.txt]}
+  #for example if there were two files, foo.txt and bar.txt which were not readable due to permission issues.
+  #error_log is expected to be the full path to the error log in question.  The error log is expected to be the stderr output
+  #from running rsync ... &>error_log, from simpleBackup().
+  def self.rsyncErr?( p, error_log )
+    return false if p.exitstatus==0
+    results={:FailedToOpen=>[]}
+    log=PPCommon.readFile(error_log)
+    log.each {|log_line|
+      case
+        #In the folloring when tests, the .nil? and ! basically cancel each other out, but the reason they're used is to provide a boolean response
+        #which is required for case/when (methinks)
+        when (!log_line[/^.+?"/].nil? and !log_line[/": Permission denied \(13\)$/].nil?)
+          #oh noes! This file, we can has no read access on it!
+          results[:FailedToOpen] << log_line.gsub(/^.+?"/,'').gsub(/": Permission denied \(13\)$/,'')
+      end
+    }
+    results
+  end
+  
+  #readFile takes a filename, and optionally the maximum number of lines to read.
+  #
+  #returns the lines read as an array.
+  def self.readFile file, max_lines=0
+    counter=0
+    read_lines=[]
+    File.open(file, 'r') {|f|
+      while (line= f.gets and counter<=max_lines)
+        read_lines << line
+        counter+=1 unless max_lines==0
+      end
+    }
+    read_lines
+  end
 
-	#mark(dir) will mark the backup destination before performing a backup to assist in finding
-	#incomplete backups later on. dir is expected to be the directory of backupDest/'backup'/backupName/datetime/
-	#
-	#See also: PPCommon.removeMark()
-	def self.mark( dir )
-		raise "You idiot!" unless dir.is_a? String
-		`touch #{PPCommon.addSlash(dir) + '.incomplete_backup'}`
-		true
-	end
+  #mark(dir) will mark the backup destination before performing a backup to assist in finding
+  #incomplete backups later on. dir is expected to be the directory of backupDest/'backup'/backupName/datetime/
+  #
+  #See also: PPCommon.removeMark()
+  def self.mark( dir )
+    raise "You idiot!" unless dir.is_a? String
+    `touch #{PPCommon.addSlash(dir) + '.incomplete_backup'}`
+    true
+  end
 
-	#removeMark(dir) is intended to be used after a backup has been completed to remove the mark indicating an incomplete backup
-	#dir must be the same as was applied to PPCommon.mark() before the backup was begun, obviously.
-	def self.removeMark( dir )
-		raise "You stupid individual!" unless dir.is_a? String
-		File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
-		true
-	end
+  #removeMark(dir) is intended to be used after a backup has been completed to remove the mark indicating an incomplete backup
+  #dir must be the same as was applied to PPCommon.mark() before the backup was begun, obviously.
+  def self.removeMark( dir )
+    raise "You stupid individual!" unless dir.is_a? String
+    File.delete(PPCommon.addSlash(dir) + '.incomplete_backup')
+    true
+  end
 
-	#returns true is dir is marked as being an incomplete backup
-	#else true
-	def self.marked? dir, buffer=nil
-		File.exist?(PPCommon.addSlash(dir) + '.incomplete_backup')
-	end
-	
-	#Return a DateTime object representing 6 hours in the past
-	def self.sixHoursAgo
-		DateTime.parse(Time.new.-(60*60*6).to_s)
-	end
+  #returns true is dir is marked as being an incomplete backup
+  #else true
+  def self.marked? dir, buffer=nil
+    File.exist?(PPCommon.addSlash(dir) + '.incomplete_backup')
+  end
+  
+  #Return a DateTime object representing 6 hours in the past
+  def self.sixHoursAgo
+    DateTime.parse(Time.new.-(60*60*6).to_s)
+  end
 
-	#gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
-	#optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
-	#is taking place, it doesn't delete the backup in progress.  Obviously this won't be a problem if you don't run it concurrently, and don't have it
-	#set to run in cron.
-	#FIXME I need to be set up to also check the global backup destination when it is set!
-	def self.gc buffer=true
-		num_deleted=0
-		PPConfig.dumpConfig.each {|config|
-			dests=config[1][:BackupDestination]
-			dests=PPConfig[:globalDests] if dests.nil?
-			dests.each {|dest|
-				backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
-				Dir.glob(backup_path + '*').each {|backup_instance|
-					backup_path_incomplete=backup_instance + '/.incomplete_backup'
-					datetime=backup_instance.gsub(backup_path, '')
-					next unless PPCommon.datetimeFormat?(datetime)
-					if buffer == true
-						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
-					else
-						(FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
-					end
-				}    #And the file was deleted, and jesus' boots were gone.
-			}
-		} #end of dumpConfig.each
-		num_deleted
-	end
+  #gc will traverse every configured backupDestination folder, and will delete incomplete backups, identified by a mark that is 6 hours old or more.
+  #optionally, setting buffer to nil will skip that 6 hour buffer, which is intended to make sure that if gc is run at the same time as a backup
+  #is taking place, it doesn't delete the backup in progress.  Obviously this won't be a problem if you don't run it concurrently, and don't have it
+  #set to run in cron.
+  #FIXME I need to be set up to also check the global backup destination when it is set!
+  def self.gc buffer=true
+    num_deleted=0
+    PPConfig.dumpConfig.each {|config|
+      dests=config[1][:BackupDestination]
+      dests=PPConfig[:globalDests] if dests.nil?
+      dests.each {|dest|
+        backup_path=PPCommon.addSlash(dest) + 'backup/' + PPCommon.addSlash(config[1][:BackupName])
+        Dir.glob(backup_path + '*').each {|backup_instance|
+          backup_path_incomplete=backup_instance + '/.incomplete_backup'
+          datetime=backup_instance.gsub(backup_path, '')
+          next unless PPCommon.datetimeFormat?(datetime)
+          if buffer == true
+                  (FileUtils.rm_rf(backup_instance) and num_deleted+=1) if (PPCommon.marked?(backup_instance) and (DateTime.parse(File.mtime(backup_path_incomplete).to_s) > PPCommon.sixHoursAgo))
+          else
+                  (FileUtils.rm_rf(backup_instance) and num_deleted+=1) if PPCommon.marked?(backup_instance)
+          end
+        }    #And the file was deleted, and jesus' boots were gone.
+      }
+    } #end of dumpConfig.each
+    num_deleted
+  end
 
-	#takes a source, and a destination. destination is expected to be a backup directory.
-	#It returns the estimated size the backup will take
-	def self.willTakeUp? source, dest
-		o=PPCommon.rsync( source, dest, '/dev/null', :dryrun)
-		o.split("\n").each {|line|	
-			return line[/\d+\sbytes$/][/\d+/] if line[/^total transferred file size/i]
-		}
-	end
+  #takes a source, and a destination. destination is expected to be a backup directory.
+  #It returns the estimated size the backup will take
+  def self.willTakeUp? source, dest
+    o=PPCommon.rsync( source, dest, '/dev/null', :dryrun)
+    o.split("\n").each {|line|	
+      return line[/\d+\sbytes$/][/\d+/] if line[/^total transferred file size/i]
+    }
+  end
 
-	#simple wrapper for rsync
-	#so that the rsync call is in one place
-	def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
-		`rsync -aH  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
-	end
+  #simple wrapper for rsync
+  #so that the rsync call is in one place
+  def self.rsync(source, dest, err_log, dry_run=nil, human_readable=nil)
+    `rsync -aH  --link-dest=../last_backup#{dry_run.nil? ? (' ') : (' --dry-run')}#{human_readable.nil? ? (' '):(' -h')} --stats #{PPCommon.stripSlash(source).gsub(' ','\ ')} #{dest.gsub(' ','\ ')} 2>#{err_log.gsub(' ','\ ')}`	
+  end
 
-	#Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
-	def self.expireOldBackups(backup)
-		#Do naughty, naughty things here.
-	end
+  #Expire old backups in backupDestination/backup/backupName, per the expiration policy defined in backup itself.
+  def self.expireOldBackups(backup)
+    #Do naughty, naughty things here.
+  end
 
-        #return the path that the last_backup symlink points to for the backup defined by config
-        def self.getLastBackupFor config
-                oldest=''
-                config[:BackupDestination].each {|backup_dest|
-                        last_backup=File.readlink(PPCommon.addSlash(backup_dest) + 'backup/' + config[:BackupName] + 'last_backup' )
-                        datetime=last_backup[/\/[^\/]+\/$/].gsub('/','')
-                        (oldest=last_backup and next) if oldest.empty?
-                        next if DateTime.parse(datetime) == DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
-                        oldest=last_backup if DateTime.parse(datetime) > DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
-                }
-                oldest
+  #return the path that the last_backup symlink points to for the backup defined by config
+  def self.getLastBackupFor config
+    oldest=''
+    config[:BackupDestination].each {|backup_dest|
+      last_backup=File.readlink(PPCommon.addSlash(backup_dest) + 'backup/' + config[:BackupName] + 'last_backup' )
+      datetime=last_backup[/\/[^\/]+\/$/].gsub('/','')
+      (oldest=last_backup and next) if oldest.empty?
+      next if DateTime.parse(datetime) == DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
+      oldest=last_backup if DateTime.parse(datetime) > DateTime.parse(oldest[/\/[^\/]+\/$/].gsub('/',''))
+    }
+    oldest
+  end
+
+  #Look for a pid file.  If there is one, check that it's process is still running.
+  #returns true or false
+  def self.alreadyRunning?
+    pid=PPCommon.readFile(File.expand_path('~/.ParanoidPackrat.rb.pid')) rescue (return false)
+    begin
+      return true if Process.kill(0,pid[0].to_i)==1
+    rescue
+    end
+    File.delete(File.expand_path('~/.ParanoidPackrat.rb.pid')) and false
+  end
+
+  #echo our pid into our .pid file
+  def self.starting
+    (File.open(File.expand_path('~/.ParanoidPackrat.rb.pid'), 'w') {|f| f.write(Process.pid.to_s) } and return true) unless PPCommon.alreadyRunning?
+    false
+  end
+
+  #echo remove our pid file, we're exiting.
+  def self.exiting
+    (File.delete(File.expand_path('~/.ParanoidPackrat.rb.pid')) and return true) rescue false
+  end
+
+  #hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
+  #if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
+  #Be aware that setting buffer != true may return true if a backup is currently running.
+  def self.hasIncompleteBackups?( backup_destination, buffer=true )
+    Dir.glob(PPCommon.addSlash(backup_destination) + 'backup/*').each {|backup_name|
+      Dir.glob(backup_name + '/*').each {|datetime|
+        next unless PPCommon.datetimeFormat?(File.basename(datetime))
+        if buffer.class==TrueClass
+          return true if PPCommon.marked?(datetime) and (DateTime.parse(File.mtime(datetime).to_s) > PPCommon.sixHoursAgo)
+        else 
+          return true if PPCommon.marked?(datetime)
         end
-
-        #Look for a pid file.  If there is one, check that it's process is still running.
-        #returns true or false
-        def self.alreadyRunning?
-                pid=PPCommon.readFile(File.expand_path('~/.ParanoidPackrat.rb.pid')) rescue (return false)
-                begin
-                        return true if Process.kill(0,pid[0].to_i)==1
-                rescue
-                end
-                File.delete(File.expand_path('~/.ParanoidPackrat.rb.pid')) and false
-        end
-
-        #echo our pid into our .pid file
-        def self.starting
-                (File.open(File.expand_path('~/.ParanoidPackrat.rb.pid'), 'w') {|f| f.write(Process.pid.to_s) } and return true) unless PPCommon.alreadyRunning?
-                false
-        end
-
-        #echo remove our pid file, we're exiting.
-        def self.exiting
-                (File.delete(File.expand_path('~/.ParanoidPackrat.rb.pid')) and return true) rescue false
-        end
-
-	#hasIncompleteBackups?() takes a backup Destination, and searches it for incomplete backups that are more than 6 hours old.
-	#if buffer != true, than it will return true if there are any incomplete backups at all, regardless of when they were cretaed.
-	#Be aware that setting buffer != true may return true if a backup is currently running.
-	def self.hasIncompleteBackups?( backup_destination, buffer=true )
-		Dir.glob(PPCommon.addSlash(backup_destination) + 'backup/*').each {|backup_name|
-			Dir.glob(backup_name + '/*').each {|datetime|
-				next unless PPCommon.datetimeFormat?(File.basename(datetime))
-				if buffer.class==TrueClass
-					return true if PPCommon.marked?(datetime) and (DateTime.parse(File.mtime(datetime).to_s) > PPCommon.sixHoursAgo)
-				else 
-					return true if PPCommon.marked?(datetime)
-				end
-			}
-		}
-		false
-	end
+      }
+    }
+    false
+  end
 end
 
